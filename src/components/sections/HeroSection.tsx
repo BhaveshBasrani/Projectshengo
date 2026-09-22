@@ -59,11 +59,11 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
           
           {/* Main Typography & CTAs */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-5">
-            <h1 className="font-heading font-black text-[2.5rem] leading-[0.9] tracking-tight sm:text-5xl md:text-6xl lg:text-[5.25rem] lg:tracking-tighter lg:leading-[0.93] text-[#EDEDED] flex flex-col items-start">
+            <h1 className="font-heading font-black text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem] leading-[0.95] tracking-tight lg:tracking-tighter lg:leading-[0.93] text-[#EDEDED] flex flex-col items-start">
               <span className="block drop-shadow-[2px_2px_0px_#E50914] sm:drop-shadow-[3px_3px_0px_#E50914] animate-fade-in-up">RESIST ABUSE.</span>
               <MorphingText
                 texts={["RECLAIM POWER.", "DEMAND JUSTICE.", "DEFEND SURVIVORS."]}
-                className="text-[#E50914] underline decoration-4 sm:decoration-8 underline-offset-4 sm:underline-offset-8 drop-shadow-[2px_2px_0px_#000000] sm:drop-shadow-[3px_3px_0px_#000000] h-10 sm:h-14 md:h-16 lg:h-[5.25rem] mt-2 sm:mt-4"
+                className="text-[#E50914] underline decoration-4 sm:decoration-8 underline-offset-4 sm:underline-offset-8 drop-shadow-[2px_2px_0px_#000000] sm:drop-shadow-[3px_3px_0px_#000000] h-12 sm:h-14 md:h-16 lg:h-[5.25rem] mt-2 sm:mt-4"
               />
             </h1>
 

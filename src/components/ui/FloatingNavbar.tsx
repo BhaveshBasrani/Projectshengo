@@ -271,7 +271,7 @@ export default function FloatingNavbar() {
               <div className="flex items-center gap-1.5">
                 <Link
                   href="/auth/login"
-                  className="px-3.5 py-2 bg-[#E50914] text-white border-2 border-white shadow-[2px_2px_0px_0px_#000000] font-mono text-xs font-black uppercase tracking-wider hover:bg-white hover:text-black hover:border-black transition-all min-h-[44px] flex items-center hover-lift"
+                  className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-[#E50914] text-white border-2 border-white shadow-[2px_2px_0px_0px_#000000] font-mono text-[10px] sm:text-xs font-black uppercase tracking-wider hover:bg-white hover:text-black hover:border-black transition-all min-h-[36px] sm:min-h-[44px] flex items-center hover-lift"
                 >
                   PORTAL
                 </Link>

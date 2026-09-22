@@ -30,7 +30,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
           </span>
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
         </div>
-        <h2 className="font-heading font-black text-3xl sm:text-5xl uppercase tracking-tight text-[#EDEDED]">
+        <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-[#EDEDED] leading-none">
           DONATE VIA UPI
         </h2>
         <p className="font-sans text-sm sm:text-base text-[#888888] max-w-2xl leading-relaxed">
