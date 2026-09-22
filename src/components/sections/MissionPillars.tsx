@@ -20,6 +20,9 @@ export default function MissionPillars() {
           <span className="text-xs text-neutral-400 font-bold uppercase tracking-wider">
             HYDERABAD • EST. APRIL 29, 2025
           </span>
+          <span className="zine-stamp-black text-[9px] -rotate-1 hidden sm:inline-block">
+            AUTHENTIC GRASSROOTS
+          </span>
         </div>
 
         {/* Founder's Note Card with Zine Masking Tape */}
@@ -27,6 +30,9 @@ export default function MissionPillars() {
           {/* Authentic Zine Masking Tape on Corner */}
           <div className="zine-tape absolute -top-2.5 -left-4 w-28 -rotate-6 z-20" />
           <div className="zine-tape absolute -bottom-2.5 -right-4 w-28 rotate-3 z-20" />
+          <span className="absolute top-3 right-4 font-mono text-[9px] uppercase tracking-widest text-[#E50914] border border-[#E50914]/40 px-2 py-0.5 -rotate-1 select-none bg-black/70 z-20">
+            ZINE REF // VOL-01
+          </span>
 
           {/* Permitted Punk Tribal Lily Accent Watermark */}
           <div className="absolute -right-2 -bottom-4 w-48 h-72 opacity-20 pointer-events-none select-none rotate-12">
@@ -111,10 +117,10 @@ export default function MissionPillars() {
               <span className="font-mono text-sm font-black text-[#E50914]">₹</span>
             </div>
             <span className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white block truncate">
-              ₹2,00,000+
+              ₹5,00,000+
             </span>
             <span className="text-[11px] text-neutral-400 font-sans mt-1 block">
-              Raised for survivor rehabilitation
+              Raised &amp; ₹1,00,000+ donated
             </span>
           </div>
 
@@ -201,7 +207,7 @@ export default function MissionPillars() {
                 </div>
                 <div className="flex items-start gap-2 font-mono text-[11px] text-neutral-300">
                   <GrungeGlyph name="check" className="w-3.5 h-3.5 text-[#E50914] shrink-0 mt-0.5" />
-                  <span>Over ₹2,00,000 mobilized for survivor care</span>
+                  <span>Over ₹5,00,000 raised &amp; ₹1,00,000 donated to safehouses</span>
                 </div>
               </div>
             </div>

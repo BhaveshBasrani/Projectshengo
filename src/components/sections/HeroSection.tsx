@@ -23,8 +23,9 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
       <span>SURVIVOR REHABILITATION</span>
       <span>/</span>
       <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] SAYODHYA WOMEN'S HELP HOME PARTNER</span>
+      <span>OVER ₹5,00,000+ RAISED</span>
       <span>/</span>
-      <span>OVER ₹2,00,000 RAISED</span>
+      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] ₹1,00,000+ DIRECTLY DONATED</span>
       <span>/</span>
       <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] 50+ CORE TEAM &amp; 100+ VOLUNTEERS</span>
       <span>/</span>
@@ -45,12 +46,15 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
       <div className="max-w-7xl mx-auto w-full relative z-10 px-4 sm:px-6 md:px-8 mt-4 sm:my-auto py-4">
 
         {/* Top Status Badges */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-4">
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 flex-wrap">
           <span className="punk-stamp text-[10px] sm:text-xs bg-[#E50914] text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_currentColor] tracking-widest font-black">
             NON-PROFIT ORGANISATION
           </span>
           <span className="text-[10px] sm:text-xs text-neutral-400 font-mono font-bold tracking-wider">
             HYDERABAD, INDIA
+          </span>
+          <span className="zine-stamp-black text-[9px] -rotate-1 hidden sm:inline-block">
+            VOL. 01 // RIOT ZINE
           </span>
         </div>
 
@@ -107,6 +111,9 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
 
               {/* Outer Unclipped Brutalist Box */}
               <div className="w-full h-full border-4 border-[#E50914] shadow-[10px_10px_0px_0px_#E50914] bg-[#0A0A0A] p-4 sm:p-5 relative transition-transform duration-200 group-hover:scale-[1.02] flex items-center justify-center">
+                {/* Authentic Zine Masking Tape on Corner */}
+                <div className="zine-tape absolute -top-3 -right-3 w-20 rotate-12 z-30" />
+                <div className="zine-tape absolute -bottom-3 -left-3 w-20 -rotate-6 z-30" />
 
                 {/* Industrial Corner Marks */}
                 <span className="absolute top-2 left-2 text-[10px] font-mono font-black text-[#E50914] select-none opacity-80">

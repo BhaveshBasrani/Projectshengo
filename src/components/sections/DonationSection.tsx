@@ -69,10 +69,19 @@ export default function DonationSection({ config }: DonationSectionProps) {
               />
             </div>
 
-            <div className="flex items-center gap-2 mb-4 mt-1 relative z-10">
+            <div className="flex items-center gap-2 mb-2 mt-1 relative z-10">
               <GrungeGlyph name="lock" className="w-5 h-5 text-[#E50914]" />
               <span className="font-heading font-black text-lg tracking-tight uppercase text-white">
                 OFFICIAL DONATION QR
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 mb-4 relative z-10 flex-wrap justify-center">
+              <span className="zine-stamp-red text-[9px] -rotate-1">
+                DIRECT AID ROUTE
+              </span>
+              <span className="zine-stamp-black text-[9px] rotate-1">
+                100% TO SAFEHOUSE
               </span>
             </div>
 
