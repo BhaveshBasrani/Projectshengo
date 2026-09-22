@@ -92,7 +92,7 @@ export default function FloatingNavbar() {
                 fill
                 className="object-cover group-hover:scale-105 transition-transform"
                 priority
-              />
+              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
@@ -171,7 +171,7 @@ export default function FloatingNavbar() {
                         alt={user.displayName || 'User Profile'}
                         fill
                         className="object-cover"
-                        onError={() => setImageError(true)}
+                        onError={() = sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"> setImageError(true)}
                       />
                     </div>
                   ) : (

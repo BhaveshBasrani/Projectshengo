@@ -133,7 +133,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
                     fill
                     className="object-contain drop-shadow-[0_0_24px_rgba(229,9,20,0.45)]"
                     priority
-                  />
+                  / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
                 </div>
               </div>
 

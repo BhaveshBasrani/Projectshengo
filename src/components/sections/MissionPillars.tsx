@@ -35,7 +35,7 @@ export default function MissionPillars() {
               alt="Punk Tribal Lily"
               fill
               className="object-contain object-right"
-            />
+            / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
           </div>
 
           <div className="flex items-start gap-4 sm:gap-6 relative z-10">
@@ -165,7 +165,7 @@ export default function MissionPillars() {
                 alt="Punk Guitar"
                 fill
                 className="object-contain"
-              />
+              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
             </div>
 
             <div className="absolute top-2 right-4 font-heading font-black text-6xl text-neutral-800/30 select-none pointer-events-none group-hover:text-[#E50914]/20 transition-colors">
@@ -229,7 +229,7 @@ export default function MissionPillars() {
                 alt="Punk Spiral Star"
                 fill
                 className="object-contain"
-              />
+              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
             </div>
 
             <div className="absolute top-2 right-4 font-heading font-black text-6xl text-[#E50914]/20 select-none pointer-events-none">
@@ -295,7 +295,7 @@ export default function MissionPillars() {
                 alt="Polly Barbed Stars"
                 fill
                 className="object-contain"
-              />
+              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
             </div>
 
             <div className="absolute top-2 right-4 font-heading font-black text-6xl text-neutral-800/30 select-none pointer-events-none group-hover:text-[#E50914]/20 transition-colors">
