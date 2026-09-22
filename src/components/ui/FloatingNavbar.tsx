@@ -96,10 +96,10 @@ export default function FloatingNavbar() {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="font-heading font-black text-base sm:text-lg tracking-tight leading-none text-[#E50914]">
+                <span className="font-heading font-black text-sm sm:text-lg tracking-tight leading-none text-[#E50914]">
                   PROJECT S.H.E.
                 </span>
-                <span className="w-3.5 h-3.5 relative inline-block animate-spin [animation-duration:16s] pointer-events-none">
+                <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 relative inline-block animate-spin [animation-duration:16s] pointer-events-none">
                   <Image
                     src="/assets/punk-red-spiral-star-clean.png"
                     alt="*"
@@ -109,7 +109,7 @@ export default function FloatingNavbar() {
                   />
                 </span>
               </div>
-              <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-neutral-400 group-hover:text-current transition-colors">
+              <span className="hidden sm:block font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-neutral-400 group-hover:text-current transition-colors">
                 SUPPORT • HELP • EMPOWER
               </span>
             </div>
