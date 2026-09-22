@@ -48,6 +48,7 @@ export default function MissionPillars() {
                   src="/assets/punk-red-spiral-star-clean.png"
                   alt="Punk Star"
                   fill
+                  sizes="28px"
                   className="object-contain"
                 />
               </div>

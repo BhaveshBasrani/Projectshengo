@@ -94,6 +94,7 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
                   src={form.assetSrc}
                   alt={form.title}
                   fill
+                  sizes="160px"
                   className="object-contain"
                 />
               </div>

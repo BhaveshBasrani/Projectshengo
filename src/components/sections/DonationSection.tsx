@@ -64,6 +64,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 src="/assets/punk-red-spiral-star-clean.png"
                 alt="Red Spiral Seal"
                 fill
+                sizes="64px"
                 className="object-contain"
               />
             </div>

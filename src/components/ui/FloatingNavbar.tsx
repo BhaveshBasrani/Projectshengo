@@ -104,6 +104,7 @@ export default function FloatingNavbar() {
                     src="/assets/punk-red-spiral-star-clean.png"
                     alt="*"
                     fill
+                    sizes="14px"
                     className="object-contain"
                   />
                 </span>
