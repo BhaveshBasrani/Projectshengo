@@ -89,9 +89,11 @@ export default function DonationSection({ config }: DonationSectionProps) {
             </div>
 
             <div className="mt-5 w-full pt-4 border-t-2 border-[#222222] space-y-3 font-mono relative z-10">
-              <div className="flex items-center justify-between text-xs bg-[#141414] p-3 border-2 border-[#222222]">
-                <span className="text-[#888888] text-[11px]">UPI ID:</span>
-                <span className="font-bold text-white text-xs select-all">{config.donation_upi_id}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-[#141414] p-3 border-2 border-[#222222]">
+                <div className="flex items-center gap-2 overflow-hidden w-full sm:w-auto">
+                  <span className="text-[#888888] text-[11px] shrink-0">UPI ID:</span>
+                  <span className="font-bold text-white text-[11px] sm:text-xs select-all truncate">{config.donation_upi_id}</span>
+                </div>
                 <button
                   type="button"
                   onClick={handleCopyUpi}

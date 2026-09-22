@@ -67,7 +67,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
               />
             </h1>
 
-            <p className="font-sans text-xs sm:text-sm md:text-base text-neutral-300 max-w-xl leading-relaxed animate-fade-in-up delay-200">
+            <p className="font-sans text-xs sm:text-sm md:text-base text-neutral-300 max-w-xl leading-relaxed animate-fade-in-up delay-200 pt-2 sm:pt-3">
               Fighting gender-based violence and changing society's mindset. Project S.H.E. is a youth-led NGO that gives 100% of all raised funds directly to verified survivor safehouses.
             </p>
 

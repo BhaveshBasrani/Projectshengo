@@ -110,7 +110,7 @@ export default function MissionPillars() {
               <span className="text-[10px] font-bold uppercase tracking-wider">FUNDS MOBILIZED</span>
               <span className="font-mono text-sm font-black text-[#E50914]">₹</span>
             </div>
-            <span className="font-heading font-black text-3xl sm:text-4xl text-white block">
+            <span className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white block truncate">
               ₹2,00,000+
             </span>
             <span className="text-[11px] text-neutral-400 font-sans mt-1 block">
