@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
-    "@next/swc-win32-x64-msvc": "14.2.24",
     "@supabase/supabase-js": "^2.48.1",
     "clsx": "^2.1.1",
     "firebase": "^10.14.0",
