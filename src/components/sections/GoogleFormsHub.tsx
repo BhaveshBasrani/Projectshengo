@@ -56,7 +56,7 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
   ];
 
   return (
-    <section id="external-forms" className="scroll-mt-48 lg:scroll-mt-56 py-20 px-4 sm:px-6 max-w-7xl mx-auto select-none">
+    <section id="external-forms" className="scroll-mt-28 sm:scroll-mt-36 pt-28 sm:pt-36 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none">
       
       {/* Header */}
       <div className="mb-14 space-y-2 text-center sm:text-left">

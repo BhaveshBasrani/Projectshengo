@@ -27,7 +27,7 @@ export default function BrutalFooter() {
                   alt="Project S.H.E."
                   fill
                   className="object-cover"
-                / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
               </div>
               <div>
                 <span className="font-heading font-black text-xl text-[#E50914] tracking-tight block">
@@ -174,7 +174,7 @@ export default function BrutalFooter() {
                   alt="Punk tribal lily"
                   fill
                   className="object-contain"
-                / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
               </div>
               <span className="text-[10px] text-neutral-400 uppercase tracking-widest flex items-center gap-1">
                 <GrungeGlyph name="map-pin" className="w-3.5 h-3.5 text-[#E50914]" /> Headquarters

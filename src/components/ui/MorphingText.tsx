@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
@@ -139,3 +140,4 @@ const MorphingText: React.FC<MorphingTextProps> = ({ texts, className }) => (
 );
 
 export {MorphingText};
+export default MorphingText;

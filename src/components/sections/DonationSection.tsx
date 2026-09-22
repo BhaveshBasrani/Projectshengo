@@ -19,7 +19,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
   };
 
   return (
-    <section id="donate" className="scroll-mt-48 lg:scroll-mt-56 py-20 px-4 sm:px-6 max-w-7xl mx-auto select-none font-mono">
+    <section id="donate" className="scroll-mt-28 sm:scroll-mt-36 pt-28 sm:pt-36 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none font-mono">
       
       {/* Header */}
       <div className="mb-14 space-y-2 text-center sm:text-left">
@@ -55,7 +55,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 alt="Punk Tribal Lily"
                 fill
                 className="object-contain"
-              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
 
             {/* Extracted Red Spiral Seal in Corner */}
@@ -85,7 +85,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 fill
                 className="object-contain p-2 relative z-10"
                 priority
-              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
 
             <div className="mt-5 w-full pt-4 border-t-2 border-[#222222] space-y-3 font-mono relative z-10">
@@ -127,7 +127,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 alt="Punk Cyber Lily"
                 fill
                 className="object-contain"
-              / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
 
             <div className="flex items-center justify-between border-b-2 border-[#222222] pb-3 relative z-10">

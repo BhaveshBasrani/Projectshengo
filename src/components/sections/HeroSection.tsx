@@ -32,8 +32,8 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
   );
 
   return (
-    <section className="relative min-h-[100dvh] flex flex-col justify-between pt-24 sm:pt-28 md:pt-24 pb-0 overflow-hidden border-b-2 border-[#EDEDED] select-none bg-[#090909]">
-      
+    <section className="relative min-h-[100dvh] flex flex-col justify-between pt-28 sm:pt-32 pb-0 overflow-hidden border-b-2 border-[#EDEDED] select-none bg-[#090909]">
+
       {/* Customized Punk Red Halftone Fluid Flow WebGL Canvas */}
       <HalftoneFlow
         className="z-0"
@@ -43,7 +43,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
       />
 
       <div className="max-w-7xl mx-auto w-full relative z-10 px-4 sm:px-6 md:px-8 mt-4 sm:my-auto py-4">
-        
+
         {/* Top Status Badges */}
         <div className="flex items-center gap-2 sm:gap-3 mb-4">
           <span className="punk-stamp text-[10px] sm:text-xs bg-[#E50914] text-white border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_currentColor] tracking-widest font-black">
@@ -56,14 +56,14 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
 
         {/* Main Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          
+
           {/* Main Typography & CTAs */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-5">
             <h1 className="font-heading font-black text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem] leading-[0.95] tracking-tight lg:tracking-tighter lg:leading-[0.93] text-[#EDEDED] flex flex-col items-start">
               <span className="block drop-shadow-[2px_2px_0px_#E50914] sm:drop-shadow-[3px_3px_0px_#E50914] animate-fade-in-up">RESIST ABUSE.</span>
               <MorphingText
-                texts={["RECLAIM POWER.", "DEMAND JUSTICE.", "DEFEND SURVIVORS."]}
-                className="text-[#E50914] underline decoration-4 sm:decoration-8 underline-offset-4 sm:underline-offset-8 drop-shadow-[2px_2px_0px_#000000] sm:drop-shadow-[3px_3px_0px_#000000] h-20 sm:h-14 md:h-16 lg:h-[5.25rem] mt-2 sm:mt-4 text-left mx-0 max-w-none font-heading text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem]"
+                texts={["RECLAIM POWER."]}
+                className="text-[#E50914] text-left mx-0 max-w-none font-heading text-4xl sm:text-5xl md:text-6xl lg:text-[5.25rem] h-14 sm:h-16 md:h-20 lg:h-[5.25rem] mt-2 sm:mt-4"
               />
             </h1>
 
@@ -104,10 +104,10 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
           {/* S.H.E. Emblem Seal with Unclipped Brutalist Industrial Frame */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end py-4">
             <div className="relative group w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[22rem] lg:h-[22rem]">
-              
+
               {/* Outer Unclipped Brutalist Box */}
               <div className="w-full h-full border-4 border-[#E50914] shadow-[10px_10px_0px_0px_#E50914] bg-[#0A0A0A] p-4 sm:p-5 relative transition-transform duration-200 group-hover:scale-[1.02] flex items-center justify-center">
-                
+
                 {/* Industrial Corner Marks */}
                 <span className="absolute top-2 left-2 text-[10px] font-mono font-black text-[#E50914] select-none opacity-80">
                   +
@@ -133,7 +133,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
                     fill
                     className="object-contain drop-shadow-[0_0_24px_rgba(229,9,20,0.45)]"
                     priority
-                  / sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw">
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                 </div>
               </div>
 
@@ -155,7 +155,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
       <div className="w-full mt-6 sm:mt-8 border-y-2 border-x-0 sm:border-y-4 border-[#E50914] bg-[#080808] select-none overflow-hidden shrink-0 z-10">
         {/* Top Hazard Rail */}
         <div className="w-full h-2 sm:h-2.5 bg-hazard-stripes" />
-        
+
         {/* Marquee Content Rail */}
         <div className="py-2.5 sm:py-3.5 flex overflow-hidden">
           <div className="flex shrink-0 min-w-full items-center justify-around animate-marquee">
