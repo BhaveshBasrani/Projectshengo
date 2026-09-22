@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700;800&family=Rubik+Glitch&family=Space+Grotesk:wght@400;600;700;900&family=Syne:wght@700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #080808;
+  --text-color: #EDEDED;
+  --text-muted: #888888;
+  --accent-red: #E50914;
+  --accent-crimson: #C8102E;
+  --paper-grain: #101010;
+  --card-border: #222222;
+}
+
+/* Y2K Cyber-Grunge Crosshair Cursor */
+html,
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  overflow-x: hidden;
+  cursor: crosshair;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Distinct targeted cursor for interactive elements */
+a,
+button,
+input,
+textarea,
+select,
+[role="button"] {
+  cursor: pointer;
+}
+
+/* Custom Punk / Grunge Selection */
+::selection {
+  background-color: #E50914;
+  color: #FFFFFF;
+}
+
+/* Brutalist Raw Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+  border-left: 2px solid #222222;
+}
+::-webkit-scrollbar-thumb {
+  background: #E50914;
+  border: 2px solid #080808;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FF2A2A;
+}
+
+/* Continuous Noise Overlay (Mix-Blend-Mode: Overlay) */
+.paper-texture-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Hazard Stripes Pattern (Black & Red Diagonal) */
+.bg-hazard-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    #080808,
+    #080808 14px,
+    #E50914 14px,
+    #E50914 28px
+  );
+}
+
+.bg-hazard-stripes-dark {
+  background: repeating-linear-gradient(
+    -45deg,
+    #0E0E0E,
+    #0E0E0E 12px,
+    #222222 12px,
+    #222222 24px
+  );
+}
+
+/* Aggressive Header Shadows */
+.text-shadow-red {
+  text-shadow: 2px 2px 0px #E50914;
+}
+
+.text-shadow-red-lg {
+  text-shadow: 3px 3px 0px #E50914, 6px 6px 0px rgba(0, 0, 0, 0.9);
+}
+
+/* Brutalist Rigid Borders */
+.border-brutal {
+  border: 2px solid currentColor;
+}
+
+.border-brutal-thick {
+  border: 3px solid currentColor;
+}
+
+/* Tactile Mechanical Button Interactions */
+.btn-brutal-tactile {
+  box-shadow: 4px 4px 0px 0px #E50914;
+  transition: transform 0.12s ease-in-out, box-shadow 0.12s ease-in-out;
+}
+.btn-brutal-tactile:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #E50914;
+}
+.btn-brutal-tactile:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px 0px #E50914;
+}
+
+.btn-brutal-dark {
+  box-shadow: 4px 4px 0px 0px #222222;
+  transition: transform 0.12s ease-in-out, box-shadow 0.12s ease-in-out, border-color 0.12s ease-in-out;
+}
+.btn-brutal-dark:hover {
+  border-color: #E50914;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #E50914;
+}
+.btn-brutal-dark:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px 0px #E50914;
+}
+
+/* Interactive Card Glitch Hover */
+.card-grunge {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.card-grunge:hover {
+  filter: contrast(1.1) brightness(1.05);
+}
+
+/* Grunge Stencil Stamp effect */
+.punk-stamp {
+  display: inline-block;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  padding: 0.25rem 0.65rem;
+  border: 2px solid currentColor;
+  transform: rotate(-1deg);
+}
+
+/* Hide scrollbar for carousel while preserving smooth touch scrolling */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth Scrolling & Fluid Transitions */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Subtle Fluid Card Hover & Elevation */
+.fluid-card {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+.fluid-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 8px 8px 0px 0px #E50914;
+  border-color: #E50914;
+}
+
+/* Deep Ambient Red Glow Effect on Hover */
+.glow-on-hover {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.glow-on-hover:hover {
+  box-shadow: 0 0 25px rgba(229, 9, 20, 0.25), 6px 6px 0px 0px #E50914;
+  border-color: #E50914;
+}
+
+/* Fluid Micro-Lift for Buttons and Links */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+.hover-lift:active {
+  transform: translateY(1px);
+}
+
+/* Subtle Breathing Motion for Emblem Badges */
+@keyframes subtleBreath {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+.animate-subtle-breath {
+  animation: subtleBreath 4s ease-in-out infinite;
+}
+
+/* Authentic Underground Zine Masking Tape */
+.zine-tape {
+  position: absolute;
+  height: 24px;
+  background: rgba(244, 241, 234, 0.22);
+  border-left: 2px dashed rgba(0, 0, 0, 0.5);
+  border-right: 2px dashed rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  backdrop-filter: blur(1.5px);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Angular Chamfered Stencil Cut Corners */
+.stencil-cut {
+  clip-path: polygon(
+    10px 0%,
+    calc(100% - 10px) 0%,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0% calc(100% - 10px),
+    0% 10px
+  );
+}
+
+/* Barbed Cyber-Grunge Line Accent */
+.cyber-barbed-border {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #E50914,
+    #E50914 8px,
+    transparent 8px,
+    transparent 14px,
+    #333333 14px,
+    #333333 22px
+  );
+  height: 3px;
+}
+
+/* Glitch Typewriter Effect */
+@keyframes typewriter {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes blinkTextCursor {
+  0%, 100% { border-right-color: transparent; }
+  50% { border-right-color: rgba(229, 9, 20, 1); }
+}
+@keyframes glitch-skew {
+  0% { transform: skew(0deg); }
+  20% { transform: skew(-10deg); }
+  21% { transform: skew(10deg); }
+  22% { transform: skew(0deg); }
+  50% { transform: skew(0deg); }
+  51% { transform: skew(5deg); }
+  52% { transform: skew(-5deg); }
+  53% { transform: skew(0deg); }
+  100% { transform: skew(0deg); }
+}
+@keyframes loader-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-typewriter {
+  display: inline-block;
+  white-space: nowrap;
+  border-right: 4px solid #E50914;
+  animation: typewriter 1.5s cubic-bezier(0.86, 0, 0.07, 1) 0.2s 1 normal both, blinkTextCursor 500ms steps(40, end) infinite normal, glitch-skew 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite both;
+  padding-right: 8px;
+}
+
+/* Smooth Fluid Fade-in */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+
