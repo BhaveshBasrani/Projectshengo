@@ -19,7 +19,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
   };
 
   return (
-    <section id="donate" className="scroll-mt-32 py-20 px-4 sm:px-6 max-w-7xl mx-auto select-none font-mono">
+    <section id="donate" className="scroll-mt-48 lg:scroll-mt-56 py-20 px-4 sm:px-6 max-w-7xl mx-auto select-none font-mono">
       
       {/* Header */}
       <div className="mb-14 space-y-2 text-center sm:text-left">
@@ -67,11 +67,6 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 sizes="64px"
                 className="object-contain"
               />
-            </div>
-
-            {/* Classified Stamp Tag */}
-            <div className="absolute -top-3.5 left-6 bg-[#E50914] text-white font-mono text-[10px] font-black uppercase px-3 py-0.5 border-2 border-black tracking-widest z-10">
-              DOC-REF // DIRECT-AID-STAMP
             </div>
 
             <div className="flex items-center gap-2 mb-4 mt-1 relative z-10">
