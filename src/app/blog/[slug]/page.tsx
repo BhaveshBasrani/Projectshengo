@@ -1,13 +1,60 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getPostBySlug } from '@/lib/data/store';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface PostDetailPageProps {
   params: Promise<{ slug: string }> | { slug: string };
+}
+
+export async function generateMetadata({ params }: PostDetailPageProps): Promise<Metadata> {
+  const resolvedParams = await Promise.resolve(params);
+  const post = await getPostBySlug(resolvedParams.slug);
+
+  if (!post || post.status !== 'published') {
+    return {
+      title: 'Article Not Found | Project S.H.E.',
+    };
+  }
+
+  const title = `${post.title} | Project S.H.E.`;
+  const description = post.excerpt || post.body.substring(0, 160) + '...';
+  const imageUrl = post.cover_image_url || '/assets/logo.png';
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
+    openGraph: {
+      title: post.title,
+      description,
+      url: `https://projectshe.in/blog/${post.slug}`,
+      siteName: 'Project S.H.E. NGO',
+      type: 'article',
+      publishedTime: post.published_at || post.created_at,
+      authors: [post.author_name || 'Project S.H.E.'],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description,
+      images: [imageUrl],
+    },
+  };
 }
 
 export default async function PostDetailPage({ params }: PostDetailPageProps) {
@@ -109,7 +156,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
             STAND WITH SURVIVORS
           </span>
           <span className="text-xs text-neutral-400 font-sans">
-            100% of gathered funds route directly to verified safehouses like Sayodhya Women’s Help Home.
+            Every contribution goes towards making someone’s life safer through verified safehouse partners like Sahodaya Women’s Help Home.
           </span>
         </div>
         <Link

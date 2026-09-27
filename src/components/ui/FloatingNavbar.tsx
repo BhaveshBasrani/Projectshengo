@@ -64,6 +64,7 @@ export default function FloatingNavbar() {
     { label: 'ABOUT', href: '/#mission' },
     { label: 'GET INVOLVED', href: '/#external-forms' },
     { label: 'DONATE', href: '/#donate' },
+    { label: 'REVIEWS', href: '/reviews' },
     { label: 'STORIES', href: '/blog' },
   ];
 
@@ -82,9 +83,17 @@ export default function FloatingNavbar() {
   return (
     <>
       <header className="fixed top-3 sm:top-4 left-0 right-0 z-50 px-3 sm:px-6 max-w-7xl mx-auto select-none">
-        <nav className="w-full transition-all duration-200 border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md flex items-center justify-between">
+        <nav className="w-full transition-all duration-200 border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md flex items-center justify-between relative overflow-hidden">
+          {/* Authentic Crimson Grunge Background Texture */}
+          <div
+            className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none opacity-30 mix-blend-screen"
+            style={{ backgroundImage: `url('/assets/punk-navbar-grunge.jpg')` }}
+          />
+          {/* Contrast scrim so nav buttons and typography remain crisp */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/85 via-black/75 to-black/85 pointer-events-none" />
+
           {/* Brand Logo & Tag */}
-          <Link href="/" className="flex items-center gap-2.5 group min-h-[44px]">
+          <Link href="/" className="flex items-center gap-2.5 group min-h-[44px] relative z-10">
             <div className="relative w-9 h-9 sm:w-10 sm:h-10 border-2 border-current overflow-hidden shrink-0 bg-black">
               <Image
                 src="/assets/logo.png"
@@ -116,7 +125,7 @@ export default function FloatingNavbar() {
           </Link>
 
           {/* Desktop Nav Anchors */}
-          <div className="hidden lg:flex items-center gap-5 font-mono text-xs font-bold tracking-wider">
+          <div className="hidden lg:flex items-center gap-5 font-mono text-xs font-bold tracking-wider relative z-10">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -129,7 +138,7 @@ export default function FloatingNavbar() {
           </div>
 
           {/* Right Action Icons & Auth */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
             {/* Quick Action: Suggestion / Feedback */}
             {/* Quick Action: Suggestion / Feedback */}
             <button

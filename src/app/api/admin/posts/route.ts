@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedAdmin } from '@/lib/admin/auth';
-import { getAllPostsAdmin, savePost, deletePost } from '@/lib/data/store';
+import { getAllPostsAdmin, savePost, deletePost, togglePinBlogPost } from '@/lib/data/store';
 
 export async function GET(req: NextRequest) {
   if (!isAuthorizedAdmin(req)) {
@@ -32,6 +32,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, post: saved });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Failed to save post' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  if (!isAuthorizedAdmin(req)) {
+    return NextResponse.json({ error: 'FORBIDDEN: Hard Administrator Authorization Required' }, { status: 403 });
+  }
+
+  try {
+    const body = await req.json();
+    const { id, is_pinned } = body;
+
+    if (!id || typeof is_pinned !== 'boolean') {
+      return NextResponse.json({ error: 'Post ID and is_pinned boolean required' }, { status: 400 });
+    }
+
+    const result = await togglePinBlogPost(id, is_pinned);
+    if (!result.success) {
+      return NextResponse.json({ error: result.error || 'Failed to toggle pin' }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, is_pinned });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || 'Failed to update post pin status' }, { status: 500 });
   }
 }
 

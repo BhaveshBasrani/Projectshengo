@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 48" preserveAspectRatio="none" fill="none">
+  <!-- Organic dry paint brush stroke -->
+  <path d="M6 24 C 20 18, 45 15, 80 14 C 130 13, 200 12, 270 15 C 295 16, 310 19, 316 23 C 319 25, 314 28, 305 30 C 275 35, 210 37, 140 36 C 80 35, 30 33, 8 28 C 3 26, 2 24, 6 24 Z" fill="#FFFFFF" fill-opacity="0.95"/>
+  <!-- Feathered brush bristles top edge -->
+  <path d="M18 19 C 40 14, 90 11, 150 11 C 210 11, 265 13, 298 17 C 285 14, 230 12, 170 12 C 110 12, 55 14, 25 18 Z" fill="#FFFFFF" fill-opacity="0.8"/>
+  <path d="M40 13 C 85 9, 155 8, 225 10 C 265 11, 290 14, 305 16 C 280 13, 220 10, 160 10 C 100 10, 60 12, 40 13 Z" fill="#FFFFFF" fill-opacity="0.7"/>
+  <!-- Feathered brush bristles bottom edge -->
+  <path d="M12 29 C 45 34, 110 38, 180 38 C 240 38, 285 34, 308 29 C 280 33, 225 36, 165 36 C 105 36, 50 33, 20 29 Z" fill="#FFFFFF" fill-opacity="0.75"/>
+  <path d="M50 36 C 100 40, 170 41, 240 39 C 275 38, 295 35, 302 32 C 285 35, 235 38, 175 38 C 115 38, 70 36, 50 36 Z" fill="#FFFFFF" fill-opacity="0.6"/>
+  <!-- Bristle streaks and dry texture left end -->
+  <path d="M2 24 L 28 21 L 22 25 L 3 27 Z" fill="#FFFFFF" fill-opacity="0.6"/>
+  <path d="M5 21 L 35 18 L 26 23 L 8 24 Z" fill="#FFFFFF" fill-opacity="0.7"/>
+  <path d="M9 26 L 40 28 L 30 31 L 11 30 Z" fill="#FFFFFF" fill-opacity="0.5"/>
+  <!-- Bristle streaks and dry texture right end -->
+  <path d="M285 20 L 318 21 L 308 24 L 280 23 Z" fill="#FFFFFF" fill-opacity="0.6"/>
+  <path d="M292 23 L 320 25 L 312 28 L 288 26 Z" fill="#FFFFFF" fill-opacity="0.7"/>
+  <path d="M278 28 L 315 30 L 304 33 L 282 31 Z" fill="#FFFFFF" fill-opacity="0.55"/>
+</svg>

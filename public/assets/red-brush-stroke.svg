@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 32" preserveAspectRatio="none" fill="none">
+  <!-- Exact dry-brush stroke in vibrant punk red with textured horizontal bristles -->
+  <path d="M 8,18 
+           C 25,15 50,14 90,13 
+           C 160,11 250,10 320,11 
+           C 355,12 375,13 392,15 
+           C 398,16 390,18 375,19 
+           C 340,21 260,22 170,22 
+           C 100,22 45,21 16,20 
+           C 5,19 2,18 8,18 Z" 
+        fill="#E50914" fill-opacity="0.95"/>
+  <!-- Top feathered dry edge -->
+  <path d="M 30,13 C 80,10 160,9 250,9 C 320,9 360,11 385,13 C 350,11 280,10 200,10 C 120,10 60,11 30,13 Z" fill="#E50914" fill-opacity="0.85"/>
+  <path d="M 80,9 C 140,8 220,8 300,9 C 350,10 375,12 390,14 C 365,11 310,10 240,9 C 170,9 110,9 80,9 Z" fill="#FF3333" fill-opacity="0.8"/>
+  <!-- Bottom feathered dry edge -->
+  <path d="M 20,20 C 70,22 150,23 230,23 C 300,23 350,21 380,18 C 345,21 285,22 210,22 C 130,22 60,21 20,20 Z" fill="#E50914" fill-opacity="0.85"/>
+  <path d="M 60,22 C 120,24 200,24 280,23 C 330,22 365,20 382,18 C 355,21 305,23 240,23 C 170,23 110,22 60,22 Z" fill="#C8102E" fill-opacity="0.75"/>
+  <!-- Left fine dry-brush streaks -->
+  <path d="M 0,18 L 25,16 L 18,19 L 2,20 Z" fill="#E50914" fill-opacity="0.7"/>
+  <path d="M 4,16 L 30,14 L 22,17 L 6,18 Z" fill="#E50914" fill-opacity="0.8"/>
+  <path d="M 10,20 L 35,21 L 28,23 L 12,22 Z" fill="#E50914" fill-opacity="0.6"/>
+  <!-- Right long feathered bristle wisps -->
+  <path d="M 330,12 L 398,14 L 380,16 L 340,15 Z" fill="#E50914" fill-opacity="0.8"/>
+  <path d="M 345,14 L 400,16 L 388,18 L 350,17 Z" fill="#FF3333" fill-opacity="0.85"/>
+  <path d="M 320,16 L 395,18 L 382,20 L 335,19 Z" fill="#E50914" fill-opacity="0.7"/>
+  <path d="M 350,18 L 392,20 L 378,22 L 345,21 Z" fill="#C8102E" fill-opacity="0.6"/>
+</svg>

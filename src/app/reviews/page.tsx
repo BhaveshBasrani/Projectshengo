@@ -1,0 +1,255 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import GrungeGlyph from '@/components/ui/GrungeGlyph';
+import ReviewModal from '@/components/ui/ReviewModal';
+import { PublicReview } from '@/lib/types';
+
+export default function ReviewsArchivePage() {
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<'likes' | 'rating' | 'newest'>('likes');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
+  const [expandedReviews, setExpandedReviews] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetchReviews(sortBy);
+  }, [sortBy]);
+
+  const fetchReviews = async (sort: string) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/reviews?sort=${sort}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.reviews)) {
+        setReviews(data.reviews);
+      }
+    } catch {
+      // Graceful error fallback
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLike = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (likedReviews[id]) return; // already liked in this session
+
+    // Optimistic UI update
+    setLikedReviews((prev) => ({ ...prev, [id]: true }));
+    setReviews((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, likes: (r.likes || 0) + 1 } : r))
+    );
+
+    try {
+      await fetch('/api/reviews', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action: 'like' }),
+      });
+    } catch (err) {
+      console.warn('Like failed:', err);
+    }
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedReviews((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <div className="pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono">
+      
+      {/* Background Ambience Texture */}
+      <div 
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-[600px] opacity-10 pointer-events-none bg-contain bg-center bg-no-repeat [mask-image:radial-gradient(circle,black_40%,transparent_70%)]"
+        style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
+      />
+
+      {/* Header */}
+      <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10 border-b-2 border-neutral-900 pb-8">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
+            <span className="text-xs text-[#E50914] uppercase tracking-widest font-black">
+              COMMUNITY VOICES &amp; SOLIDARITY
+            </span>
+          </div>
+          <h1 className="font-heading font-black text-4xl sm:text-6xl uppercase tracking-tight text-white leading-none">
+            COMMUNITY REVIEWS
+          </h1>
+          <p className="text-xs sm:text-sm text-neutral-400 max-w-2xl font-sans leading-relaxed">
+            Real testimonies, verified feedback, and experiences shared by volunteers, event attendees, partners, and survivor advocates across Hyderabad.
+          </p>
+        </div>
+
+        {/* Action Button: Submit Review */}
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="group px-6 py-3 bg-[#E50914] text-white hover:bg-white hover:text-black border-2 border-white shadow-[4px_4px_0px_0px_#E50914] hover:shadow-[2px_2px_0px_0px_#E50914] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider min-h-[44px] shrink-0 hover-lift"
+        >
+          <GrungeGlyph name="star" className="w-4 h-4 text-white group-hover:text-black transition-colors" />
+          <span>WRITE A REVIEW</span>
+        </button>
+      </div>
+
+      {/* Sort Filter Tabs & Stats Bar */}
+      <div className="mb-8 flex items-center justify-between flex-wrap gap-4 relative z-10">
+        <div className="flex items-center gap-1.5 text-xs">
+          <span className="text-[11px] text-neutral-500 uppercase mr-2 font-bold">SORT BY:</span>
+          {(['likes', 'rating', 'newest'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setSortBy(tab)}
+              className={`px-3.5 py-1.5 uppercase font-bold text-xs border transition-all ${
+                sortBy === tab
+                  ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
+                  : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:text-white hover:border-neutral-700'
+              }`}
+            >
+              {tab === 'likes' ? '★ MOST LIKED' : tab === 'rating' ? 'HIGHEST RATED' : 'NEWEST'}
+            </button>
+          ))}
+        </div>
+
+        <div className="text-[11px] text-neutral-400 font-mono">
+          <span>SHOWING {reviews.length} VERIFIED REVIEWS</span>
+        </div>
+      </div>
+
+      {/* Grid of Reviews */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="p-6 bg-[#0E0E0E] border-2 border-neutral-900 animate-pulse min-h-[200px] space-y-4">
+              <div className="h-4 bg-neutral-800 w-1/3 rounded" />
+              <div className="h-3 bg-neutral-800 w-3/4 rounded" />
+              <div className="h-3 bg-neutral-800 w-1/2 rounded" />
+            </div>
+          ))}
+        </div>
+      ) : reviews.length === 0 ? (
+        <div className="p-16 text-center border-2 border-dashed border-neutral-800 text-xs text-neutral-500 relative z-10 max-w-xl mx-auto space-y-4">
+          <div className="w-12 h-12 mx-auto border border-[#E50914] bg-black flex items-center justify-center text-[#E50914]">
+            <GrungeGlyph name="star" className="w-6 h-6" />
+          </div>
+          <p className="text-white font-bold text-sm">NO APPROVED REVIEWS PUBLISHED YET</p>
+          <p className="font-sans text-neutral-400">
+            Be the first to share your experience with our team, grassroots fundraisers, or advocacy work.
+          </p>
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            className="px-6 py-2.5 bg-[#E50914] text-white font-bold text-xs uppercase"
+          >
+            SUBMIT FIRST TESTIMONIAL
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+          {reviews.map((rev) => {
+            const isLong = rev.review_text.length > 220;
+            const isExpanded = expandedReviews[rev.id];
+            const hasLiked = likedReviews[rev.id];
+
+            return (
+              <article
+                key={rev.id}
+                className="p-6 bg-[#0E0E0E] text-[#F4F1EA] border-2 border-[#262626] hover:border-[#E50914] shadow-[6px_6px_0px_0px_#000000] flex flex-col justify-between space-y-4 transition-all group stencil-cut relative overflow-hidden"
+              >
+                {/* Subtle Punk Watermark */}
+                <div className="absolute -right-3 -bottom-3 w-32 h-32 opacity-10 pointer-events-none select-none group-hover:scale-105 transition-transform duration-500">
+                  <Image
+                    src="/assets/punk-red-spiral-star-clean.png"
+                    alt="Star"
+                    fill
+                    sizes="128px"
+                    className="object-contain"
+                  />
+                </div>
+
+                <div className="space-y-3.5 relative z-10">
+                  {/* Top Bar: Stars + Role Badge */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-1 text-[#E50914]">
+                      {[...Array(rev.rating || 5)].map((_, i) => (
+                        <GrungeGlyph key={i} name="star" className="w-3.5 h-3.5 fill-current text-[#E50914]" />
+                      ))}
+                    </div>
+                    <span className="px-2 py-0.5 bg-[#161616] text-neutral-300 border border-neutral-800 text-[10px] font-mono font-semibold uppercase tracking-wider">
+                      {rev.role_or_relation || 'Community Voice'}
+                    </span>
+                  </div>
+
+                  {/* Review Text with graceful clamp */}
+                  <div>
+                    <p
+                      className={`text-xs sm:text-sm text-neutral-200 leading-relaxed font-sans italic ${
+                        !isExpanded && isLong ? 'line-clamp-4' : ''
+                      }`}
+                    >
+                      &ldquo;{rev.review_text}&rdquo;
+                    </p>
+                    {isLong && (
+                      <button
+                        type="button"
+                        onClick={() => toggleExpand(rev.id)}
+                        className="text-[11px] text-[#E50914] hover:underline font-bold mt-1.5 inline-block"
+                      >
+                        {isExpanded ? 'Show less ▲' : 'Read full review ▼'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom Bar: Author + Like Button */}
+                <div className="pt-4 border-t border-neutral-900 flex items-center justify-between text-xs relative z-10">
+                  <div>
+                    <span className="font-heading font-bold text-white uppercase tracking-tight block text-sm">
+                      {rev.display_name}
+                    </span>
+                    <span className="text-[10px] font-mono text-neutral-500">
+                      {new Date(rev.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+
+                  {/* Like Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleLike(rev.id, e)}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 border transition-all text-xs font-mono font-bold ${
+                      hasLiked
+                        ? 'border-[#E50914] bg-[#220707] text-[#E50914]'
+                        : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-[#E50914] hover:text-white'
+                    }`}
+                    title="Like this review"
+                  >
+                    <GrungeGlyph
+                      name="heart"
+                      className={`w-3.5 h-3.5 transition-colors ${hasLiked ? 'text-[#E50914] fill-current' : 'text-neutral-500'}`}
+                    />
+                    <span>{rev.likes || 0}</span>
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => fetchReviews(sortBy)}
+      />
+    </div>
+  );
+}

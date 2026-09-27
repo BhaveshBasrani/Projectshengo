@@ -13,37 +13,37 @@ export default function DonationSection({ config }: DonationSectionProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyUpi = () => {
-    navigator.clipboard.writeText(config.donation_upi_id || 'projectshe.ngo@upi');
+    navigator.clipboard.writeText(config.donation_upi_id || 'shailajalakshmisarao1974-2@okicici');
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
 
   return (
-    <section id="donate" className="scroll-mt-28 sm:scroll-mt-36 pt-28 sm:pt-36 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none font-mono">
-      
+    <section id="donate" className="scroll-mt-28 sm:scroll-mt-36 pt-24 sm:pt-32 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none">
+
       {/* Header */}
       <div className="mb-14 space-y-2 text-center sm:text-left">
         <div className="flex items-center gap-2 justify-center sm:justify-start">
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
-          <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest font-black flex items-center gap-1.5">
+          <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold flex items-center gap-1.5">
             <GrungeGlyph name="heart" className="w-3.5 h-3.5 text-[#E50914]" /> 100% DIRECT SURVIVOR RELIEF
           </span>
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
         </div>
-        <h2 className="font-heading font-black text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-[#EDEDED] leading-none">
-          DONATE VIA UPI
+        <h2 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-[#EDEDED] leading-none">
+          DONATE THROUGH UPI
         </h2>
-        <p className="font-sans text-sm sm:text-base text-[#888888] max-w-2xl leading-relaxed">
-          We don't use expensive payment gateways. 100% of your donation goes directly to emergency shelter, food, and trauma support for women in crisis.
+        <p className="text-sm sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
+          Convenient, safe, and designed to ensure your contribution reaches those who need it most.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        
+
         {/* Left QR Card - Styled as a Classified Punk Zine Document with Masking Tape */}
         <div className="lg:col-span-6 flex justify-center">
           <div className="w-full max-w-md p-6 sm:p-8 bg-[#0E0E0E] text-[#EDEDED] border-4 border-dashed border-[#E50914] shadow-[8px_8px_0px_0px_#E50914] flex flex-col items-center text-center relative group overflow-hidden stencil-cut">
-            
+
             {/* Authentic Zine Masking Tape on Corners */}
             <div className="zine-tape absolute -top-3 -left-3 w-24 -rotate-12 z-20" />
             <div className="zine-tape absolute -bottom-3 -right-3 w-24 rotate-12 z-20" />
@@ -55,7 +55,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 alt="Punk Tribal Lily"
                 fill
                 className="object-contain"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
 
             {/* Extracted Red Spiral Seal in Corner */}
@@ -85,14 +85,25 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 fill
                 className="object-contain p-2 relative z-10"
                 priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+
+              {/* Authentic Comic Starburst Action Badge */}
+              <div className="absolute -top-6 -right-6 w-20 h-20 sm:w-24 sm:h-24 rotate-12 pointer-events-none select-none z-30 drop-shadow-[0_0_15px_rgba(229,9,20,0.6)]">
+                <Image
+                  src="/assets/punk-starburst.png"
+                  alt="100% Direct Aid Starburst"
+                  fill
+                  sizes="96px"
+                  className="object-contain"
+                />
+              </div>
             </div>
 
             <div className="mt-5 w-full pt-4 border-t-2 border-[#222222] space-y-3 font-mono relative z-10">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-[#141414] p-3 border-2 border-[#222222]">
                 <div className="flex items-center gap-2 overflow-hidden w-full sm:w-auto">
                   <span className="text-[#888888] text-[11px] shrink-0">UPI ID:</span>
-                  <span className="font-bold text-white text-[11px] sm:text-xs select-all truncate">{config.donation_upi_id}</span>
+                  <span className="font-bold text-white text-[11px] sm:text-xs select-all truncate">shailajalakshmisarao1974-2@okicici</span>
                 </div>
                 <button
                   type="button"
@@ -118,7 +129,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
 
         {/* Right Transparency Information - Monospace Raw Data Readout */}
         <div className="lg:col-span-6 space-y-6">
-          
+
           <div className="p-6 sm:p-8 bg-[#0E0E0E] border-2 border-[#222222] shadow-[6px_6px_0px_0px_#E50914] fluid-card glow-on-hover space-y-5 stencil-cut relative overflow-hidden">
             {/* Permitted Cyber Lily Watermark */}
             <div className="absolute -right-4 -bottom-8 w-64 h-80 opacity-15 pointer-events-none select-none rotate-12">
@@ -127,59 +138,62 @@ export default function DonationSection({ config }: DonationSectionProps) {
                 alt="Punk Cyber Lily"
                 fill
                 className="object-contain"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
 
             <div className="flex items-center justify-between border-b-2 border-[#222222] pb-3 relative z-10">
               <h3 className="font-heading font-black text-xl sm:text-2xl uppercase tracking-tight text-[#E50914]">
                 WHERE YOUR MONEY GOES
               </h3>
-              <span className="font-mono text-[10px] bg-[#1a1a1a] text-[#888888] px-2 py-0.5 border border-[#333333] flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" /> AUDIT-READY
-              </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed font-sans relative z-10">
-              Funds gathered go directly to supporting survivors via partner organizations like Sayodhya Women’s Help Home, with reserves stored for future large-scale fundraisers.
+            <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-sans relative z-10">
+              Our partnerships with organisations like Sayodhya help ensure that every contribution goes towards making someone’s life safer. A small portion of your contribution is set aside to support future events and outreach campaigns. We then donate the funds raised through these initiatives to organisations working within Project S.H.E.’s areas of focus.
             </p>
 
             {/* Monospace Raw Data Readouts */}
             <div className="space-y-3 pt-1 relative z-10">
               <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[01] DIRECT SAFEHOUSE RELIEF</span>
-                  <span className="text-[#E50914]">100% ROUTED</span>
+                  <span>[01] DIRECT PARTNER RELIEF</span>
+                  <span className="text-[#E50914]">SAFEHOUSES</span>
                 </div>
                 <p className="text-xs text-[#888888] font-sans mt-1">
-                  100% of gathered relief funds are transferred to established safehouses, including Sayodhya Women’s Help Home, providing immediate shelter, medicine, and food.
+                  Partnerships with verified safehouses ensure every contribution goes directly towards making vulnerable lives safer.
                 </p>
               </div>
 
               <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[02] FUTURE EVENT RESERVES</span>
-                  <span className="text-[#E50914]">TRANSPARENT</span>
+                  <span>[02] EVENT &amp; OUTREACH CAMPAIGNS</span>
+                  <span className="text-[#E50914]">CATALYST</span>
                 </div>
                 <p className="text-xs text-[#888888] font-sans mt-1">
-                  A small operational reserve is stored transparently to finance future large-scale community fundraisers (like Battle of the Bands) to generate exponentially more aid.
+                  A small portion is set aside to support future community events, whose proceeds are then contributed to core focus areas.
                 </p>
               </div>
 
               <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[03] ZERO PLATFORM CUT</span>
-                  <span className="text-[#E50914]">DIRECT UPI</span>
+                  <span>[03] DIRECT PEER-TO-PEER UPI</span>
+                  <span className="text-[#E50914]">DIRECT ROUTE</span>
                 </div>
                 <p className="text-xs text-[#888888] font-sans mt-1">
-                  Direct peer-to-peer UPI transfers incur zero payment gateway commissions, maximizing the real-world impact of your donation.
+                  Safe, convenient, and designed to ensure your contribution reaches those who need it most without third-party fees.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="p-4 bg-[#111111] border-2 border-[#222222] text-xs text-[#888888] flex items-center gap-2 font-mono">
-            <GrungeGlyph name="shield" className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Registered Non-Profit Organisation • Hyderabad, India.</span>
+          {/* Official Registration Status Card */}
+          <div className="p-5 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] font-mono text-xs space-y-2 relative stencil-cut">
+            <div className="flex items-center gap-2 text-[#E50914] font-black uppercase tracking-wider text-[11px]">
+              <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914]" />
+              <span>OUR REGISTRATION STATUS</span>
+            </div>
+            <p className="text-neutral-200 text-xs font-sans leading-relaxed">
+              We are formally registered as <strong className="text-white font-mono">Sarva Nirbhaya Foundation</strong>, a Section 8 company under the Companies Act, 2013. We were incorporated on <strong className="text-white">19 May 2026</strong> under the Ministry of Corporate Affairs, Government of India.
+            </p>
           </div>
 
         </div>

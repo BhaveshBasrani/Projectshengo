@@ -15,7 +15,7 @@ export const DEFAULT_CONFIG: SiteConfig = {
   google_form_artwork_poetry: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheArtworkPoetry/viewform',
   google_form_anonymous_confessions: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheAnonymousConfessions/viewform',
   donation_qr_url: '/assets/donation-qr.png',
-  donation_upi_id: 'projectshe.ngo@upi',
+  donation_upi_id: 'shailajalakshmisarao1974-2@okicici',
   contact_email: 'projectshe.ngo@gmail.com',
   emergency_helpline: 'Women Helpline: 1091 | Domestic Abuse: 181 | Direct: +91 98765 43210',
   instagram_url: 'https://instagram.com/projectshe.ngo',
@@ -31,22 +31,33 @@ let memoryConfig: SiteConfig = { ...DEFAULT_CONFIG };
 
 // --- REVIEWS ---
 
-export async function getPublicReviews(): Promise<PublicReview[]> {
+export async function getPublicReviews(sortBy: 'likes' | 'rating' | 'newest' = 'likes'): Promise<PublicReview[]> {
+  let list: PublicReview[] = [];
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServer();
       const { data, error } = await supabase
         .from('reviews')
-        .select('id, user_id, display_name, role_or_relation, rating, review_text, status, created_at')
-        .eq('status', 'approved')
-        .order('created_at', { ascending: false })
-        .limit(24);
-      if (!error && data) return data as PublicReview[];
+        .select('*')
+        .eq('status', 'approved');
+      if (!error && data) list = data as PublicReview[];
     } catch (e) {
       console.warn('Supabase fetch failed, falling back to memory store:', e);
     }
+  } else {
+    list = memoryReviews.filter((r) => r.status === 'approved');
   }
-  return memoryReviews.filter((r) => r.status === 'approved');
+
+  return list.sort((a, b) => {
+    if (sortBy === 'likes') {
+      const diff = (b.likes || 0) - (a.likes || 0);
+      if (diff !== 0) return diff;
+    } else if (sortBy === 'rating') {
+      const diff = (b.rating || 5) - (a.rating || 5);
+      if (diff !== 0) return diff;
+    }
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 }
 
 export async function getAllReviewsAdmin(): Promise<PublicReview[]> {
@@ -70,6 +81,7 @@ export async function submitReview(review: Omit<PublicReview, 'id' | 'status' | 
     ...review,
     id: 'rev-' + Math.random().toString(36).substring(2, 9),
     status: 'pending', // Strictly pending by default
+    likes: 0,
     created_at: new Date().toISOString(),
   };
 
@@ -107,6 +119,29 @@ export async function updateReviewStatus(id: string, status: 'approved' | 'rejec
   }
 
   return Boolean(item);
+}
+
+export async function likeReview(id: string): Promise<{ success: boolean; likes: number }> {
+  let newLikes = 1;
+  const item = memoryReviews.find((r) => r.id === id);
+  if (item) {
+    item.likes = (item.likes || 0) + 1;
+    newLikes = item.likes;
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data } = await supabase.from('reviews').select('likes').eq('id', id).single();
+      const currentLikes = (data?.likes || 0) + 1;
+      await supabase.from('reviews').update({ likes: currentLikes }).eq('id', id);
+      newLikes = currentLikes;
+    } catch (e) {
+      console.warn('Supabase likeReview failed:', e);
+    }
+  }
+
+  return { success: true, likes: newLikes };
 }
 
 export async function deleteReview(id: string): Promise<boolean> {
@@ -203,21 +238,28 @@ export async function deleteFeedback(id: string): Promise<boolean> {
 // --- BLOG / CASE POSTS ---
 
 export async function getPublishedPosts(): Promise<BlogPost[]> {
+  let list: BlogPost[] = [];
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServer();
       const { data, error } = await supabase
         .from('posts')
-        .select('id, title, slug, cover_image_url, excerpt, category, tags, author_name, status, published_at, created_at')
-        .eq('status', 'published')
-        .order('published_at', { ascending: false })
-        .limit(12);
-      if (!error && data) return data as BlogPost[];
+        .select('*')
+        .eq('status', 'published');
+      if (!error && data) list = data as BlogPost[];
     } catch (e) {
       console.warn('Supabase fetch failed:', e);
     }
+  } else {
+    list = memoryPosts.filter((p) => p.status === 'published');
   }
-  return memoryPosts.filter((p) => p.status === 'published');
+
+  // Pinned posts always appear at the top (max 3), followed by newest published
+  return list.sort((a, b) => {
+    if (a.is_pinned && !b.is_pinned) return -1;
+    if (!a.is_pinned && b.is_pinned) return 1;
+    return new Date(b.published_at || b.created_at).getTime() - new Date(a.published_at || a.created_at).getTime();
+  });
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
@@ -312,6 +354,55 @@ export async function deletePost(id: string): Promise<boolean> {
   const len = memoryPosts.length;
   memoryPosts = memoryPosts.filter((p) => p.id !== id);
   return memoryPosts.length < len;
+}
+
+export async function likeBlogPost(id: string): Promise<{ success: boolean; likes: number }> {
+  let newLikes = 1;
+  const item = memoryPosts.find((p) => p.id === id);
+  if (item) {
+    item.likes = (item.likes || 0) + 1;
+    newLikes = item.likes;
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data } = await supabase.from('posts').select('likes').eq('id', id).single();
+      const currentLikes = (data?.likes || 0) + 1;
+      await supabase.from('posts').update({ likes: currentLikes }).eq('id', id);
+      newLikes = currentLikes;
+    } catch (e) {
+      console.warn('Supabase likeBlogPost failed:', e);
+    }
+  }
+
+  return { success: true, likes: newLikes };
+}
+
+export async function togglePinBlogPost(id: string, is_pinned: boolean): Promise<{ success: boolean; error?: string }> {
+  const allPosts = await getAllPostsAdmin();
+  if (is_pinned) {
+    const currentlyPinned = allPosts.filter((p) => p.is_pinned && p.id !== id);
+    if (currentlyPinned.length >= 3) {
+      return { success: false, error: 'Maximum 3 blogs can be pinned simultaneously. Please unpin an existing blog first.' };
+    }
+  }
+
+  const post = memoryPosts.find((p) => p.id === id);
+  if (post) {
+    post.is_pinned = is_pinned;
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('posts').update({ is_pinned }).eq('id', id);
+    } catch (e) {
+      console.warn('Supabase togglePinBlogPost failed:', e);
+    }
+  }
+
+  return { success: true };
 }
 
 // --- UPDATES ---

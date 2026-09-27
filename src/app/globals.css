@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700;800&family=Rubik+Glitch&family=Space+Grotesk:wght@400;600;700;900&family=Syne:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -19,7 +19,7 @@ html,
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
   cursor: crosshair;
   transition: background-color 0.25s ease, color 0.25s ease;
@@ -307,5 +307,128 @@ html {
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }
 .delay-300 { animation-delay: 300ms; }
+
+/* Authentic Punk Zine & Paper Cutout Utilities */
+.font-marker {
+  font-family: 'Permanent Marker', cursive, sans-serif;
+}
+.font-typewriter {
+  font-family: 'Special Elite', 'JetBrains Mono', monospace;
+}
+.font-poster {
+  font-family: 'Anton', 'Bebas Neue', 'Space Grotesk', sans-serif;
+}
+
+.torn-paper-edge-top {
+  clip-path: polygon(
+    0% 4px, 2% 0px, 5% 5px, 8% 1px, 12% 6px, 15% 2px, 18% 5px, 22% 1px, 25% 6px, 29% 2px,
+    33% 5px, 36% 1px, 40% 6px, 44% 2px, 48% 5px, 52% 1px, 55% 6px, 59% 2px, 63% 5px, 67% 1px,
+    71% 6px, 75% 2px, 79% 5px, 83% 1px, 87% 6px, 90% 2px, 94% 5px, 97% 1px, 100% 4px,
+    100% 100%, 0% 100%
+  );
+}
+
+.torn-paper-edge-bottom {
+  clip-path: polygon(
+    0% 0%, 100% 0%, 100% calc(100% - 4px),
+    97% 100%, 94% calc(100% - 5px), 90% calc(100% - 1px), 87% calc(100% - 6px), 83% calc(100% - 2px),
+    79% calc(100% - 5px), 75% calc(100% - 1px), 71% calc(100% - 6px), 67% calc(100% - 2px),
+    63% calc(100% - 5px), 59% calc(100% - 1px), 55% calc(100% - 6px), 52% calc(100% - 2px),
+    48% calc(100% - 5px), 44% calc(100% - 1px), 40% calc(100% - 6px), 36% calc(100% - 2px),
+    33% calc(100% - 5px), 29% calc(100% - 1px), 25% calc(100% - 6px), 22% calc(100% - 2px),
+    18% calc(100% - 5px), 15% calc(100% - 1px), 12% calc(100% - 6px), 8% calc(100% - 2px),
+    5% calc(100% - 5px), 2% 100%, 0% calc(100% - 4px)
+  );
+}
+
+.torn-paper-badge {
+  clip-path: polygon(
+    2% 0%, 98% 0%, 100% 8%, 98% 18%, 100% 28%, 98% 38%, 100% 48%, 98% 58%, 100% 68%, 98% 78%, 100% 88%, 98% 100%,
+    2% 100%, 0% 88%, 2% 78%, 0% 68%, 2% 58%, 0% 48%, 2% 38%, 0% 28%, 2% 18%, 0% 8%
+  );
+}
+
+.screenprint-distress {
+  text-shadow: 3px 3px 0px #000000, -1px -1px 0px rgba(229, 9, 20, 0.4);
+}
+
+/* --- CINEMATIC EASTER EGG (The "Project S.H.E." Event) --- */
+.she-event-overlay {
+  position: fixed !important; /* STRICT VIEWPORT LOCK */
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 200000;
+  pointer-events: none;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden;
+  background: transparent;
+}
+
+.she-event-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(229, 9, 20, 0.28) 0%, rgba(5, 5, 5, 0.98) 100%);
+  backdrop-filter: blur(15px) contrast(1.2);
+  -webkit-backdrop-filter: blur(15px) contrast(1.2);
+  opacity: 0;
+}
+
+.she-event-text {
+  position: relative;
+  font-family: 'Bebas Neue', 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2rem, 7.5vw, 6rem);
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: clamp(0.15rem, 1.2vw, 0.8rem);
+  text-shadow: 0 0 35px rgba(229, 9, 20, 0.95), 0 0 70px rgba(229, 9, 20, 0.7), 0 0 120px rgba(255, 30, 39, 0.45);
+  opacity: 0;
+  transform: scale(0.85);
+  filter: blur(25px);
+  z-index: 10;
+  margin: 0;
+  padding: 0 1rem;
+  line-height: 1.1;
+  text-align: center;
+  max-width: 92vw;
+  box-sizing: border-box;
+}
+
+.she-event-subtext {
+  position: relative;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(0.65rem, 1.6vw, 1.05rem);
+  font-weight: 700;
+  color: #E50914;
+  letter-spacing: clamp(0.08rem, 0.4vw, 0.3rem);
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(229, 9, 20, 0.8);
+  opacity: 0;
+  z-index: 10;
+  margin-top: 1rem;
+  text-align: center;
+  max-width: 90vw;
+}
+
+.she-event-line {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(229, 9, 20, 0.95), #ff3b30, rgba(229, 9, 20, 0.95), transparent);
+  width: 100%;
+  opacity: 0;
+  z-index: 1;
+}
+
+.she-event-particle {
+  position: absolute;
+  width: 2px;
+  height: 35px;
+  background: #ff1e27;
+  box-shadow: 0 0 10px #ff1e27, 0 0 18px rgba(229, 9, 20, 0.8);
+  opacity: 0;
+}
 
 

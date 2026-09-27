@@ -1,7 +1,41 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPublishedPosts } from '@/lib/data/store';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
+
+export const metadata: Metadata = {
+  title: 'Advocacy Journal & Case Studies | Project S.H.E. NGO',
+  description:
+    'Educational articles, mindset awareness essays, event recaps, and survivor rehabilitation reports published by the Project S.H.E. team.',
+  alternates: {
+    canonical: '/blog',
+  },
+  openGraph: {
+    title: 'The S.H.E. Advocacy Journal | Project S.H.E.',
+    description:
+      'Educational articles, mindset awareness essays, event recaps, and survivor rehabilitation reports.',
+    url: 'https://projectshe.in/blog',
+    siteName: 'Project S.H.E. NGO',
+    images: [
+      {
+        url: '/assets/logo.png',
+        width: 800,
+        height: 800,
+        alt: 'Project S.H.E. Advocacy Journal',
+      },
+    ],
+    locale: 'en_IN',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Advocacy Journal & Field Reports | Project S.H.E.',
+    description:
+      'Educational articles, mindset awareness essays, and survivor rehabilitation reports.',
+    images: ['/assets/logo.png'],
+  },
+};
 
 // Cache blog archive for 120 seconds (ISR) to minimize database egress
 export const revalidate = 120;
@@ -39,16 +73,36 @@ export default async function BlogArchivePage() {
               key={post.id}
               className="bg-[#0E0E0E] text-[#F4F1EA] border-2 border-[#333333] hover:border-[#E50914] shadow-[6px_6px_0px_0px_#000000] flex flex-col justify-between hover:-translate-y-1 transition-all group"
             >
-              <div>
+              <div className="relative">
+                {post.is_pinned && (
+                  <div className="absolute -top-4 -right-3 z-30 w-10 h-10 rotate-12 pointer-events-none drop-shadow-[0_4px_12px_rgba(229,9,20,0.8)]">
+                    <Image
+                      src="/assets/punk-red-pin.png"
+                      alt="Pinned Feature"
+                      fill
+                      sizes="40px"
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+
                 <div className="relative w-full h-52 bg-neutral-900 overflow-hidden border-b-2 border-current">
                   <Image
                     src={post.cover_image_url || '/assets/logo.png'}
                     alt={post.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-                  <div className="absolute top-3 left-3 bg-[#E50914] text-white text-[10px] font-black uppercase px-2 py-0.5 border border-black">
-                    {post.category}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className="bg-[#E50914] text-white text-[10px] font-black uppercase px-2 py-0.5 border border-black shadow-[2px_2px_0px_0px_#000000]">
+                      {post.category}
+                    </span>
+                    {post.is_pinned && (
+                      <span className="bg-black text-[#E50914] border border-[#E50914] text-[9px] font-black uppercase px-1.5 py-0.5 tracking-wider">
+                        ★ PINNED
+                      </span>
+                    )}
                   </div>
                 </div>
 

@@ -13,41 +13,41 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
   const forms = [
     {
       id: 'team',
-      title: 'JOIN OUR TEAM',
-      subtitle: 'VOLUNTEERS & COMMUNITY WORKERS',
+      title: 'JOIN OUR MAIN TEAM OR VOLUNTEER',
+      subtitle: 'WOMEN’S EMPOWERMENT & REHABILITATION',
       glyphName: 'user' as const,
       description:
-        'Help us make a real difference. We need volunteers for events, fundraising, outreach, and media.',
+        'We are always looking for individuals who are passionate about women’s empowerment and survivor rehabilitation to join our core team. You can also contribute as a volunteer by supporting our events, outreach campaigns, and media and advocacy initiatives.',
       url: config.google_form_team_app,
-      badge: 'OPEN APPLICATION',
+      badge: 'CORE & VOLUNTEERS',
       actionText: 'APPLY TO JOIN US',
       themeBorder: 'border-neutral-800 hover:border-[#E50914]',
-      assetSrc: '/assets/punk-guitar-sticker-clean.png',
-      assetClass: 'w-40 h-64 -bottom-4 -right-2 opacity-30 group-hover:opacity-50 -rotate-12',
+      assetSrc: '/assets/punk-warlock-guitar.png',
+      assetClass: 'w-36 h-64 -bottom-4 -right-2 opacity-30 group-hover:opacity-50 -rotate-12',
     },
     {
       id: 'art',
-      title: 'ARTWORK & POETRY',
-      subtitle: 'CREATIVE EXPRESSION',
+      title: 'CREATIVE SUBMISSIONS',
+      subtitle: 'ART, WRITING, DESIGN & MORE',
       glyphName: 'quote' as const,
       description:
-        'Share your journey through art or writing. Selected pieces get featured in our books and exhibitions.',
+        'Creative expression is vital to bringing any cause to life—be it through art, writing, design, or any other medium. Project S.H.E welcomes every expression of your artistic voice that reflects the values of equality and justice.',
       url: config.google_form_artwork_poetry,
-      badge: 'COMMUNITY VOICES',
-      actionText: 'SUBMIT YOUR ART',
+      badge: 'ARTISTIC VOICE',
+      actionText: 'SUBMIT CREATIVE WORK',
       themeBorder: 'border-neutral-800 hover:border-[#E50914]',
-      assetSrc: '/assets/punk-vinyl-clean.png',
-      assetClass: 'w-44 h-44 -bottom-4 -right-4 opacity-30 group-hover:opacity-50 group-hover:rotate-45 transition-transform duration-700',
+      assetSrc: '/assets/punk-film-strip.png',
+      assetClass: 'w-32 h-64 -bottom-4 -right-2 opacity-30 group-hover:opacity-50 -rotate-6 transition-transform duration-500',
     },
     {
       id: 'confessions',
       title: 'SHARE YOUR STORY',
-      subtitle: 'COMMUNITY EXPERIENCES',
+      subtitle: 'WITHOUT DILUTION OR CENSORSHIP',
       glyphName: 'heart' as const,
       description:
-        'A safe place to share what you’ve been through or get something off your chest. Completely anonymous.',
+        'We believe every survivor deserves to tell their story in the way they choose—without dilution, dramatisation, or censorship. Whatever you are willing to share about a particular incident or experience, we are here to listen and to share it with the world on your terms.',
       url: config.google_form_anonymous_confessions,
-      badge: 'ANONYMOUS',
+      badge: 'ON YOUR TERMS',
       actionText: 'SHARE YOUR STORY',
       themeBorder: 'border-[#E50914]',
       assetSrc: '/assets/punk-red-spiral-star-clean.png',
@@ -56,30 +56,36 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
   ];
 
   return (
-    <section id="external-forms" className="scroll-mt-28 sm:scroll-mt-36 pt-28 sm:pt-36 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none">
+    <section id="external-forms" className="scroll-mt-28 sm:scroll-mt-36 pt-28 sm:pt-36 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none relative">
       
+      {/* Atmospheric Halftone Stars Texture */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 opacity-10 pointer-events-none bg-contain bg-center bg-no-repeat [mask-image:radial-gradient(circle,black_40%,transparent_70%)]"
+        style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
+      />
+
       {/* Header */}
-      <div className="mb-14 space-y-2 text-center sm:text-left">
+      <div className="mb-14 space-y-2 text-center sm:text-left relative z-10">
         <div className="flex items-center gap-2 justify-center sm:justify-start">
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
-          <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest font-black">
-            GET INVOLVED
+          <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold">
+            ENGAGEMENT &amp; INITIATIVES
           </span>
-          <span className="px-2 py-0.5 bg-neutral-800 text-[10px] font-mono text-neutral-300 border border-neutral-700">
+          <span className="px-2 py-0.5 bg-neutral-800 text-[10px] text-neutral-300 border border-neutral-700 font-medium">
             OFFICIAL GOOGLE FORMS
           </span>
         </div>
-        <h2 className="font-heading font-black text-2xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white leading-none">
-          WAYS TO PARTICIPATE
+        <h2 className="font-heading font-extrabold text-2xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white leading-none">
+          HOW TO GET INVOLVED?
         </h2>
         <p className="font-sans text-sm sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
-          Choose an option below to volunteer with us, share your art, or tell your story safely and anonymously.
+          Join our core team, volunteer at community initiatives, submit creative works for equality, or share your story on your own terms.
         </p>
       </div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-        {forms.map((form) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative z-10">
+        {forms.map((form, fIdx) => (
           <div
             key={form.id}
             className={`p-6 sm:p-8 bg-[#0E0E0E] text-[#F4F1EA] border-2 ${form.themeBorder} shadow-[6px_6px_0px_0px_#000000] fluid-card glow-on-hover flex flex-col justify-between relative group overflow-hidden stencil-cut`}

@@ -11,13 +11,13 @@ export default function BrutalFooter() {
   };
 
   return (
-    <footer className="w-full bg-[#080808] text-[#F4F1EA] dark:bg-[#080808] dark:text-[#F4F1EA] border-t-2 border-[#E50914] relative overflow-hidden select-none font-mono">
+    <footer className="w-full bg-[#080808] text-[#F4F1EA] dark:bg-[#080808] dark:text-[#F4F1EA] border-t-2 border-[#E50914] relative overflow-hidden select-none">
       {/* Red highlight top accent bar */}
       <div className="w-full h-1 bg-[#E50914]" />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-12 sm:py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-          
+
           {/* Brand & Mission */}
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
@@ -27,7 +27,7 @@ export default function BrutalFooter() {
                   alt="Project S.H.E."
                   fill
                   className="object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
               </div>
               <div>
                 <span className="font-heading font-black text-xl text-[#E50914] tracking-tight block">
@@ -39,8 +39,8 @@ export default function BrutalFooter() {
               </div>
             </div>
 
-            <p className="text-xs text-neutral-400 leading-relaxed max-w-md font-sans">
-              Combating gender-based violence, shifting societal mindsets, and raising critical financial aid for survivor rehabilitation and trusted safehomes.
+            <p className="text-xs text-neutral-300 leading-relaxed max-w-md font-sans">
+              &ldquo;Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.&rdquo;
             </p>
 
             {/* Emergency Helpline Box */}
@@ -89,7 +89,7 @@ export default function BrutalFooter() {
               <ul className="space-y-2 text-neutral-400">
                 <li>
                   <Link href="/#mission" className="hover:text-white transition-colors">
-                    Community Fundraising
+                    Fundraising
                   </Link>
                 </li>
                 <li>
@@ -99,17 +99,12 @@ export default function BrutalFooter() {
                 </li>
                 <li>
                   <Link href="/#mission" className="hover:text-white transition-colors">
-                    Mindset Shift
+                    Advocacy &amp; Dialogue
                   </Link>
                 </li>
                 <li>
                   <Link href="/blog" className="hover:text-white transition-colors">
                     Articles &amp; Stories
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/#updates" className="hover:text-white transition-colors">
-                    Latest Updates
                   </Link>
                 </li>
               </ul>
@@ -174,7 +169,7 @@ export default function BrutalFooter() {
                   alt="Punk tribal lily"
                   fill
                   className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
               </div>
               <span className="text-[10px] text-neutral-400 uppercase tracking-widest flex items-center gap-1">
                 <GrungeGlyph name="map-pin" className="w-3.5 h-3.5 text-[#E50914]" /> Headquarters
@@ -184,53 +179,52 @@ export default function BrutalFooter() {
               </p>
             </div>
 
-            <div className="p-3 bg-[#121212] border border-neutral-800 space-y-1 text-[11px] text-neutral-400 stencil-cut">
+            <div className="p-3 bg-[#121212] border border-neutral-800 space-y-1.5 text-[11px] text-neutral-300 stencil-cut">
               <div className="flex items-center gap-1.5 text-[#E50914] font-bold">
                 <GrungeGlyph name="shield" className="w-3.5 h-3.5" />
-                <span>100% DIRECT SUPPORT</span>
+                <span>SARVA NIRBHAYA FOUNDATION</span>
               </div>
-              <p className="text-[10px] leading-relaxed">
-                Registered non-profit. 100% of gathered funds route directly to verified safehouses like Sayodhya Women&apos;s Help Home.
+              <p className="text-[10px] leading-relaxed text-neutral-400">
+                Registered Section 8 company under Companies Act, 2013 • Inc. 19 May 2026, Ministry of Corporate Affairs, Govt. of India.
               </p>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 mt-10 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
-          <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+        {/* Bottom Tagline & Bar */}
+        <div className="pt-6 mt-8 border-t border-neutral-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
+          <p className="text-neutral-300 font-sans text-xs sm:text-sm font-medium italic border-l-2 border-[#E50914] pl-3 max-w-2xl">
+            Hyderabad&apos;s leading student NGO mobilizing grassroots action, supporting survivor safe houses, and dismantling systemic gender-based violence. </p>.
+
+          <div className="flex items-center gap-3 flex-wrap shrink-0">
             <span className="text-[11px]">
-              © {new Date().getFullYear()} PROJECT S.H.E. NGO.
+              © {new Date().getFullYear()} PROJECT S.H.E.
+            </span>
+
+            <span className="text-[11px] text-neutral-600">•</span>
+
+            <span className="text-[11px] text-neutral-400">
+              Powered by <span className="text-white font-semibold tracking-wide"> Rendervoid</span>
             </span>
 
             <button
               type="button"
               onClick={scrollToTop}
-              className="group inline-flex items-center gap-1 px-2.5 py-1 bg-[#141414] border border-neutral-700 hover:border-[#E50914] hover:bg-[#E50914] text-[11px] font-bold text-white transition-all hover-lift"
+              className="group inline-flex items-center gap-1 px-2.5 py-1 bg-[#141414] border border-neutral-700 hover:border-[#E50914] hover:bg-[#E50914] text-[11px] font-bold text-white transition-all hover-lift ml-1"
               aria-label="Back to top"
             >
               <GrungeGlyph name="arrow-up" className="w-3 h-3 text-[#E50914] group-hover:text-white transition-colors" />
               <span>TOP</span>
             </button>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-[10px] text-neutral-500 uppercase tracking-widest hidden sm:flex">
-              <span>SUPPORT</span>
-              <span>-</span>
-              <span>HELP</span>
-              <span>-</span>
-              <span>EMPOWER</span>
-            </div>
-          </div>
         </div>
 
       </div>
 
-      {/* Brutalist Text Watermark */}
-      <div className="w-full overflow-hidden flex justify-center items-end mt-2 pointer-events-none select-none">
-        <span className="font-heading font-black text-[13.5vw] leading-[0.72] tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-neutral-800/80 to-transparent whitespace-nowrap">
+      {/* Brutalist Text Watermark - Large Edge-to-Edge & Centered Across All Screens */}
+      <div className="w-full overflow-hidden flex justify-center items-end mt-2 pointer-events-none select-none text-center">
+        <span className="font-heading font-black text-center w-full block uppercase text-[13.6vw] leading-[0.72] tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-neutral-800/85 via-neutral-800/40 to-transparent whitespace-nowrap m-0 p-0">
           PROJECT S.H.E.
         </span>
       </div>

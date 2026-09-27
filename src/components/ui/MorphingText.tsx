@@ -2,13 +2,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-
 import { cn } from "@/lib/utils";
 
-const morphTime = 1.5;
-const cooldownTime = 0.5;
-
-const useMorphingText = (texts: string[]) => {
+const useMorphingText = (
+  texts: string[],
+  cooldownTime = 2.8,
+  morphTime = 1.2
+) => {
   const textIndexRef = useRef(0);
   const morphRef = useRef(0);
   const cooldownRef = useRef(0);
@@ -51,7 +51,7 @@ const useMorphingText = (texts: string[]) => {
     if (fraction === 1) {
       textIndexRef.current++;
     }
-  }, [setStyles]);
+  }, [setStyles, cooldownTime, morphTime]);
 
   const doCooldown = useCallback(() => {
     morphRef.current = 0;
@@ -66,6 +66,18 @@ const useMorphingText = (texts: string[]) => {
 
   useEffect(() => {
     let animationFrameId: number;
+
+    // Initialize texts immediately on mount
+    if (text1Ref.current && texts.length > 0) {
+      text1Ref.current.textContent = texts[0];
+      text1Ref.current.style.opacity = "100%";
+      text1Ref.current.style.filter = "none";
+    }
+    if (text2Ref.current && texts.length > 1) {
+      text2Ref.current.textContent = texts[1];
+      text2Ref.current.style.opacity = "0%";
+      text2Ref.current.style.filter = "none";
+    }
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
@@ -84,7 +96,7 @@ const useMorphingText = (texts: string[]) => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [doMorph, doCooldown]);
+  }, [doMorph, doCooldown, texts]);
 
   return { text1Ref, text2Ref };
 };
@@ -92,18 +104,24 @@ const useMorphingText = (texts: string[]) => {
 interface MorphingTextProps {
   className?: string;
   texts: string[];
+  cooldown?: number;
+  morph?: number;
 }
 
-const Texts: React.FC<Pick<MorphingTextProps, "texts">> = ({ texts }) => {
-  const { text1Ref, text2Ref } = useMorphingText(texts);
+const Texts: React.FC<{
+  texts: string[];
+  cooldown?: number;
+  morph?: number;
+}> = ({ texts, cooldown, morph }) => {
+  const { text1Ref, text2Ref } = useMorphingText(texts, cooldown, morph);
   return (
     <>
       <span
-        className="absolute inset-x-0 top-0 m-auto inline-block w-full"
+        className="absolute inset-x-0 top-0 inline-block w-full text-inherit leading-tight"
         ref={text1Ref}
       />
       <span
-        className="absolute inset-x-0 top-0 m-auto inline-block w-full"
+        className="absolute inset-x-0 top-0 inline-block w-full text-inherit leading-tight"
         ref={text2Ref}
       />
     </>
@@ -111,7 +129,11 @@ const Texts: React.FC<Pick<MorphingTextProps, "texts">> = ({ texts }) => {
 };
 
 const SvgFilters: React.FC = () => (
-  <svg id="filters" className="hidden" preserveAspectRatio="xMidYMid slice">
+  <svg
+    id="morphing-filters"
+    className="fixed -top-[9999px] -left-[9999px] w-0 h-0 pointer-events-none"
+    aria-hidden="true"
+  >
     <defs>
       <filter id="threshold">
         <feColorMatrix
@@ -127,17 +149,22 @@ const SvgFilters: React.FC = () => (
   </svg>
 );
 
-const MorphingText: React.FC<MorphingTextProps> = ({ texts, className }) => (
+const MorphingText: React.FC<MorphingTextProps> = ({
+  texts,
+  className,
+  cooldown = 2.8,
+  morph = 1.2,
+}) => (
   <div
     className={cn(
-      "relative mx-auto h-16 w-full max-w-screen-md text-center font-sans text-[40pt] font-bold leading-none [filter:url(#threshold)_blur(0.6px)] md:h-24 lg:text-[6rem]",
-      className,
+      "relative w-full h-full text-left font-heading font-extrabold [filter:url(#threshold)_blur(0.6px)]",
+      className
     )}
   >
-    <Texts texts={texts} />
+    <Texts texts={texts} cooldown={cooldown} morph={morph} />
     <SvgFilters />
   </div>
 );
 
-export {MorphingText};
+export { MorphingText };
 export default MorphingText;

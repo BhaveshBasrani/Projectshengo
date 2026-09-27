@@ -156,6 +156,7 @@ export default function UserDashboard() {
                 alt="Tribal Lily"
                 width={144}
                 height={224}
+                style={{ width: 'auto', height: 'auto' }}
                 className="object-contain"
               />
             </div>
@@ -167,6 +168,7 @@ export default function UserDashboard() {
                 alt="Polly Stars Watermark"
                 width={176}
                 height={176}
+                style={{ width: 'auto', height: 'auto' }}
                 className="object-contain"
               />
             </div>
@@ -282,6 +284,7 @@ export default function UserDashboard() {
                 alt="Polly Star"
                 width={56}
                 height={80}
+                style={{ width: 'auto', height: 'auto' }}
                 className="object-contain drop-shadow-[0_0_6px_rgba(229,9,20,0.5)] rotate-6"
               />
             </div>

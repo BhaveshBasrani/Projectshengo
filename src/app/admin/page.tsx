@@ -363,6 +363,36 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleTogglePinPost = async (post: BlogPost) => {
+    const currentlyPinned = posts.filter((p) => p.is_pinned).length;
+    if (!post.is_pinned && currentlyPinned >= 3) {
+      alert('Maximum 3 blogs can be pinned simultaneously. Please unpin an existing blog first.');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const res = await fetch('/api/admin/posts', {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify({ id: post.id, is_pinned: !post.is_pinned }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(post.is_pinned ? 'Blog unpinned' : 'Blog pinned to top (Max 3)');
+        setPosts((prev) =>
+          prev.map((p) => (p.id === post.id ? { ...p, is_pinned: !post.is_pinned } : p))
+        );
+      } else {
+        alert(data.error || 'Failed to toggle pin state');
+      }
+    } catch (e) {
+      showToast('Error toggling pin status');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // Update Actions
   const handleCreateUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -517,6 +547,8 @@ export default function AdminDashboardPage() {
             alt="Punk Spiral Star"
             width={76}
             height={76}
+            priority
+            style={{ width: 'auto', height: 'auto' }}
             className="object-contain drop-shadow-[0_0_10px_rgba(229,9,20,0.7)] animate-[spin_10s_linear_infinite]"
           />
         </div>
@@ -529,6 +561,8 @@ export default function AdminDashboardPage() {
             alt="Polly Star"
             width={64}
             height={96}
+            priority
+            style={{ width: 'auto', height: 'auto' }}
             className="object-contain drop-shadow-[0_0_8px_rgba(229,9,20,0.6)] -rotate-12"
           />
         </div>
@@ -541,6 +575,8 @@ export default function AdminDashboardPage() {
               alt="Cyber Lily Watermark"
               width={144}
               height={208}
+              priority
+              style={{ width: 'auto', height: 'auto' }}
               className="object-contain"
             />
           </div>
@@ -1290,7 +1326,7 @@ export default function AdminDashboardPage() {
       {/* TAB 5: BLOG & STORIES */}
       {activeTab === 'posts' && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
                 STORIES &amp; ARTICLES
@@ -1300,23 +1336,33 @@ export default function AdminDashboardPage() {
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                setEditingPost({
-                  title: '',
-                  body: '',
-                  category: 'Awareness & Action',
-                  status: 'draft',
-                  author_name: 'Project S.H.E. Core Team',
-                  tags: ['Project SHE', 'Awareness', 'Rehabilitation'],
-                })
-              }
-              className="px-4 py-2 bg-[#E50914] text-white hover:bg-white hover:text-black text-xs font-bold uppercase transition-colors flex items-center gap-1.5 stencil-cut"
-            >
-              <GrungeGlyph name="plus" className="w-4 h-4" />
-              <span>NEW ARTICLE</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-black/60 border border-neutral-800 text-[11px] font-mono text-neutral-300 stencil-cut">
+                <Image src="/assets/punk-red-pin.png" alt="Pin" width={14} height={14} className="w-3.5 h-3.5 object-contain" />
+                <span>PINNED:</span>
+                <span className={`font-bold ${posts.filter((p) => p.is_pinned).length >= 3 ? 'text-amber-400' : 'text-[#E50914]'}`}>
+                  {posts.filter((p) => p.is_pinned).length}/3
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setEditingPost({
+                    title: '',
+                    body: '',
+                    category: 'Awareness & Action',
+                    status: 'draft',
+                    author_name: 'Project S.H.E. Core Team',
+                    tags: ['Project SHE', 'Awareness', 'Rehabilitation'],
+                  })
+                }
+                className="px-4 py-2 bg-[#E50914] text-white hover:bg-white hover:text-black text-xs font-bold uppercase transition-colors flex items-center gap-1.5 stencil-cut"
+              >
+                <GrungeGlyph name="plus" className="w-4 h-4" />
+                <span>NEW ARTICLE</span>
+              </button>
+            </div>
           </div>
 
           {/* Post Editor Drawer */}
@@ -1440,12 +1486,22 @@ export default function AdminDashboardPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs stencil-cut"
+                className={`p-5 bg-[#0E0E0E] border-2 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs stencil-cut ${
+                  post.is_pinned
+                    ? 'border-[#E50914] bg-[#120505]'
+                    : 'border-neutral-800'
+                }`}
               >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {post.is_pinned && (
+                      <span className="flex items-center gap-1 px-2 py-0.5 text-[9px] uppercase font-bold bg-[#E50914] text-white tracking-widest stencil-cut">
+                        <Image src="/assets/punk-red-pin.png" alt="Pinned" width={12} height={12} className="w-3 h-3 object-contain" />
+                        PINNED TOP
+                      </span>
+                    )}
                     <span
-                      className={`px-2 py-0.2 text-[9px] uppercase font-bold ${
+                      className={`px-2 py-0.5 text-[9px] uppercase font-bold ${
                         post.status === 'published'
                           ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
                           : post.status === 'draft'
@@ -1459,12 +1515,38 @@ export default function AdminDashboardPage() {
                     <h3 className="font-bold text-white text-sm">{post.title}</h3>
                   </div>
 
-                  <div className="text-[10px] text-neutral-500 font-mono">
-                    Slug: /{post.slug} • Author: {post.author_name}
+                  <div className="flex items-center gap-3 text-[10px] text-neutral-500 font-mono">
+                    <span>Slug: /{post.slug}</span>
+                    <span>•</span>
+                    <span>Author: {post.author_name}</span>
+                    <span>•</span>
+                    <span className="text-neutral-400">♥ {post.likes || 0} Likes</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleTogglePinPost(post)}
+                    disabled={actionLoading}
+                    className={`px-3 py-2 border flex items-center gap-1.5 font-bold text-xs stencil-cut transition-all ${
+                      post.is_pinned
+                        ? 'border-[#E50914] bg-[#E50914]/20 text-[#E50914] hover:bg-[#E50914] hover:text-white'
+                        : 'border-neutral-700 text-neutral-400 hover:border-white hover:text-white'
+                    }`}
+                    title={post.is_pinned ? 'Unpin this blog' : 'Pin to top of blog archive (Max 3)'}
+                  >
+                    <Image
+                      src="/assets/punk-red-pin.png"
+                      alt="Pin"
+                      width={14}
+                      height={14}
+                      className={`w-3.5 h-3.5 object-contain transition-transform ${
+                        post.is_pinned ? '-rotate-12 scale-110' : 'opacity-60 grayscale'
+                      }`}
+                    />
+                    <span>{post.is_pinned ? 'PINNED' : 'PIN (MAX 3)'}</span>
+                  </button>
                   <button
                     type="button"
                     onClick={() => setEditingPost(post)}

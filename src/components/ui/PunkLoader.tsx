@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface PunkLoaderProps {
@@ -11,28 +11,34 @@ interface PunkLoaderProps {
 }
 
 /**
- * Proper, Sleek Brutalist Loader for Project S.H.E.
- * Clean, fast, high-contrast, non-AI, zero gimmick clutter.
+ * Ultra-minimalist, sleek loader inspired by Resolve MUN.
+ * Clean brand emblem, subtle red glow, hairline progress indicator.
  */
 export default function PunkLoader({
-  label = 'Loading...',
+  label,
   sublabel,
   size = 'md',
   className = '',
 }: PunkLoaderProps) {
+  const [percent, setPercent] = useState(18);
+
+  useEffect(() => {
+    const progressInterval = setInterval(() => {
+      setPercent((prev) => {
+        if (prev >= 98) return 98;
+        const jump = Math.floor(Math.random() * 9) + 4;
+        return Math.min(prev + jump, 98);
+      });
+    }, 180);
+
+    return () => clearInterval(progressInterval);
+  }, []);
+
   if (size === 'sm') {
     return (
-      <span className={`inline-flex items-center gap-2 font-mono text-xs font-bold text-white ${className}`}>
-        <span className="w-3.5 h-3.5 relative inline-block animate-spin [animation-duration:2s]">
-          <Image
-            src="/assets/punk-red-spiral-star-clean.png"
-            alt="*"
-            fill
-            sizes="14px"
-            className="object-contain"
-          />
-        </span>
-        <span>{label}</span>
+      <span className={`inline-flex items-center gap-2 font-mono text-xs text-neutral-300 ${className}`}>
+        <span className="w-2 h-2 rounded-full bg-[#E50914] animate-ping" />
+        <span>{label || 'Loading...'}</span>
       </span>
     );
   }
@@ -41,46 +47,59 @@ export default function PunkLoader({
 
   return (
     <div
-      className={`font-mono select-none flex flex-col items-center justify-center ${
+      className={`select-none flex flex-col items-center justify-center font-sans ${
         isFull
-          ? 'min-h-[60vh] w-full px-4 py-16'
-          : 'p-6 bg-[#0E0E0E] border-2 border-neutral-800 text-[#F4F1EA] shadow-[6px_6px_0px_0px_#000000]'
+          ? 'min-h-[70vh] w-full px-4 py-16'
+          : 'p-8 bg-[#080808] border border-neutral-900 text-neutral-200'
       } ${className}`}
     >
-      <div className="flex flex-col items-center space-y-4 max-w-xs text-center">
+      <div className="flex flex-col items-center space-y-5 max-w-xs text-center relative z-10">
         
-        {/* Clean Rotating Punk Star Core */}
-        <div className="relative w-12 h-12 sm:w-14 sm:h-14 animate-spin [animation-duration:3s]">
-          <Image
-            src="/assets/punk-red-spiral-star-clean.png"
-            alt="Loading"
-            fill
-            sizes="56px"
-            className="object-contain drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]"
-            priority
-          />
+        {/* Minimalist Emblem with subtle crimson breathing glow */}
+        <div className="relative w-16 h-16 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(229,9,20,0.35)_0%,transparent_70%)] animate-pulse [animation-duration:2.5s] pointer-events-none" />
+          <div className="relative w-12 h-12">
+            <Image
+              src="/assets/logo-clean.png"
+              alt="Project S.H.E."
+              fill
+              sizes="48px"
+              className="object-contain drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"
+              priority
+            />
+          </div>
         </div>
 
-        {/* Brand & Loading Label */}
+        {/* Minimalist Label & Progress Percentage */}
         <div className="space-y-1">
-          <span className="font-heading font-black text-sm uppercase tracking-widest text-[#E50914] block">
-            PROJECT S.H.E.
-          </span>
-          <p className="font-mono text-xs text-neutral-300 font-bold">
-            {label}
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <span className="font-heading font-bold text-xs uppercase tracking-widest text-white">
+              {label || 'PROJECT S.H.E.'}
+            </span>
+            <span className="text-[10px] font-mono text-neutral-600">•</span>
+            <span className="font-mono text-xs font-semibold text-neutral-400">
+              {percent}%
+            </span>
+          </div>
+
           {sublabel && (
-            <p className="font-sans text-[11px] text-neutral-500">
+            <p className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider">
               {sublabel}
             </p>
           )}
         </div>
 
-        {/* Dynamic White Progress Loader */}
-        <div className="w-40 h-1 bg-neutral-900 border border-neutral-800 overflow-hidden relative">
-          <div className="absolute inset-y-0 left-0 bg-[#EDEDED] shadow-[0_0_10px_#ffffff] animate-[loader-slide_1.5s_ease-in-out_infinite] w-1/2" />
+        {/* Hairline sleek progress bar */}
+        <div className="w-44 h-[2px] bg-neutral-900 overflow-hidden relative rounded-full">
+          <div
+            className="h-full bg-gradient-to-r from-red-700 via-[#E50914] to-red-500 transition-all duration-200 ease-out"
+            style={{ width: `${percent}%` }}
+          />
         </div>
 
+        <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-neutral-600">
+          SUPPORT • HELP • EMPOWER
+        </span>
       </div>
     </div>
   );

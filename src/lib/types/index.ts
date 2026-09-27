@@ -21,6 +21,7 @@ export interface PublicReview {
   rating: number; // 1 to 5
   review_text: string;
   status: ReviewStatus;
+  likes?: number;
   created_at: string;
   reviewed_at?: string | null;
 }
@@ -53,6 +54,8 @@ export interface BlogPost {
   tags?: string[];
   author_name: string;
   status: PostStatus;
+  likes?: number;
+  is_pinned?: boolean;
   published_at?: string | null;
   created_at: string;
   updated_at?: string;

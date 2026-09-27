@@ -47,10 +47,11 @@ const config: Config = {
         'brutal-white-lg': '8px 8px 0px 0px #EDEDED',
       },
       fontFamily: {
-        heading: ['var(--font-heading)', 'Space Grotesk', 'Impact', 'Syne', 'sans-serif'],
-        mono: ['var(--font-mono)', 'JetBrains Mono', 'Courier New', 'monospace'],
-        body: ['var(--font-body)', 'Inter', 'Space Grotesk', 'system-ui', 'sans-serif'],
-        glitch: ['var(--font-glitch)', 'Rubik Glitch', 'Impact', 'cursive'],
+        heading: ['Plus Jakarta Sans', 'Inter', '-apple-system', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', '-apple-system', 'sans-serif'],
+        body: ['Inter', 'Plus Jakarta Sans', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+        glitch: ['Rubik Glitch', 'Impact', 'cursive'],
       },
       animation: {
         'marquee': 'marquee 24s linear infinite',

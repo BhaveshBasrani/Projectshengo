@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPublicReviews, submitReview, getAllReviewsAdmin } from '@/lib/data/store';
+import { getPublicReviews, submitReview, getAllReviewsAdmin, likeReview } from '@/lib/data/store';
 import { notifyAdminEvent } from '@/lib/email/google-apps-script';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
+    const sort = (searchParams.get('sort') as 'likes' | 'rating' | 'newest') || 'likes';
 
     // If userId provided, return the user's submitted reviews for their private dashboard
     if (userId) {
@@ -14,11 +14,27 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, reviews: userReviews });
     }
 
-    // Public request: strictly approved reviews only
-    const reviews = await getPublicReviews();
-    return NextResponse.json({ success: true, reviews });
+    // Public request: strictly approved reviews only with sorting
+    const reviews = await getPublicReviews(sort);
+    const response = NextResponse.json({ success: true, reviews });
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    return response;
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Failed to fetch reviews' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { id, action } = body;
+    if (action === 'like' && id) {
+      const result = await likeReview(id);
+      return NextResponse.json(result);
+    }
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || 'Failed to update review' }, { status: 500 });
   }
 }
 

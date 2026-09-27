@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS public.reviews (
   role_or_relation TEXT,
   rating INTEGER CHECK (rating >= 1 AND rating <= 5) DEFAULT 5,
   review_text TEXT NOT NULL,
+  likes INTEGER DEFAULT 0,
   status TEXT CHECK (status IN ('pending', 'approved', 'rejected')) DEFAULT 'pending',
   admin_notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -29,6 +30,7 @@ CREATE TABLE IF NOT EXISTS public.reviews (
 
 -- Index for public reviews
 CREATE INDEX IF NOT EXISTS idx_reviews_status ON public.reviews(status);
+CREATE INDEX IF NOT EXISTS idx_reviews_likes ON public.reviews(likes DESC);
 
 -- 3. PRIVATE SUGGESTIONS & FEEDBACK TABLE
 CREATE TABLE IF NOT EXISTS public.suggestions_feedback (
@@ -54,6 +56,8 @@ CREATE TABLE IF NOT EXISTS public.posts (
   category TEXT DEFAULT 'Legal Rights',
   tags TEXT[] DEFAULT ARRAY['Project SHE'],
   author_name TEXT DEFAULT 'Project S.H.E.',
+  likes INTEGER DEFAULT 0,
+  is_pinned BOOLEAN DEFAULT FALSE,
   status TEXT CHECK (status IN ('draft', 'published', 'archived')) DEFAULT 'draft',
   published_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -62,6 +66,12 @@ CREATE TABLE IF NOT EXISTS public.posts (
 
 CREATE INDEX IF NOT EXISTS idx_posts_status ON public.posts(status);
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON public.posts(slug);
+CREATE INDEX IF NOT EXISTS idx_posts_pinned ON public.posts(is_pinned DESC);
+
+-- Migration Statements for Existing Databases:
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0;
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0;
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE;
 
 -- 5. FIELD BULLETINS & ANNOUNCEMENTS TABLE
 CREATE TABLE IF NOT EXISTS public.updates (
