@@ -92,13 +92,13 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
 
         <div className="mb-6">
           <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest block mb-1">
-            VOICES OF COURAGE
+            COMMUNITY REVIEWS
           </span>
           <h3 className="font-heading text-2xl font-black uppercase tracking-tight">
-            SUBMIT A PUBLIC REVIEW
+            WRITE A REVIEW
           </h3>
           <p className="text-xs text-neutral-400 mt-1 font-sans">
-            Your review will be checked by our team before appearing publicly to protect privacy.
+            Your review will be checked by our team before appearing publicly.
           </p>
         </div>
 
@@ -204,7 +204,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
               disabled={submitting}
               className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-sm uppercase tracking-wider transition-all border border-[#E50914] shadow-[4px_4px_0px_0px_#000000] disabled:opacity-50"
             >
-              {submitting ? 'TRANSMITTING...' : 'SUBMIT REVIEW FOR MODERATION'}
+              {submitting ? 'SUBMITTING...' : 'SUBMIT REVIEW'}
             </button>
           </form>
         )}

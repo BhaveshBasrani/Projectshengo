@@ -201,7 +201,7 @@ export default function FloatingNavbar() {
                   <div className="absolute right-0 top-full mt-2 w-56 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] p-3 font-mono text-xs z-50 animate-fadeIn">
                     <div className="pb-2 mb-2 border-b border-neutral-800">
                       <p className="font-bold text-white truncate">
-                        {user.displayName || 'Survivor / Ally'}
+                        {user.displayName || 'Community Member'}
                       </p>
                       <p className="text-[10px] text-neutral-400 truncate">{user.email}</p>
                     </div>
@@ -283,7 +283,7 @@ export default function FloatingNavbar() {
                   href="/auth/login"
                   className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-[#E50914] text-white border-2 border-white shadow-[2px_2px_0px_0px_#000000] font-mono text-[10px] sm:text-xs font-black uppercase tracking-wider hover:bg-white hover:text-black hover:border-black transition-all min-h-[36px] sm:min-h-[44px] flex items-center hover-lift"
                 >
-                  PORTAL
+                  SIGN IN
                 </Link>
               </div>
             ) : (
@@ -351,7 +351,7 @@ export default function FloatingNavbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full py-2.5 bg-[#E50914] text-white text-center font-bold min-h-[44px] flex items-center justify-center"
                 >
-                  {isAdmin ? 'ADMIN CONTROL CENTER' : 'MY DASHBOARD'}
+                  {isAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}
                 </Link>
                 <button
                   type="button"

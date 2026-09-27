@@ -74,7 +74,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
         className="inline-flex items-center gap-2 text-xs font-bold text-[#E50914] hover:text-white uppercase tracking-wider mb-8 transition-colors"
       >
         <GrungeGlyph name="arrow-left" className="w-4 h-4" />
-        <span>BACK TO JOURNAL ARCHIVE</span>
+        <span>BACK TO ARTICLES</span>
       </Link>
 
       {/* Header */}
@@ -103,7 +103,7 @@ export default async function PostDetailPage({ params }: PostDetailPageProps) {
           </div>
           <div className="flex items-center gap-1.5 text-neutral-500 text-[11px]">
             <GrungeGlyph name="shield" className="w-3.5 h-3.5 text-emerald-400" />
-            <span>VERIFIED PROJECT S.H.E. RELEASE</span>
+            <span>OFFICIAL PROJECT S.H.E. POST</span>
           </div>
         </div>
       </header>

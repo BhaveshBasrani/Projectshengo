@@ -74,17 +74,15 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
         <div className="flex items-center gap-2 justify-center sm:justify-start">
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
           <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold">
-            ENGAGEMENT &amp; INITIATIVES
+            GET INVOLVED
           </span>
-          <span className="px-2 py-0.5 bg-neutral-800 text-[10px] text-neutral-300 border border-neutral-700 font-medium">
-            OFFICIAL GOOGLE FORMS
-          </span>
+          <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
         </div>
         <h2 className="font-heading font-extrabold text-2xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white leading-none">
           HOW TO GET INVOLVED?
         </h2>
         <p className="font-sans text-sm sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
-          Join our core team, volunteer at community initiatives, submit creative works for equality, or share your story on your own terms.
+          Join our core team or volunteer, submit your creative work, or share your story with us.
         </p>
       </div>
 

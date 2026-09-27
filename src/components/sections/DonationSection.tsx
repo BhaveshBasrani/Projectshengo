@@ -26,7 +26,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
         <div className="flex items-center gap-2 justify-center sm:justify-start">
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
           <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold flex items-center gap-1.5">
-            <GrungeGlyph name="heart" className="w-3.5 h-3.5 text-[#E50914]" /> 100% DIRECT SURVIVOR RELIEF
+            <GrungeGlyph name="heart" className="w-3.5 h-3.5 text-[#E50914]" /> SUPPORT SURVIVORS DIRECTLY
           </span>
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
         </div>
@@ -143,7 +143,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
 
             <div className="flex items-center justify-between border-b-2 border-[#222222] pb-3 relative z-10">
               <h3 className="font-heading font-black text-xl sm:text-2xl uppercase tracking-tight text-[#E50914]">
-                WHERE YOUR MONEY GOES
+                WHERE DOES YOUR MONEY GO?
               </h3>
             </div>
 
@@ -155,31 +155,31 @@ export default function DonationSection({ config }: DonationSectionProps) {
             <div className="space-y-3 pt-1 relative z-10">
               <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[01] DIRECT PARTNER RELIEF</span>
-                  <span className="text-[#E50914]">SAFEHOUSES</span>
+                  <span>[01] DIRECT SUPPORT FOR SURVIVORS</span>
+                  <span className="text-[#E50914]">SAFE HOUSES</span>
                 </div>
                 <p className="text-xs text-[#888888] font-sans mt-1">
-                  Partnerships with verified safehouses ensure every contribution goes directly towards making vulnerable lives safer.
+                  Partnerships with organisations like Sayodhya help ensure that every contribution goes towards making someone’s life safer.
                 </p>
               </div>
 
               <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[02] EVENT &amp; OUTREACH CAMPAIGNS</span>
-                  <span className="text-[#E50914]">CATALYST</span>
+                  <span>[02] FUTURE EVENTS &amp; OUTREACH</span>
+                  <span className="text-[#E50914]">CAMPAIGNS</span>
                 </div>
                 <p className="text-xs text-[#888888] font-sans mt-1">
-                  A small portion is set aside to support future community events, whose proceeds are then contributed to core focus areas.
+                  A small portion of your contribution is set aside to support future events and outreach campaigns.
                 </p>
               </div>
 
               <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
                 <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[03] DIRECT PEER-TO-PEER UPI</span>
-                  <span className="text-[#E50914]">DIRECT ROUTE</span>
+                  <span>[03] COMMUNITY IMPACT</span>
+                  <span className="text-[#E50914]">FOCUS AREAS</span>
                 </div>
                 <p className="text-xs text-[#888888] font-sans mt-1">
-                  Safe, convenient, and designed to ensure your contribution reaches those who need it most without third-party fees.
+                  We donate the funds raised through these initiatives to organisations working within Project S.H.E.’s areas of focus.
                 </p>
               </div>
             </div>

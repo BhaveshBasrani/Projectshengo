@@ -88,15 +88,15 @@ export default function BlogGlimpse() {
           <div className="flex items-center gap-2 justify-center md:justify-start">
             <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
             <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold flex items-center gap-1.5">
-              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" /> FIELD REPORTS &amp; MANIFESTOS
+              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" /> ADVOCACY &amp; DIALOGUE
             </span>
             <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
           </div>
           <h2 className="font-heading font-extrabold text-3xl sm:text-4xl uppercase tracking-tight text-white leading-none">
-            THE ADVOCACY JOURNAL
+            STORIES &amp; ARTICLES
           </h2>
           <p className="font-sans text-xs sm:text-sm text-neutral-400 max-w-xl leading-relaxed">
-            A glimpse into grassroots investigations, survivor safehouse initiatives, and youth awareness essays.
+            Articles and case posts from our team of writers and designers turning community support into tangible change.
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function BlogGlimpse() {
             href="/blog"
             className="group px-4 py-2.5 bg-[#141414] hover:bg-[#E50914] text-neutral-200 hover:text-white border border-neutral-800 hover:border-[#E50914] transition-all flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider min-h-[42px] hover-lift stencil-cut"
           >
-            <span>EXPLORE ALL STORIES</span>
+            <span>READ MORE STORIES</span>
             <GrungeGlyph name="arrow-right" className="w-3.5 h-3.5 text-[#E50914] group-hover:text-white transition-colors" />
           </Link>
         </div>
@@ -129,7 +129,7 @@ export default function BlogGlimpse() {
           <div className="p-8 bg-[#0E0E0E] border border-neutral-800 text-center space-y-3 max-w-lg mx-auto stencil-cut">
             <p className="text-white font-bold text-sm">NO ARTICLES PUBLISHED YET</p>
             <p className="text-xs text-neutral-400 font-sans">
-              Stay tuned for grassroots reports and survivor stories.
+              Stay tuned for upcoming articles and stories.
             </p>
           </div>
         ) : (
@@ -210,7 +210,7 @@ export default function BlogGlimpse() {
                       href={`/blog/${post.slug}`}
                       className="inline-flex items-center gap-1 text-[11px] font-bold text-[#E50914] group-hover:text-white uppercase tracking-wider transition-colors"
                     >
-                      <span>READ DISPATCH</span>
+                      <span>READ ARTICLE</span>
                       <GrungeGlyph name="arrow-right" className="w-3 h-3" />
                     </Link>
 

@@ -90,15 +90,15 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
 
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest">
-              DIRECT TO LEADERSHIP
+            <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest font-bold">
+              CONTACT US
             </span>
           </div>
           <h3 className="font-heading text-2xl font-black uppercase tracking-tight">
-            COMMUNITY INBOX
+            SEND A MESSAGE
           </h3>
           <p className="text-xs text-neutral-400 mt-1 font-sans">
-            Your message goes directly to our team and will never be shared publicly.
+            Your message goes directly to our team and is kept private.
           </p>
         </div>
 
@@ -220,7 +220,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
               disabled={submitting}
               className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-sm uppercase tracking-wider transition-all border border-[#E50914] shadow-[4px_4px_0px_0px_#000000] disabled:opacity-50"
             >
-              {submitting ? 'TRANSMITTING...' : `SEND PRIVATE ${type.toUpperCase()}`}
+              {submitting ? 'SENDING...' : `SEND ${type.toUpperCase()}`}
             </button>
           </form>
         )}

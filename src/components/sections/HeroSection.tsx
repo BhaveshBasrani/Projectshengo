@@ -18,15 +18,13 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
       <span>/</span>
       <span>EXTENDING SUPPORT TO SURVIVOR SAFE HOUSES</span>
       <span>/</span>
-      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] SAHODAYA WOMEN'S HELP HOME PARTNER</span>
+      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] SAHODAYA WOMEN&apos;S HELP HOME PARTNER</span>
       <span>/</span>
       <span>OVER ₹2,00,000 RAISED &amp; CONTRIBUTED</span>
       <span>/</span>
       <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] BATTLE OF THE BANDS (BOTB 1.0 &amp; 2.0)</span>
       <span>/</span>
-      <span>50+ TEAM &amp; 100+ VOLUNTEERS</span>
-      <span>/</span>
-      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] SARVA NIRBHAYA FOUNDATION (SEC. 8)</span>
+      <span>SARVA NIRBHAYA FOUNDATION (SEC. 8)</span>
       <span>/</span>
     </div>
   );
@@ -62,7 +60,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
             HYDERABAD&apos;S LEADING STUDENT NGO
           </span>
           <span className="text-[10px] sm:text-xs text-neutral-400 font-mono font-bold tracking-wider">
-            EST. APRIL 29, 2025 • HYDERABAD, INDIA
+            SARVA NIRBHAYA FOUNDATION • HYDERABAD, INDIA
           </span>
         </div>
 
@@ -127,7 +125,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
                 href="/#mission"
                 className="group px-5 py-3 border-2 border-neutral-800 hover:border-[#E50914] hover:bg-[#150505] text-neutral-300 hover:text-white transition-all flex items-center gap-2 min-h-[44px] hover-lift"
               >
-                <span>OUR STORY &amp; PILLARS</span>
+                <span>THREE PILLARS</span>
                 <GrungeGlyph name="arrow-down" className="w-3.5 h-3.5 text-[#E50914] group-hover:translate-y-0.5 transition-transform" />
               </Link>
             </div>
@@ -171,7 +169,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
 
               {/* Status Badges - Unclipped & Full Text */}
               <div className="absolute -top-3.5 left-3 sm:left-4 bg-[#E50914] text-white font-mono text-[10px] sm:text-xs font-black uppercase px-3 py-1 border-2 border-black shadow-[3px_3px_0px_0px_#000000] z-30 tracking-wider">
-                EST. APRIL 2025
+                SECTION 8 NGO
               </div>
               <div className="absolute -bottom-3.5 right-3 sm:right-4 bg-white text-black font-mono text-[10px] sm:text-xs font-black uppercase px-3 py-1 border-2 border-black shadow-[3px_3px_0px_0px_#E50914] z-30 tracking-wider">
                 100% NON-PROFIT

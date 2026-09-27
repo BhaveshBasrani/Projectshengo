@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import ReviewModal from '@/components/ui/ReviewModal';
 import { PublicReview } from '@/lib/types';
 
 export default function CommunityReviews() {
+  const router = useRouter();
   const [topReviews, setTopReviews] = useState<PublicReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,15 +86,15 @@ export default function CommunityReviews() {
           <div className="flex items-center gap-2 justify-center md:justify-start">
             <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
             <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold flex items-center gap-1.5">
-              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" /> SOLIDARITY SPOTLIGHT
+              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" /> COMMUNITY EXPERIENCES
             </span>
             <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
           </div>
           <h2 className="font-heading font-extrabold text-3xl sm:text-4xl uppercase tracking-tight text-white leading-none">
-            VOICES OF PROJECT S.H.E.
+            COMMUNITY REVIEWS
           </h2>
           <p className="font-sans text-xs sm:text-sm text-neutral-400 max-w-xl leading-relaxed">
-            A glimpse into community experiences, volunteer testimonies, and grassroots solidarity.
+            Read what volunteers, event attendees, and supporters say about Project S.H.E.
           </p>
         </div>
 
@@ -150,7 +152,9 @@ export default function CommunityReviews() {
               return (
                 <div
                   key={rev.id}
-                  className="p-5 bg-[#0E0E0E] text-[#F4F1EA] border border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_#E50914] flex flex-col justify-between space-y-4 transition-all relative group stencil-cut overflow-hidden"
+                  onClick={() => router.push(`/reviews?selected=${rev.id}`)}
+                  className="p-5 bg-[#0E0E0E] text-[#F4F1EA] border border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_#E50914] flex flex-col justify-between space-y-4 transition-all relative group stencil-cut overflow-hidden cursor-pointer"
+                  title="Click to view full review and enlarge"
                 >
                   {/* Subtle Corner Star Seal */}
                   <div className="absolute -right-3 -bottom-3 w-20 h-20 opacity-10 pointer-events-none select-none group-hover:scale-110 transition-transform duration-500">
@@ -180,6 +184,11 @@ export default function CommunityReviews() {
                     <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-sans italic line-clamp-3">
                       &ldquo;{rev.review_text}&rdquo;
                     </p>
+
+                    <div className="text-[10px] text-[#E50914] font-bold group-hover:underline flex items-center gap-1 pt-1">
+                      <span>READ FULL REVIEW</span>
+                      <span>→</span>
+                    </div>
                   </div>
 
                   {/* Footer Bar: Reviewer + Like Counter */}

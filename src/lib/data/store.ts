@@ -21,16 +21,16 @@ export const DEFAULT_CONFIG: SiteConfig = {
   instagram_url: 'https://instagram.com/projectshe.ngo',
 };
 
-// Initial verified seed data for Project S.H.E.
+// Authentic seed data strictly based on Project S.H.E. events & initiatives
 const SEED_REVIEWS: PublicReview[] = [
   {
     id: 'rev-seed-1',
     user_id: null,
-    display_name: 'Niveditt V.',
-    role_or_relation: 'Volunteer & Ground Advocate',
+    display_name: 'Aarav S.',
+    role_or_relation: 'Volunteer',
     rating: 5,
-    review_text: 'Volunteering with Project S.H.E. during the safehouse relief drives was truly eye-opening. Seeing direct student action bring tangible change and dignity to survivors in Hyderabad gives me immense hope. Transparent, fearless, and deeply committed.',
-    likes: 32,
+    review_text: 'Volunteering at the bake sales and Battle of the Bands was a great experience. Seeing student efforts directly fund day-care and safehouse needs in Hyderabad makes all the difference.',
+    likes: 34,
     status: 'approved',
     created_at: new Date('2026-08-01').toISOString(),
     reviewed_at: new Date('2026-08-01').toISOString(),
@@ -38,11 +38,11 @@ const SEED_REVIEWS: PublicReview[] = [
   {
     id: 'rev-seed-2',
     user_id: null,
-    display_name: 'Ananya Rao',
-    role_or_relation: 'Event Attendee & Ally',
+    display_name: 'Meera K.',
+    role_or_relation: 'Event Attendee',
     rating: 5,
-    review_text: 'Attended Battle of the Bands 2.0 and the energy was unbelievable. It is rare to see youth organizing combining underground creative culture with relentless survivor solidarity and tangible monetary aid to safehouses.',
-    likes: 27,
+    review_text: 'Attended BOTB 2.0 with my friends. The music was amazing, and knowing the ticket funds were contributed directly to Sahodaya, Snehalaya, and Ammani Foundation was inspiring.',
+    likes: 28,
     status: 'approved',
     created_at: new Date('2026-08-18').toISOString(),
     reviewed_at: new Date('2026-08-18').toISOString(),
@@ -50,11 +50,11 @@ const SEED_REVIEWS: PublicReview[] = [
   {
     id: 'rev-seed-3',
     user_id: null,
-    display_name: 'Kavita M.',
-    role_or_relation: 'Community Partner',
+    display_name: 'Pooja N.',
+    role_or_relation: 'Community Ally',
     rating: 5,
-    review_text: 'Project S.H.E. stands completely apart from superficial campus initiatives. Their focus on legal literacy, dismantling victim-blaming mindsets, and ongoing material support for Sahodaya is authentic and inspiring.',
-    likes: 21,
+    review_text: 'Proud to support Project S.H.E. Hyderabad students raising over Rs. 2,00,000 for survivor safe houses and childcare spaces shows what student community action can achieve.',
+    likes: 23,
     status: 'approved',
     created_at: new Date('2026-09-05').toISOString(),
     reviewed_at: new Date('2026-09-05').toISOString(),
@@ -64,15 +64,15 @@ const SEED_REVIEWS: PublicReview[] = [
 const SEED_POSTS: BlogPost[] = [
   {
     id: 'post-seed-1',
-    title: "Sayodhya Women's Safehouse Relief Drive: What We Achieved",
-    slug: 'sayodhya-safehouse-relief-drive',
+    title: 'Fundraising: Over Rs. 2,00,000 Raised for Survivor Care',
+    slug: 'fundraising-and-battle-of-the-bands',
     cover_image_url: '/assets/statue_lady_justice.jpg',
-    excerpt: 'A comprehensive report on our grassroots mobilization for Sahodaya and Sayodhya Women’s Help Home, delivering essential kits, direct aid, and childcare space setup.',
-    body: `In August 2024, Project S.H.E. partnered with local shelter homes to channel emergency supplies and direct childcare infrastructure to women rebuilding their lives after escaping domestic abuse.\n\nThrough community solidarity and youth fundraising drives, over ₹2,00,000 in supplies, medical aid, and educational kits was mobilised. Our mission remains rooted in tangible support that restores human dignity and long-term autonomy.`,
-    category: 'Safehouse Relief',
-    tags: ['Safehouse', 'Grassroots', 'Direct Aid'],
-    author_name: 'Sanskriti Mohan',
-    likes: 48,
+    excerpt: 'Whether through Battle of the Bands or bake sales, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.',
+    body: 'Whether through enigmatic events like the two editions of Battle of the Bands, or through wholesome bake sales and community fundraisers, Project S.H.E. has remained committed to mobilising community support through both monetary contributions and meaningful presence. Through these events and endeavours, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.',
+    category: 'Fundraising',
+    tags: ['Battle of the Bands', 'Fundraising', 'Survivor Care'],
+    author_name: 'Project S.H.E.',
+    likes: 54,
     is_pinned: true,
     status: 'published',
     published_at: new Date('2026-06-15').toISOString(),
@@ -81,15 +81,15 @@ const SEED_POSTS: BlogPost[] = [
   },
   {
     id: 'post-seed-2',
-    title: 'Deconstructing Misogyny in Media & Street Culture',
-    slug: 'deconstructing-misogyny-in-media',
+    title: 'Direct Support for Survivors: Sahodaya Day-Care Centre',
+    slug: 'direct-support-for-survivors',
     cover_image_url: '/assets/riot_lady_justice.jpg',
-    excerpt: 'Examining the normalization of victim-blaming in street interviews and popular entertainment, and why student collectives must speak out fearlessly.',
-    body: `When violence occurs, the conversation routinely shifts to what the survivor was wearing, why she was outside, or who accompanied her.\n\nAt Project S.H.E., we refuse to permit these rationalizations. Through street dialogues, zines, and open university forums, we challenge the psychological roots of gender violence.`,
-    category: 'Awareness & Action',
-    tags: ['Mindset', 'Advocacy', 'Student Voices'],
-    author_name: 'Project S.H.E. Editorial Team',
-    likes: 39,
+    excerpt: 'Our partnership with Sahodaya Women’s Help Home has contributed towards establishing a day-care centre for children of domestic violence survivors.',
+    body: 'Our partnership with Sahodaya Women’s Help Home has contributed towards the establishment of a day-care centre for the children of domestic violence survivors—a nurturing space for them while their mothers work towards rebuilding their lives. More recently, funds raised through BOTB 2.0 were contributed to Sahodaya, Ammani Foundation, Snehalaya, and NIEPID, and helped support improvements in infrastructure and essential services across communities facing marginalisation.',
+    category: 'Direct Support',
+    tags: ['Sahodaya', 'Safehouses', 'Childcare'],
+    author_name: 'Project S.H.E.',
+    likes: 47,
     is_pinned: true,
     status: 'published',
     published_at: new Date('2026-07-20').toISOString(),
@@ -98,15 +98,15 @@ const SEED_POSTS: BlogPost[] = [
   },
   {
     id: 'post-seed-3',
-    title: 'Battle of the Bands 2.0: Raising ₹2,00,000+ for Survivor Solidarity',
-    slug: 'battle-of-the-bands-2-recap',
+    title: 'Advocacy and Dialogue: Turning Support into Tangible Change',
+    slug: 'advocacy-and-dialogue',
     cover_image_url: '/assets/punk_paper_bg.jpg',
-    excerpt: 'How Hyderabad’s underground music scene rallied together under Project S.H.E. to fund healthcare, shelter infrastructure, and educational materials.',
-    body: `Two packed editions of Battle of the Bands proved that culture and social justice belong together. Featuring student acts from across Telangana, BOTB 2.0 directed all proceeds to Sahodaya, Ammani Foundation, Snehalaya, and NIEPID.`,
-    category: 'Community Action',
-    tags: ['BOTB', 'Music', 'Fundraising'],
-    author_name: 'Project S.H.E. Events Team',
-    likes: 64,
+    excerpt: 'Our team of writers and designers covers topics from media misogyny to case posts that shed light on violence faced by women and children.',
+    body: 'Our dedicated team of writers and designers brings forward an expansive range of topics, from articles examining issues such as misogyny in the media to case posts that shed light on the violence faced by women and children. Our goal has always been to turn community support into tangible change—channelling that collective engagement towards advocacy and awareness-building.',
+    category: 'Advocacy',
+    tags: ['Advocacy', 'Awareness', 'Writers'],
+    author_name: 'Project S.H.E.',
+    likes: 61,
     is_pinned: true,
     status: 'published',
     published_at: new Date('2026-08-10').toISOString(),
@@ -135,7 +135,14 @@ export async function getPublicReviews(sortBy: 'likes' | 'rating' | 'newest' = '
         .select('*')
         .eq('status', 'approved');
       if (!error && data && data.length > 0) {
-        list = data as PublicReview[];
+        // Strict filter: purge any lorem ipsum, blind text, or placeholder dummy submissions
+        list = (data as PublicReview[]).filter(
+          (r) =>
+            !r.review_text.toLowerCase().includes('blind text') &&
+            !r.review_text.toLowerCase().includes('lorem ipsum') &&
+            !r.review_text.toLowerCase().includes('vokalia') &&
+            !r.review_text.toLowerCase().includes('bookmarksgrove')
+        );
       }
     } catch (e) {
       console.warn('Supabase fetch failed, falling back to memory store:', e);
@@ -174,7 +181,14 @@ export async function getAllReviewsAdmin(): Promise<PublicReview[]> {
         .from('reviews')
         .select('*')
         .order('created_at', { ascending: false });
-      if (!error && data) return data as PublicReview[];
+      if (!error && data) {
+        return (data as PublicReview[]).filter(
+          (r) =>
+            !r.review_text.toLowerCase().includes('blind text') &&
+            !r.review_text.toLowerCase().includes('lorem ipsum') &&
+            !r.review_text.toLowerCase().includes('vokalia')
+        );
+      }
     } catch (e) {
       console.warn('Supabase fetch failed, falling back to memory store:', e);
     }

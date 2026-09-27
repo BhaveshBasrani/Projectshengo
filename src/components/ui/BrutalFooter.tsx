@@ -40,7 +40,7 @@ export default function BrutalFooter() {
             </div>
 
             <p className="text-xs text-neutral-300 leading-relaxed max-w-md font-sans">
-              &ldquo;Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.&rdquo;
+              Hyderabad&apos;s leading student NGO working to dismantle systemic gender-based violence and extend support to survivor safe houses.
             </p>
 
             {/* Emergency Helpline Box */}
@@ -194,8 +194,9 @@ export default function BrutalFooter() {
 
         {/* Bottom Tagline & Bar */}
         <div className="pt-6 mt-8 border-t border-neutral-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-neutral-400">
-          <p className="text-neutral-300 font-sans text-xs sm:text-sm font-medium italic border-l-2 border-[#E50914] pl-3 max-w-2xl">
-            Hyderabad&apos;s leading student NGO mobilizing grassroots action, supporting survivor safe houses, and dismantling systemic gender-based violence. </p>.
+          <p className="text-neutral-200 font-sans text-xs sm:text-sm font-medium italic border-l-2 border-[#E50914] pl-3 max-w-2xl">
+            &ldquo;Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.&rdquo;
+          </p>
 
           <div className="flex items-center gap-3 flex-wrap shrink-0">
             <span className="text-[11px]">

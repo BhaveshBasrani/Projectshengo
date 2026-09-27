@@ -59,21 +59,21 @@ export default async function BlogArchivePage() {
         <div className="flex items-center gap-2">
           <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
           <span className="text-xs text-[#E50914] uppercase tracking-widest font-black">
-            ARCHIVE &amp; CASE STUDIES
+            ADVOCACY &amp; DIALOGUE
           </span>
         </div>
         <h1 className="font-heading font-black text-4xl sm:text-6xl uppercase tracking-tight text-white">
-          THE S.H.E. ADVOCACY JOURNAL
+          ARTICLES &amp; STORIES
         </h1>
         <p className="text-xs sm:text-sm text-neutral-400 max-w-2xl font-sans">
-          Educational articles, mindset awareness essays, event recaps, and survivor rehabilitation reports published by the Project S.H.E. team.
+          Articles and case posts from our team of writers and designers turning community support into tangible change.
         </p>
       </div>
 
       {/* Grid */}
       {posts.length === 0 ? (
         <div className="p-16 text-center border-2 border-dashed border-neutral-800 text-xs text-neutral-500">
-          No published articles available at this time. Check back soon for field updates.
+          No published articles available at this time. Check back soon.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -156,7 +156,7 @@ export default async function BlogArchivePage() {
                   href={`/blog/${post.slug}`}
                   className="w-full py-2.5 bg-[#141414] hover:bg-[#E50914] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 border border-neutral-800 hover:border-[#E50914] transition-all"
                 >
-                  <span>READ FULL REPORT</span>
+                  <span>READ ARTICLE</span>
                   <GrungeGlyph name="arrow-right" className="w-3.5 h-3.5" />
                 </Link>
               </div>
