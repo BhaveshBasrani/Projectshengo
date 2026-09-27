@@ -44,7 +44,16 @@ export default async function BlogArchivePage() {
   const posts = await getPublishedPosts();
 
   return (
-    <div className="pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono">
+    <div className="pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono relative">
+      {/* Background Ambience Texture */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-[0.05] mix-blend-screen"
+          style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#080808_85%)]" />
+      </div>
+
       {/* Header */}
       <div className="mb-14 space-y-3">
         <div className="flex items-center gap-2">

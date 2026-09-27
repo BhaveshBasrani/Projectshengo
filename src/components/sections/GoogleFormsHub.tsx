@@ -58,11 +58,16 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
   return (
     <section id="external-forms" className="scroll-mt-28 sm:scroll-mt-36 pt-28 sm:pt-36 pb-20 px-4 sm:px-6 max-w-7xl mx-auto select-none relative">
       
-      {/* Atmospheric Halftone Stars Texture */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-96 opacity-10 pointer-events-none bg-contain bg-center bg-no-repeat [mask-image:radial-gradient(circle,black_40%,transparent_70%)]"
-        style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
-      />
+      {/* Immersive Dark-Punk Atmospheric Background */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-[0.05] mix-blend-screen"
+          style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
+        />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[500px] bg-[radial-gradient(ellipse,rgba(229,9,20,0.08)_0%,transparent_70%)] blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,#080808_90%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-transparent to-[#080808]" />
+      </div>
 
       {/* Header */}
       <div className="mb-14 space-y-2 text-center sm:text-left relative z-10">

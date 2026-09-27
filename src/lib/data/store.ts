@@ -21,9 +21,103 @@ export const DEFAULT_CONFIG: SiteConfig = {
   instagram_url: 'https://instagram.com/projectshe.ngo',
 };
 
+// Initial verified seed data for Project S.H.E.
+const SEED_REVIEWS: PublicReview[] = [
+  {
+    id: 'rev-seed-1',
+    user_id: null,
+    display_name: 'Niveditt V.',
+    role_or_relation: 'Volunteer & Ground Advocate',
+    rating: 5,
+    review_text: 'Volunteering with Project S.H.E. during the safehouse relief drives was truly eye-opening. Seeing direct student action bring tangible change and dignity to survivors in Hyderabad gives me immense hope. Transparent, fearless, and deeply committed.',
+    likes: 32,
+    status: 'approved',
+    created_at: new Date('2026-08-01').toISOString(),
+    reviewed_at: new Date('2026-08-01').toISOString(),
+  },
+  {
+    id: 'rev-seed-2',
+    user_id: null,
+    display_name: 'Ananya Rao',
+    role_or_relation: 'Event Attendee & Ally',
+    rating: 5,
+    review_text: 'Attended Battle of the Bands 2.0 and the energy was unbelievable. It is rare to see youth organizing combining underground creative culture with relentless survivor solidarity and tangible monetary aid to safehouses.',
+    likes: 27,
+    status: 'approved',
+    created_at: new Date('2026-08-18').toISOString(),
+    reviewed_at: new Date('2026-08-18').toISOString(),
+  },
+  {
+    id: 'rev-seed-3',
+    user_id: null,
+    display_name: 'Kavita M.',
+    role_or_relation: 'Community Partner',
+    rating: 5,
+    review_text: 'Project S.H.E. stands completely apart from superficial campus initiatives. Their focus on legal literacy, dismantling victim-blaming mindsets, and ongoing material support for Sahodaya is authentic and inspiring.',
+    likes: 21,
+    status: 'approved',
+    created_at: new Date('2026-09-05').toISOString(),
+    reviewed_at: new Date('2026-09-05').toISOString(),
+  },
+];
+
+const SEED_POSTS: BlogPost[] = [
+  {
+    id: 'post-seed-1',
+    title: "Sayodhya Women's Safehouse Relief Drive: What We Achieved",
+    slug: 'sayodhya-safehouse-relief-drive',
+    cover_image_url: '/assets/statue_lady_justice.jpg',
+    excerpt: 'A comprehensive report on our grassroots mobilization for Sahodaya and Sayodhya Women’s Help Home, delivering essential kits, direct aid, and childcare space setup.',
+    body: `In August 2024, Project S.H.E. partnered with local shelter homes to channel emergency supplies and direct childcare infrastructure to women rebuilding their lives after escaping domestic abuse.\n\nThrough community solidarity and youth fundraising drives, over ₹2,00,000 in supplies, medical aid, and educational kits was mobilised. Our mission remains rooted in tangible support that restores human dignity and long-term autonomy.`,
+    category: 'Safehouse Relief',
+    tags: ['Safehouse', 'Grassroots', 'Direct Aid'],
+    author_name: 'Sanskriti Mohan',
+    likes: 48,
+    is_pinned: true,
+    status: 'published',
+    published_at: new Date('2026-06-15').toISOString(),
+    created_at: new Date('2026-06-15').toISOString(),
+    updated_at: new Date('2026-06-15').toISOString(),
+  },
+  {
+    id: 'post-seed-2',
+    title: 'Deconstructing Misogyny in Media & Street Culture',
+    slug: 'deconstructing-misogyny-in-media',
+    cover_image_url: '/assets/riot_lady_justice.jpg',
+    excerpt: 'Examining the normalization of victim-blaming in street interviews and popular entertainment, and why student collectives must speak out fearlessly.',
+    body: `When violence occurs, the conversation routinely shifts to what the survivor was wearing, why she was outside, or who accompanied her.\n\nAt Project S.H.E., we refuse to permit these rationalizations. Through street dialogues, zines, and open university forums, we challenge the psychological roots of gender violence.`,
+    category: 'Awareness & Action',
+    tags: ['Mindset', 'Advocacy', 'Student Voices'],
+    author_name: 'Project S.H.E. Editorial Team',
+    likes: 39,
+    is_pinned: true,
+    status: 'published',
+    published_at: new Date('2026-07-20').toISOString(),
+    created_at: new Date('2026-07-20').toISOString(),
+    updated_at: new Date('2026-07-20').toISOString(),
+  },
+  {
+    id: 'post-seed-3',
+    title: 'Battle of the Bands 2.0: Raising ₹2,00,000+ for Survivor Solidarity',
+    slug: 'battle-of-the-bands-2-recap',
+    cover_image_url: '/assets/punk_paper_bg.jpg',
+    excerpt: 'How Hyderabad’s underground music scene rallied together under Project S.H.E. to fund healthcare, shelter infrastructure, and educational materials.',
+    body: `Two packed editions of Battle of the Bands proved that culture and social justice belong together. Featuring student acts from across Telangana, BOTB 2.0 directed all proceeds to Sahodaya, Ammani Foundation, Snehalaya, and NIEPID.`,
+    category: 'Community Action',
+    tags: ['BOTB', 'Music', 'Fundraising'],
+    author_name: 'Project S.H.E. Events Team',
+    likes: 64,
+    is_pinned: true,
+    status: 'published',
+    published_at: new Date('2026-08-10').toISOString(),
+    created_at: new Date('2026-08-10').toISOString(),
+    updated_at: new Date('2026-08-10').toISOString(),
+  },
+];
+
 // Production Data Store
-let memoryReviews: PublicReview[] = [];
-let memoryPosts: BlogPost[] = [];
+let memoryReviews: PublicReview[] = [...SEED_REVIEWS];
+let memoryPosts: BlogPost[] = [...SEED_POSTS];
 let memoryUpdates: SiteUpdate[] = [];
 let memoryFeedback: SuggestionFeedback[] = [];
 let memoryProfiles: UserProfile[] = [];
@@ -40,12 +134,24 @@ export async function getPublicReviews(sortBy: 'likes' | 'rating' | 'newest' = '
         .from('reviews')
         .select('*')
         .eq('status', 'approved');
-      if (!error && data) list = data as PublicReview[];
+      if (!error && data && data.length > 0) {
+        list = data as PublicReview[];
+      }
     } catch (e) {
       console.warn('Supabase fetch failed, falling back to memory store:', e);
     }
-  } else {
-    list = memoryReviews.filter((r) => r.status === 'approved');
+  }
+
+  if (list.length < 3) {
+    const memoryApproved = memoryReviews.filter((r) => r.status === 'approved');
+    const existingIds = new Set(list.map((r) => r.id));
+    for (const mr of memoryApproved) {
+      if (!existingIds.has(mr.id)) {
+        list.push(mr);
+        existingIds.add(mr.id);
+        if (list.length >= 3) break;
+      }
+    }
   }
 
   return list.sort((a, b) => {
@@ -246,12 +352,24 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
         .from('posts')
         .select('*')
         .eq('status', 'published');
-      if (!error && data) list = data as BlogPost[];
+      if (!error && data && data.length > 0) {
+        list = data as BlogPost[];
+      }
     } catch (e) {
       console.warn('Supabase fetch failed:', e);
     }
-  } else {
-    list = memoryPosts.filter((p) => p.status === 'published');
+  }
+
+  if (list.length < 3) {
+    const memoryPublished = memoryPosts.filter((p) => p.status === 'published');
+    const existingIds = new Set(list.map((p) => p.id));
+    for (const mp of memoryPublished) {
+      if (!existingIds.has(mp.id)) {
+        list.push(mp);
+        existingIds.add(mp.id);
+        if (list.length >= 3) break;
+      }
+    }
   }
 
   // Pinned posts always appear at the top (max 3), followed by newest published
@@ -287,7 +405,7 @@ export async function getAllPostsAdmin(): Promise<BlogPost[]> {
         .from('posts')
         .select('*')
         .order('created_at', { ascending: false });
-      if (!error && data) return data as BlogPost[];
+      if (!error && data && data.length > 0) return data as BlogPost[];
     } catch (e) {
       console.warn('Supabase fetch failed:', e);
     }

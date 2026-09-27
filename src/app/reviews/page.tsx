@@ -62,10 +62,13 @@ export default function ReviewsArchivePage() {
     <div className="pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono">
       
       {/* Background Ambience Texture */}
-      <div 
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-6xl h-[600px] opacity-10 pointer-events-none bg-contain bg-center bg-no-repeat [mask-image:radial-gradient(circle,black_40%,transparent_70%)]"
-        style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
-      />
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-[0.05] mix-blend-screen"
+          style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#080808_85%)]" />
+      </div>
 
       {/* Header */}
       <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10 border-b-2 border-neutral-900 pb-8">

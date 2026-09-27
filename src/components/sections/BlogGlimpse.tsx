@@ -60,11 +60,27 @@ export default function BlogGlimpse() {
   return (
     <section id="stories" className="scroll-mt-28 sm:scroll-mt-36 pt-24 sm:pt-32 pb-8 px-4 sm:px-6 max-w-7xl mx-auto select-none relative">
       
-      {/* Background Ambience */}
-      <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-80 opacity-10 pointer-events-none bg-contain bg-center bg-no-repeat [mask-image:radial-gradient(circle,black_40%,transparent_70%)]"
-        style={{ backgroundImage: `url('/assets/punk-bg-abstract.jpg')` }}
-      />
+      {/* Immersive Dark-Punk Atmospheric Background */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-[0.06] mix-blend-screen"
+          style={{ backgroundImage: `url('/assets/punk-bg-abstract.jpg')` }}
+        />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[400px] bg-[radial-gradient(ellipse,rgba(229,9,20,0.12)_0%,transparent_70%)] blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#080808_88%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-transparent to-[#080808]" />
+      </div>
+
+      {/* Subtle Corner Punk Seal */}
+      <div className="absolute -top-10 -right-10 w-48 h-48 opacity-[0.07] pointer-events-none select-none z-0 hidden sm:block">
+        <Image
+          src="/assets/punk-starburst.png"
+          alt="*"
+          fill
+          sizes="192px"
+          className="object-contain"
+        />
+      </div>
 
       {/* Header Bar */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10 border-b border-neutral-900 pb-6">
