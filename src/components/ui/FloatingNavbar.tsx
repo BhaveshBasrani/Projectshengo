@@ -15,6 +15,7 @@ export default function FloatingNavbar() {
   const { user, isAdmin, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [hasTopBanner, setHasTopBanner] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -23,20 +24,21 @@ export default function FloatingNavbar() {
   useEffect(() => {
     setMounted(true);
 
-    const checkInitialBanner = () => {
-      try {
-        const isDismissed = sessionStorage.getItem('she_bulletin_dismissed') === 'true';
-        setHasTopBanner(!isDismissed && pathname !== '/bulletin');
-      } catch (e) {}
-    };
-    checkInitialBanner();
-
     const handleBannerState = (e: any) => {
-      setHasTopBanner(Boolean(e.detail?.visible) && pathname !== '/bulletin');
+      setHasTopBanner(Boolean(e.detail?.visible));
     };
     window.addEventListener('bulletin-banner-state', handleBannerState);
     return () => window.removeEventListener('bulletin-banner-state', handleBannerState);
-  }, [pathname]);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Fetch user's latest review status whenever user is logged in
   useEffect(() => {
@@ -98,11 +100,13 @@ export default function FloatingNavbar() {
     return clean.slice(0, 2).toUpperCase() || 'U';
   };
 
+  const isPushedDown = hasTopBanner && !isScrolled && pathname !== '/bulletin';
+
   return (
     <>
       <header
         className={`fixed left-0 right-0 z-50 px-3 sm:px-6 max-w-7xl mx-auto select-none transition-all duration-300 ease-out ${
-          hasTopBanner ? 'top-12 sm:top-14' : 'top-3 sm:top-4'
+          isPushedDown ? 'top-12 sm:top-14' : 'top-3 sm:top-4'
         }`}
       >
         <nav className="w-full transition-all duration-200 border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md flex items-center justify-between relative overflow-hidden">

@@ -68,12 +68,15 @@ export const metadata: Metadata = {
 };
 
 import CinematicEasterEgg from '@/components/ui/CinematicEasterEgg';
+import { getPublishedUpdates } from '@/lib/data/store';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const updates = await getPublishedUpdates();
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -122,7 +125,7 @@ export default function RootLayout({
         <PaperOverlay />
 
         <AuthProvider>
-          <BulletinBanner />
+          <BulletinBanner updates={updates} />
           <FloatingNavbar />
           <main className="flex-1 relative z-10">{children}</main>
           <BrutalFooter />

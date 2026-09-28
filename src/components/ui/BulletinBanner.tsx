@@ -14,39 +14,45 @@ interface BulletinBannerProps {
 export default function BulletinBanner({ updates: initialUpdates }: BulletinBannerProps) {
   const pathname = usePathname();
   const [updates, setUpdates] = useState<SiteUpdate[]>(initialUpdates || []);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissedId, setDismissedId] = useState<string | null>(null);
 
-  // Check dismissal state in session storage
+  // Check dismissal state in session storage per bulletin ID
   useEffect(() => {
     try {
-      const isDismissed = sessionStorage.getItem('she_bulletin_dismissed');
-      if (isDismissed === 'true') {
-        setDismissed(true);
+      const storedId = sessionStorage.getItem('she_bulletin_dismissed_id');
+      if (storedId) {
+        setDismissedId(storedId);
       }
     } catch (e) {}
   }, []);
 
-  // Fetch updates if none provided
+  // Fetch updates if none provided or sync with public endpoint
   useEffect(() => {
-    if (!initialUpdates || initialUpdates.length === 0) {
-      fetch('/api/admin/updates')
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.updates && Array.isArray(data.updates)) {
-            setUpdates(data.updates);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [initialUpdates]);
+    fetch('/api/updates')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.updates && Array.isArray(data.updates)) {
+          setUpdates(data.updates);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Find the latest bulletin that is marked as banner
-  const bannerUpdate = updates.find((u) => {
-    const parsed = parseBulletinPayload(u);
-    return parsed.is_banner !== false;
-  }) || updates[0];
+  const bannerUpdate =
+    updates.find((u) => {
+      const parsed = parseBulletinPayload(u);
+      return parsed.is_banner === true;
+    }) ||
+    (updates.length > 0 && parseBulletinPayload(updates[0]).is_banner !== false
+      ? updates[0]
+      : null);
 
-  const isVisible = Boolean(bannerUpdate && !dismissed && pathname !== '/bulletin');
+  const isVisible = Boolean(
+    bannerUpdate &&
+    bannerUpdate.id !== dismissedId &&
+    pathname !== '/bulletin'
+  );
 
   // Broadcast visibility to FloatingNavbar so it adjusts top position smoothly
   useEffect(() => {
@@ -58,10 +64,12 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
   }, [isVisible]);
 
   const handleDismiss = () => {
-    setDismissed(true);
-    try {
-      sessionStorage.setItem('she_bulletin_dismissed', 'true');
-    } catch (e) {}
+    if (bannerUpdate) {
+      setDismissedId(bannerUpdate.id);
+      try {
+        sessionStorage.setItem('she_bulletin_dismissed_id', bannerUpdate.id);
+      } catch (e) {}
+    }
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
         new CustomEvent('bulletin-banner-state', { detail: { visible: false } })
