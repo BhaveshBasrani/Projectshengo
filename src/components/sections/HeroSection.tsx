@@ -13,8 +13,8 @@ interface HeroSectionProps {
 
 export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
   const tickerItems = (
-    <div className="flex items-center space-x-6 sm:space-x-8 px-4 font-mono text-[11px] sm:text-xs uppercase tracking-widest text-[#EDEDED] font-black whitespace-nowrap">
-      <span className="flex items-center gap-1.5 text-[#E50914] font-black drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]">
+    <div suppressHydrationWarning className="flex items-center space-x-6 sm:space-x-8 px-4 font-mono text-[11px] sm:text-xs uppercase tracking-widest text-[#EDEDED] font-black whitespace-nowrap">
+      <span suppressHydrationWarning className="flex items-center gap-1.5 text-[#E50914] font-black drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]">
         <span className="w-2 h-2 bg-[#E50914] inline-block shadow-[0_0_6px_#E50914]"></span>
         DISMANTLING GENDER-BASED VIOLENCE
       </span>
@@ -213,12 +213,12 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
       </div>
 
       {/* Full-Bleed Continuous Edge-to-Edge Marquee Ticker with Animated Hazard Stripes */}
-      <div className="w-full mt-6 sm:mt-8 border-y-2 border-x-0 sm:border-y-4 border-[#E50914] bg-[#070707] select-none overflow-hidden shrink-0 z-10 group/marquee">
+      <div suppressHydrationWarning className="w-full mt-6 sm:mt-8 border-y-2 border-x-0 sm:border-y-4 border-[#E50914] bg-[#070707] select-none overflow-hidden shrink-0 z-10 group/marquee">
         {/* Top Animated Hazard Rail */}
         <div className="w-full h-2.5 sm:h-3 bg-hazard-stripes shadow-[0_0_10px_rgba(229,9,20,0.5)]" />
 
         {/* Marquee Content Rail with Hover Pause */}
-        <div className="py-2.5 sm:py-3 flex overflow-hidden group-hover/marquee:[&_.animate-marquee]:[animation-play-state:paused]">
+        <div suppressHydrationWarning className="py-2.5 sm:py-3 flex overflow-hidden group-hover/marquee:[&_.animate-marquee]:[animation-play-state:paused]">
           <div className="flex shrink-0 min-w-full items-center justify-around animate-marquee">
             {tickerItems}
           </div>

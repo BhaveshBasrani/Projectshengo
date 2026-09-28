@@ -426,6 +426,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
             src="/assets/discoball-sticker.png"
             alt="Disco Ball Sticker"
             fill
+            sizes="112px"
             className="object-contain drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"
           />
         </div>
@@ -434,6 +435,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
             src="/assets/headphones-sticker.png"
             alt="Headphones Sticker"
             fill
+            sizes="96px"
             className="object-contain drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"
           />
         </div>
@@ -479,6 +481,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           src={parsed.image_url}
                           alt={update.title}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-contain p-2 group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
@@ -562,6 +565,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           src={parsed.image_url}
                           alt={update.title}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-contain p-2"
                         />
                       </div>
@@ -622,6 +626,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           src={parsed.image_url}
                           alt={update.title}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-contain p-2"
                         />
                       </div>
@@ -683,6 +688,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           src={parsed.image_url}
                           alt={update.title}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
@@ -797,6 +803,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                       src={parsedModal.image_url}
                       alt={selectedUpdate.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, 768px"
                       className="object-contain p-4"
                     />
                   </div>

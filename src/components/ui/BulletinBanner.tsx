@@ -108,6 +108,7 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
                 src={parsed.image_url}
                 alt="Bulletin Icon"
                 fill
+                sizes="24px"
                 className="object-contain drop-shadow-[0_0_8px_rgba(229,9,20,0.7)]"
               />
             </div>

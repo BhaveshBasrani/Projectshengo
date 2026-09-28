@@ -1857,6 +1857,7 @@ export default function AdminDashboardPage() {
                             src={newUpdateImageUrl}
                             alt="Preview"
                             fill
+                            sizes="96px"
                             className="object-contain p-2"
                           />
                         ) : (
@@ -1889,7 +1890,7 @@ export default function AdminDashboardPage() {
                       </div>
                       {newUpdateImageUrl && (
                         <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
-                          <Image src={newUpdateImageUrl} alt="Preview" fill className="object-contain p-2" />
+                          <Image src={newUpdateImageUrl} alt="Preview" fill sizes="96px" className="object-contain p-2" />
                         </div>
                       )}
                       <div className="font-heading font-black text-xs uppercase text-white truncate">
@@ -1912,7 +1913,7 @@ export default function AdminDashboardPage() {
                       </div>
                       {newUpdateImageUrl && (
                         <div className="relative w-full h-24 bg-black border border-dashed border-neutral-700 overflow-hidden my-1">
-                          <Image src={newUpdateImageUrl} alt="Preview" fill className="object-contain p-2" />
+                          <Image src={newUpdateImageUrl} alt="Preview" fill sizes="96px" className="object-contain p-2" />
                         </div>
                       )}
                       <div className="font-heading font-black text-xs uppercase tracking-tight text-white truncate">
@@ -1935,7 +1936,7 @@ export default function AdminDashboardPage() {
                       </div>
                       {newUpdateImageUrl && (
                         <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
-                          <Image src={newUpdateImageUrl} alt="Preview" fill className="object-contain p-2" />
+                          <Image src={newUpdateImageUrl} alt="Preview" fill sizes="96px" className="object-contain p-2" />
                         </div>
                       )}
                       <div className="font-heading font-black text-xs uppercase text-white truncate">
@@ -1981,6 +1982,7 @@ export default function AdminDashboardPage() {
                             src={parsed.image_url}
                             alt={u.title}
                             fill
+                            sizes="48px"
                             className="object-contain p-1"
                           />
                         </div>
