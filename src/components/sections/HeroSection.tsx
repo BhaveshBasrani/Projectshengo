@@ -39,7 +39,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
   );
 
   return (
-    <section className="relative min-h-[100dvh] flex flex-col justify-between pt-28 sm:pt-32 pb-0 overflow-hidden border-b-2 border-[#EDEDED] select-none bg-[#090909]">
+    <section className="relative min-h-[100dvh] flex flex-col justify-between pt-32 sm:pt-36 pb-0 overflow-hidden border-b-2 border-[#EDEDED] select-none bg-[#090909]">
 
       {/* Ambient Japanese Punk Posters Backdrop */}
       <div 

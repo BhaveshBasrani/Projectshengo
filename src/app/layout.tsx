@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/lib/firebase/auth-context';
 import FloatingNavbar from '@/components/ui/FloatingNavbar';
+import BulletinBanner from '@/components/ui/BulletinBanner';
 import BrutalFooter from '@/components/ui/BrutalFooter';
 import PaperOverlay from '@/components/ui/PaperOverlay';
 import TextureBackground from '@/components/ui/TextureBackground';
@@ -121,6 +122,7 @@ export default function RootLayout({
         <PaperOverlay />
 
         <AuthProvider>
+          <BulletinBanner />
           <FloatingNavbar />
           <main className="flex-1 relative z-10">{children}</main>
           <BrutalFooter />

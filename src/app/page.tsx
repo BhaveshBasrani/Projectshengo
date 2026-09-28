@@ -6,10 +6,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [config, updates] = await Promise.all([
-    getSiteConfig(),
-    getPublishedUpdates(),
-  ]);
+  const config = await getSiteConfig();
 
-  return <LandingPage config={config} initialUpdates={updates} />;
+  return <LandingPage config={config} />;
 }

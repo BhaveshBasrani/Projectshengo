@@ -24,19 +24,19 @@ export async function POST(req: NextRequest) {
     if (action === 'pin') {
       const res = await toggleBulletinPin(updateId);
       const updates = await getAllUpdatesAdmin();
-      return NextResponse.json({ success: true, ...res, updates });
+      return NextResponse.json({ ...res, updates });
     }
 
     if (action === 'lock') {
       const res = await toggleBulletinLock(updateId);
       const updates = await getAllUpdatesAdmin();
-      return NextResponse.json({ success: true, ...res, updates });
+      return NextResponse.json({ ...res, updates });
     }
 
     if (action === 'toggle_banner') {
       const res = await toggleBulletinBanner(updateId);
       const updates = await getAllUpdatesAdmin();
-      return NextResponse.json({ success: true, ...res, updates });
+      return NextResponse.json({ ...res, updates });
     }
 
     if (action === 'delete') {

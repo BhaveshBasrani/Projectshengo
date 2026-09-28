@@ -3,37 +3,26 @@
 import React from 'react';
 import FlowArt, { FlowSection } from '@/components/ui/FlowArt';
 
-import BulletinBanner from '@/components/ui/BulletinBanner';
 import HeroSection from '@/components/sections/HeroSection';
-import BulletinBoard from '@/components/sections/BulletinBoard';
 import MissionPillars from '@/components/sections/MissionPillars';
 import GoogleFormsHub from '@/components/sections/GoogleFormsHub';
 import DonationSection from '@/components/sections/DonationSection';
 import BlogGlimpse from '@/components/sections/BlogGlimpse';
 import CommunityReviews from '@/components/sections/CommunityReviews';
-import { SiteConfig, SiteUpdate } from '@/lib/types';
+import { SiteConfig } from '@/lib/types';
 
 interface LandingPageProps {
   config: SiteConfig;
-  initialUpdates?: SiteUpdate[];
 }
 
-export default function LandingPage({ config, initialUpdates = [] }: LandingPageProps) {
+export default function LandingPage({ config }: LandingPageProps) {
   return (
-    <>
-      {/* Banner on top of website above Hero */}
-      <BulletinBanner updates={initialUpdates} />
-
+    <div className="page-fluid-enter">
       <FlowArt aria-label="Project S.H.E. Story">
 
         {/* Chapter 1: WHO WE ARE — Hero + Identity */}
         <FlowSection aria-label="Hero" className="bg-[#090909]">
           <HeroSection teamFormUrl={config.google_form_team_app} />
-        </FlowSection>
-
-        {/* Community Bulletin Board with Star Gridlines Canvas */}
-        <FlowSection aria-label="Community Bulletin" className="bg-[#050505] border-t-2 border-neutral-900">
-          <BulletinBoard updates={initialUpdates} />
         </FlowSection>
 
       {/* Chapter 2: WHAT WE DO — Founder's Story + Three Pillars */}
@@ -74,6 +63,6 @@ export default function LandingPage({ config, initialUpdates = [] }: LandingPage
       </FlowSection>
 
     </FlowArt>
-    </>
+    </div>
   );
 }

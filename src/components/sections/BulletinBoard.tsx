@@ -1023,7 +1023,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                         >
                           {commentLoading ? (
                             <>
-                              <PunkLoader size="xs" color="#FFFFFF" />
+                              <PunkLoader size="sm" />
                               <span>POSTING...</span>
                             </>
                           ) : (
@@ -1207,7 +1207,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                 >
                   {newTopicLoading ? (
                     <>
-                      <PunkLoader size="xs" color="#FFFFFF" />
+                      <PunkLoader size="sm" />
                       <span>POSTING TOPIC...</span>
                     </>
                   ) : (
