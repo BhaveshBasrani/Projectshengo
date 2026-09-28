@@ -468,6 +468,28 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleModerateBulletin = async (updateId: string, action: 'pin' | 'lock' | 'toggle_banner' | 'delete') => {
+    if (action === 'delete' && !confirm('Are you sure you want to permanently delete this bulletin topic?')) return;
+    try {
+      const res = await fetch('/api/bulletin/moderate', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ updateId, action }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`Bulletin ${action} updated`);
+        if (data.updates) {
+          setUpdates(data.updates);
+        } else if (action === 'delete') {
+          setUpdates((prev) => prev.filter((u) => u.id !== updateId));
+        }
+      }
+    } catch (e) {
+      showToast('Moderation action failed');
+    }
+  };
+
   // Config Actions
   const handleSaveConfig = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1615,7 +1637,7 @@ export default function AdminDashboardPage() {
                 BULLETINS &amp; ANNOUNCEMENTS
               </h2>
               <p className="text-xs text-neutral-400">
-                Customizable bulletin dispatches displayed on the top banner and on the star-grid bulletin board.
+                Customizable bulletins, community topics, and announcements displayed on the top banner and on the star-grid bulletin board.
               </p>
             </div>
             <a
@@ -1827,13 +1849,13 @@ export default function AdminDashboardPage() {
                   {/* Polaroid Preview */}
                   {newUpdateCardStyle === 'polaroid' && (
                     <div className="bg-[#EDEDED] text-black p-3 shadow-[4px_4px_0px_#000000] rotate-[-1deg]">
-                      <div className="relative w-full h-28 bg-[#181818] mb-2 flex items-center justify-center overflow-hidden">
+                      <div className="relative w-full h-32 bg-[#181818] mb-2 flex items-center justify-center overflow-hidden">
                         {newUpdateImageUrl ? (
                           <Image
                             src={newUpdateImageUrl}
                             alt="Preview"
                             fill
-                            className="object-contain p-1"
+                            className="object-contain p-2"
                           />
                         ) : (
                           <span className="text-[10px] text-neutral-500 font-mono">PHOTO SPACE</span>
@@ -1860,6 +1882,11 @@ export default function AdminDashboardPage() {
                         </span>
                         <span className="font-mono text-[8px] text-[#E50914] font-bold">★ STAMPED</span>
                       </div>
+                      {newUpdateImageUrl && (
+                        <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
+                          <Image src={newUpdateImageUrl} alt="Preview" fill className="object-contain p-2" />
+                        </div>
+                      )}
                       <div className="font-heading font-black text-xs uppercase text-white truncate">
                         {newUpdateTitle || 'BULLETIN TITLE'}
                       </div>
@@ -1878,6 +1905,11 @@ export default function AdminDashboardPage() {
                         </span>
                         <span className="text-[#E50914] text-xs font-bold">★</span>
                       </div>
+                      {newUpdateImageUrl && (
+                        <div className="relative w-full h-24 bg-black border border-dashed border-neutral-700 overflow-hidden my-1">
+                          <Image src={newUpdateImageUrl} alt="Preview" fill className="object-contain p-2" />
+                        </div>
+                      )}
                       <div className="font-heading font-black text-xs uppercase tracking-tight text-white truncate">
                         {newUpdateTitle || 'BULLETIN TITLE'}
                       </div>
@@ -1896,6 +1928,11 @@ export default function AdminDashboardPage() {
                           {newUpdateCategory}
                         </span>
                       </div>
+                      {newUpdateImageUrl && (
+                        <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
+                          <Image src={newUpdateImageUrl} alt="Preview" fill className="object-contain p-2" />
+                        </div>
+                      )}
                       <div className="font-heading font-black text-xs uppercase text-white truncate">
                         {newUpdateTitle || 'BULLETIN TITLE'}
                       </div>
@@ -1911,9 +1948,14 @@ export default function AdminDashboardPage() {
 
           {/* List of Posted Bulletins */}
           <div className="space-y-3 pt-4 border-t border-neutral-800">
-            <span className="font-mono text-[11px] text-neutral-400 uppercase font-bold block">
-              POSTED BULLETINS ({updates.length})
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-[11px] text-neutral-400 uppercase font-bold block">
+                POSTED BULLETINS &amp; TOPICS ({updates.length})
+              </span>
+              <span className="text-[10px] text-neutral-500 font-mono">
+                Click controls to pin, toggle banner, or lock replies
+              </span>
+            </div>
 
             {updates.length === 0 ? (
               <div className="p-4 bg-[#101010] border border-neutral-800 text-neutral-500 font-mono text-xs">
@@ -1925,11 +1967,11 @@ export default function AdminDashboardPage() {
                 return (
                   <div
                     key={u.id}
-                    className="p-4 bg-[#0E0E0E] border border-neutral-800 flex items-center justify-between gap-4 text-xs"
+                    className="p-4 bg-[#0E0E0E] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
                       {parsed.image_url && (
-                        <div className="relative w-8 h-8 shrink-0 bg-neutral-900 border border-neutral-800">
+                        <div className="relative w-12 h-12 shrink-0 bg-neutral-900 border border-neutral-800">
                           <Image
                             src={parsed.image_url}
                             alt={u.title}
@@ -1938,33 +1980,85 @@ export default function AdminDashboardPage() {
                           />
                         </div>
                       )}
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="px-2 py-0.5 bg-[#E50914] text-white text-[9px] font-bold uppercase shrink-0">
                             {u.category}
                           </span>
-                          <span className="font-bold text-white truncate">{u.title}</span>
+                          <span className="font-bold text-white text-sm truncate">{u.title}</span>
                           <span className="text-neutral-500 text-[10px] font-mono shrink-0">
                             [{parsed.card_style}]
                           </span>
+                          {parsed.pinned && (
+                            <span className="text-amber-400 text-[9px] font-mono uppercase shrink-0 font-bold">
+                              • 📌 PINNED
+                            </span>
+                          )}
+                          {parsed.locked && (
+                            <span className="text-neutral-400 text-[9px] font-mono uppercase shrink-0">
+                              • 🔒 LOCKED
+                            </span>
+                          )}
                           {parsed.is_banner && (
-                            <span className="text-emerald-400 text-[9px] font-mono uppercase shrink-0">
-                              • Top Banner
+                            <span className="text-emerald-400 text-[9px] font-mono uppercase shrink-0 font-bold">
+                              • 📢 TOP BANNER
                             </span>
                           )}
                         </div>
-                        <p className="text-neutral-400 text-[11px] mt-1 line-clamp-1">{parsed.body}</p>
+                        <p className="text-neutral-400 text-[11px] mt-1 line-clamp-2">{parsed.body}</p>
+                        <div className="mt-2 flex items-center gap-3 text-[10px] font-mono text-neutral-500">
+                          <span>By {parsed.author_name || 'Admin'}</span>
+                          <span>•</span>
+                          <span>{new Date(u.created_at).toLocaleDateString()}</span>
+                          <span>•</span>
+                          <span>💬 {parsed.comments?.length || 0} comments</span>
+                          <span>•</span>
+                          <span>★ {parsed.likes || 0} stars</span>
+                        </div>
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteUpdate(u.id)}
-                      className="p-2 text-neutral-500 hover:text-red-500 hover:bg-neutral-900 transition-colors shrink-0"
-                      title="Delete Bulletin"
-                    >
-                      <GrungeGlyph name="trash" className="w-4 h-4" />
-                    </button>
+                    {/* Quick Moderation Buttons */}
+                    <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleModerateBulletin(u.id, 'pin')}
+                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors ${
+                          parsed.pinned ? 'bg-amber-950 border-amber-600 text-amber-300' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
+                        }`}
+                        title="Toggle Pin"
+                      >
+                        {parsed.pinned ? '📌 UNPIN' : '📌 PIN'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleModerateBulletin(u.id, 'toggle_banner')}
+                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors ${
+                          parsed.is_banner ? 'bg-emerald-950 border-emerald-600 text-emerald-300' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
+                        }`}
+                        title="Toggle Top Banner"
+                      >
+                        {parsed.is_banner ? '📢 BANNER ON' : '📢 SET BANNER'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleModerateBulletin(u.id, 'lock')}
+                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors ${
+                          parsed.locked ? 'bg-neutral-800 border-neutral-600 text-white' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
+                        }`}
+                        title="Toggle Discussion Lock"
+                      >
+                        {parsed.locked ? '🔒 UNLOCK' : '🔒 LOCK'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleModerateBulletin(u.id, 'delete')}
+                        className="p-2 text-neutral-500 hover:text-red-500 hover:bg-neutral-900 transition-colors"
+                        title="Delete Bulletin"
+                      >
+                        <GrungeGlyph name="trash" className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 );
               })

@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     if (!result.success) {
       return NextResponse.json({
         success: false,
-        error: result.message || 'Failed to dispatch newsletter via Google Apps Script',
+        error: result.message || 'Failed to send newsletter via Google Apps Script',
         message: result.message,
       }, { status: 500 });
     }
@@ -74,6 +74,6 @@ export async function POST(req: NextRequest) {
         : `Newsletter successfully sent to ${recipients.length} subscriber(s)!`,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'Failed to dispatch newsletter' }, { status: 500 });
+    return NextResponse.json({ error: error?.message || 'Failed to send newsletter' }, { status: 500 });
   }
 }

@@ -7,6 +7,8 @@ import {
   SiteConfig,
   UserProfile,
   AdminStats,
+  BulletinComment,
+  parseBulletinPayload,
 } from '@/lib/types';
 
 // Default initial website configuration
@@ -531,6 +533,178 @@ export async function deleteUpdate(id: string): Promise<boolean> {
   const len = memoryUpdates.length;
   memoryUpdates = memoryUpdates.filter((u) => u.id !== id);
   return memoryUpdates.length < len;
+}
+
+// --- BULLETIN BOARD INTERACTIVITY & MODERATION ---
+
+export async function addBulletinComment(
+  updateId: string,
+  comment: {
+    author_id: string;
+    author_name: string;
+    author_avatar?: string | null;
+    content: string;
+    parent_id?: string | null;
+    reply_to_name?: string | null;
+  }
+): Promise<{ success: boolean; update?: SiteUpdate; comment?: BulletinComment }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false };
+
+  const parsed = parseBulletinPayload(target);
+  if (parsed.locked) {
+    return { success: false };
+  }
+
+  const newComment: BulletinComment = {
+    id: 'cm-' + Math.random().toString(36).substring(2, 9),
+    author_id: comment.author_id,
+    author_name: comment.author_name || 'Community Member',
+    author_avatar: comment.author_avatar || null,
+    content: comment.content.trim(),
+    created_at: new Date().toISOString(),
+    parent_id: comment.parent_id || null,
+    reply_to_name: comment.reply_to_name || null,
+    likes: 0,
+    liked_by: [],
+  };
+
+  const updatedComments = [...(parsed.comments || []), newComment];
+  const updatedPayload = {
+    ...parsed,
+    comments: updatedComments,
+  };
+
+  const saved = await saveUpdate({
+    ...target,
+    content: JSON.stringify(updatedPayload),
+  });
+
+  return { success: true, update: saved, comment: newComment };
+}
+
+export async function deleteBulletinComment(
+  updateId: string,
+  commentId: string
+): Promise<{ success: boolean; update?: SiteUpdate }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false };
+
+  const parsed = parseBulletinPayload(target);
+  const updatedComments = (parsed.comments || []).filter((c) => c.id !== commentId && c.parent_id !== commentId);
+  const updatedPayload = {
+    ...parsed,
+    comments: updatedComments,
+  };
+
+  const saved = await saveUpdate({
+    ...target,
+    content: JSON.stringify(updatedPayload),
+  });
+
+  return { success: true, update: saved };
+}
+
+export async function toggleBulletinLike(
+  updateId: string,
+  userId: string
+): Promise<{ success: boolean; likes: number; liked: boolean }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false, likes: 0, liked: false };
+
+  const parsed = parseBulletinPayload(target);
+  const likedBy = parsed.liked_by || [];
+  const hasLiked = likedBy.includes(userId);
+  const nextLikedBy = hasLiked ? likedBy.filter((id) => id !== userId) : [...likedBy, userId];
+
+  const updatedPayload = {
+    ...parsed,
+    liked_by: nextLikedBy,
+    likes: nextLikedBy.length,
+  };
+
+  await saveUpdate({
+    ...target,
+    content: JSON.stringify(updatedPayload),
+  });
+
+  return { success: true, likes: nextLikedBy.length, liked: !hasLiked };
+}
+
+export async function toggleBulletinCommentLike(
+  updateId: string,
+  commentId: string,
+  userId: string
+): Promise<{ success: boolean; likes: number; liked: boolean }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false, likes: 0, liked: false };
+
+  const parsed = parseBulletinPayload(target);
+  let commentLiked = false;
+  let commentLikes = 0;
+
+  const nextComments = (parsed.comments || []).map((c) => {
+    if (c.id === commentId) {
+      const curLikedBy = c.liked_by || [];
+      const isAlready = curLikedBy.includes(userId);
+      const nextBy = isAlready ? curLikedBy.filter((id) => id !== userId) : [...curLikedBy, userId];
+      commentLiked = !isAlready;
+      commentLikes = nextBy.length;
+      return { ...c, liked_by: nextBy, likes: nextBy.length };
+    }
+    return c;
+  });
+
+  await saveUpdate({
+    ...target,
+    content: JSON.stringify({ ...parsed, comments: nextComments }),
+  });
+
+  return { success: true, likes: commentLikes, liked: commentLiked };
+}
+
+export async function toggleBulletinPin(updateId: string): Promise<{ success: boolean; pinned: boolean }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false, pinned: false };
+  const parsed = parseBulletinPayload(target);
+  const nextPinned = !parsed.pinned;
+  await saveUpdate({
+    ...target,
+    content: JSON.stringify({ ...parsed, pinned: nextPinned }),
+  });
+  return { success: true, pinned: nextPinned };
+}
+
+export async function toggleBulletinLock(updateId: string): Promise<{ success: boolean; locked: boolean }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false, locked: false };
+  const parsed = parseBulletinPayload(target);
+  const nextLocked = !parsed.locked;
+  await saveUpdate({
+    ...target,
+    content: JSON.stringify({ ...parsed, locked: nextLocked }),
+  });
+  return { success: true, locked: nextLocked };
+}
+
+export async function toggleBulletinBanner(updateId: string): Promise<{ success: boolean; is_banner: boolean }> {
+  const updates = await getAllUpdatesAdmin();
+  const target = updates.find((u) => u.id === updateId);
+  if (!target) return { success: false, is_banner: false };
+  const parsed = parseBulletinPayload(target);
+  const nextBanner = !parsed.is_banner;
+  await saveUpdate({
+    ...target,
+    is_banner: nextBanner,
+    content: JSON.stringify({ ...parsed, is_banner: nextBanner }),
+  });
+  return { success: true, is_banner: nextBanner };
 }
 
 // --- SITE CONFIG ---

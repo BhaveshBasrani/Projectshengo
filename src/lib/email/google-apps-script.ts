@@ -45,7 +45,7 @@ export async function sendEmailViaAppsScript(payload: EmailPayload): Promise<{ s
     console.log('[Email Simulation Mode] No GOOGLE_APPSCRIPT_URL configured. Logged payload:', payload);
     return {
       success: true,
-      message: 'Email dispatched (Simulated / Local mode: configure GOOGLE_APPSCRIPT_URL for live delivery)',
+      message: 'Email sent (Simulated / Local mode: configure GOOGLE_APPSCRIPT_URL for live delivery)',
     };
   }
 
@@ -74,7 +74,7 @@ export async function sendEmailViaAppsScript(payload: EmailPayload): Promise<{ s
       throw new Error(`Google Apps Script responded with HTTP ${res.status}`);
     }
 
-    const data = await res.json().catch(() => ({ success: true, message: 'Dispatched' }));
+    const data = await res.json().catch(() => ({ success: true, message: 'Sent' }));
     return {
       success: data.success !== false,
       message: data.message || data.error || 'Email successfully processed by Google Apps Script',
@@ -83,7 +83,7 @@ export async function sendEmailViaAppsScript(payload: EmailPayload): Promise<{ s
     console.error('[Google Apps Script Error]:', error);
     return {
       success: false,
-      message: error?.message || 'Failed to dispatch email via Google Apps Script',
+      message: error?.message || 'Failed to send email via Google Apps Script',
     };
   }
 }

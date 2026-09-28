@@ -79,6 +79,19 @@ export interface SiteUpdate {
   doodle_icon?: BulletinDoodleIcon;
 }
 
+export interface BulletinComment {
+  id: string;
+  author_id: string;
+  author_name: string;
+  author_avatar?: string | null;
+  content: string;
+  created_at: string;
+  parent_id?: string | null;
+  reply_to_name?: string | null;
+  likes?: number;
+  liked_by?: string[];
+}
+
 export interface ParsedBulletin {
   body: string;
   image_url?: string;
@@ -87,6 +100,13 @@ export interface ParsedBulletin {
   link_url?: string;
   link_text?: string;
   doodle_icon?: BulletinDoodleIcon;
+  author_name?: string;
+  author_id?: string;
+  pinned?: boolean;
+  locked?: boolean;
+  likes?: number;
+  liked_by?: string[];
+  comments?: BulletinComment[];
 }
 
 export function parseBulletinPayload(update: SiteUpdate): ParsedBulletin {
@@ -102,6 +122,13 @@ export function parseBulletinPayload(update: SiteUpdate): ParsedBulletin {
           link_url: parsed.link_url || update.link_url,
           link_text: parsed.link_text || update.link_text,
           doodle_icon: (parsed.doodle_icon as BulletinDoodleIcon) || update.doodle_icon || 'star',
+          author_name: parsed.author_name || 'Project S.H.E.',
+          author_id: parsed.author_id,
+          pinned: Boolean(parsed.pinned),
+          locked: Boolean(parsed.locked),
+          likes: typeof parsed.likes === 'number' ? parsed.likes : 0,
+          liked_by: Array.isArray(parsed.liked_by) ? parsed.liked_by : [],
+          comments: Array.isArray(parsed.comments) ? parsed.comments : [],
         };
       }
     }
@@ -115,6 +142,12 @@ export function parseBulletinPayload(update: SiteUpdate): ParsedBulletin {
     link_url: update.link_url,
     link_text: update.link_text,
     doodle_icon: update.doodle_icon || 'star',
+    author_name: 'Project S.H.E.',
+    pinned: false,
+    locked: false,
+    likes: 0,
+    liked_by: [],
+    comments: [],
   };
 }
 
