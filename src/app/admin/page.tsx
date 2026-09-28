@@ -203,7 +203,10 @@ export default function AdminDashboardPage() {
   const handleRefreshData = async () => {
     if (!adminSecret) return;
     setActionLoading(true);
-    await verifyAndLoad(adminSecret);
+    await Promise.all([
+      verifyAndLoad(adminSecret),
+      new Promise((resolve) => setTimeout(resolve, 600)),
+    ]);
     setActionLoading(false);
     showToast('Data refreshed');
   };
@@ -732,10 +735,17 @@ export default function AdminDashboardPage() {
             type="button"
             onClick={handleRefreshData}
             disabled={actionLoading}
-            className="px-3 py-2 bg-[#141414] border border-neutral-700 hover:border-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors hover-lift stencil-cut disabled:opacity-50"
+            className="group px-3 py-2 bg-[#141414] border border-neutral-700 hover:border-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors hover-lift stencil-cut disabled:opacity-50"
             title="Refresh database records"
           >
-            <GrungeGlyph name="refresh" className={`w-3.5 h-3.5 ${actionLoading ? 'animate-spin' : ''}`} />
+            <GrungeGlyph
+              name="loader"
+              className={`w-3.5 h-3.5 ${
+                actionLoading
+                  ? 'animate-spin text-[#E50914]'
+                  : 'text-neutral-400 group-hover:text-white group-hover:rotate-180 transition-transform duration-500'
+              }`}
+            />
             <span>{actionLoading ? 'REFRESHING...' : 'REFRESH'}</span>
           </button>
           <button

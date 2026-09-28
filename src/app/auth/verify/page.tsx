@@ -189,13 +189,16 @@ export default function VerifyAuthPage() {
                 type="button"
                 onClick={handleResend}
                 disabled={resendCooldown > 0}
-                className="w-full py-3 bg-transparent hover:bg-neutral-900 text-white font-mono text-xs font-bold uppercase tracking-wider border border-neutral-700 hover:border-neutral-500 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="group w-full py-3 bg-transparent hover:bg-neutral-900 text-white font-mono text-xs font-bold uppercase tracking-wider border border-neutral-700 hover:border-neutral-500 flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {resendCooldown > 0 ? (
-                  <GrungeGlyph name="loader" className="w-3.5 h-3.5 animate-spin text-[#E50914]" />
-                ) : (
-                  <GrungeGlyph name="refresh" className="w-3.5 h-3.5" />
-                )}
+                <GrungeGlyph
+                  name="loader"
+                  className={`w-3.5 h-3.5 ${
+                    resendCooldown > 0
+                      ? 'animate-spin text-[#E50914]'
+                      : 'text-neutral-400 group-hover:text-white group-hover:rotate-180 transition-transform duration-500'
+                  }`}
+                />
                 <span>
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Email'}
                 </span>
