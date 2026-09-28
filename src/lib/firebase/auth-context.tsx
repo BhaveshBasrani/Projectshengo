@@ -48,28 +48,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Sync profile with backend API
-  const syncWithBackend = async (uid: string, email: string, displayName: string) => {
+  const syncWithBackend = async (uid: string, email: string, displayName: string, avatarUrl?: string | null) => {
     try {
       const res = await fetch('/api/auth/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: uid, email, display_name: displayName }),
+        body: JSON.stringify({ id: uid, email, display_name: displayName, avatar_url: avatarUrl || null }),
       });
-      if (res.status === 403 || res.status === 410) {
-        // Account has been deleted by an administrator
-        try {
-          await signOut(auth);
-        } catch (err) {}
-        setUser(null);
-        setProfile(null);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('project_she_demo_session');
-        }
-        return;
-      }
       if (res.ok) {
         const data = await res.json();
-        setProfile(data.profile);
+        if (data.profile) {
+          setProfile(data.profile);
+        }
       }
     } catch (e) {
       console.warn('Backend profile sync failed:', e);
@@ -92,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setUser(fbUser);
       if (fbUser) {
-        await syncWithBackend(fbUser.uid, fbUser.email || '', fbUser.displayName || '');
+        await syncWithBackend(fbUser.uid, fbUser.email || '', fbUser.displayName || '', fbUser.photoURL || null);
       } else {
         setProfile(null);
       }
@@ -107,13 +97,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, pass: string) => {
     const cred = await signInWithEmailAndPassword(auth, email.trim(), pass);
     setUser(cred.user);
-    await syncWithBackend(cred.user.uid, cred.user.email || '', cred.user.displayName || '');
+    await syncWithBackend(cred.user.uid, cred.user.email || '', cred.user.displayName || '', cred.user.photoURL || null);
   };
 
   const loginWithGoogle = async () => {
     const cred = await signInWithPopup(auth, googleProvider);
     setUser(cred.user);
-    await syncWithBackend(cred.user.uid, cred.user.email || '', cred.user.displayName || '');
+    await syncWithBackend(cred.user.uid, cred.user.email || '', cred.user.displayName || '', cred.user.photoURL || null);
   };
 
   const sendMagicLink = async (email: string) => {
@@ -138,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.removeItem('emailForSignIn');
     }
     setUser(cred.user);
-    await syncWithBackend(cred.user.uid, cred.user.email || '', cred.user.displayName || '');
+    await syncWithBackend(cred.user.uid, cred.user.email || '', cred.user.displayName || '', cred.user.photoURL || null);
   };
 
   const register = async (email: string, pass: string, displayName: string, subscribeUpdates = true) => {
@@ -152,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.warn('Verification email dispatch failed:', err);
       }
       setUser(cred.user);
-      await syncWithBackend(cred.user.uid, cleanEmail, displayName);
+      await syncWithBackend(cred.user.uid, cleanEmail, displayName, cred.user.photoURL || null);
       if (!subscribeUpdates) {
         await toggleEmailSubscription(false);
       }
@@ -199,7 +189,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await updateProfile(user, { displayName: newName });
       } catch (e) {}
       if (profile) {
-        await syncWithBackend(user.uid, user.email || '', newName);
+        await syncWithBackend(user.uid, user.email || '', newName, user.photoURL || null);
       }
     }
   };

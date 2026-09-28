@@ -14,6 +14,9 @@ import {
   SiteConfig,
   AdminStats,
   UserProfile,
+  BulletinCardStyle,
+  BulletinDoodleIcon,
+  parseBulletinPayload,
 } from '@/lib/types';
 
 export default function AdminDashboardPage() {
@@ -51,7 +54,13 @@ export default function AdminDashboardPage() {
   const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
   const [newUpdateTitle, setNewUpdateTitle] = useState('');
   const [newUpdateContent, setNewUpdateContent] = useState('');
-  const [newUpdateCategory, setNewUpdateCategory] = useState('Urgent Alert');
+  const [newUpdateCategory, setNewUpdateCategory] = useState('Announcement');
+  const [newUpdateCardStyle, setNewUpdateCardStyle] = useState<BulletinCardStyle>('zine');
+  const [newUpdateImageUrl, setNewUpdateImageUrl] = useState('');
+  const [newUpdateIsBanner, setNewUpdateIsBanner] = useState(true);
+  const [newUpdateLinkUrl, setNewUpdateLinkUrl] = useState('');
+  const [newUpdateLinkText, setNewUpdateLinkText] = useState('READ MORE');
+  const [newUpdateDoodleIcon, setNewUpdateDoodleIcon] = useState<BulletinDoodleIcon>('star');
 
   const [emailSubject, setEmailSubject] = useState('');
   const [emailHeadline, setEmailHeadline] = useState('');
@@ -417,13 +426,21 @@ export default function AdminDashboardPage() {
           title: newUpdateTitle,
           content: newUpdateContent,
           category: newUpdateCategory,
+          card_style: newUpdateCardStyle,
+          image_url: newUpdateImageUrl,
+          is_banner: newUpdateIsBanner,
+          link_url: newUpdateLinkUrl,
+          link_text: newUpdateLinkText,
+          doodle_icon: newUpdateDoodleIcon,
         }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast('Bulletin posted successfully');
+        showToast('Bulletin posted successfully to website & banner');
         setNewUpdateTitle('');
         setNewUpdateContent('');
+        setNewUpdateImageUrl('');
+        setNewUpdateLinkUrl('');
         if (data.update) {
           setUpdates((prev) => [data.update, ...prev]);
         }
@@ -1592,90 +1609,366 @@ export default function AdminDashboardPage() {
       {/* TAB 6: BULLETINS & ANNOUNCEMENTS */}
       {activeTab === 'updates' && (
         <div className="space-y-6">
-          <div>
-            <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-              BULLETINS &amp; ANNOUNCEMENTS
-            </h2>
-            <p className="text-xs text-neutral-400">
-              Short updates shown on the homepage feed for urgent alerts and news.
-            </p>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
+                BULLETINS &amp; ANNOUNCEMENTS
+              </h2>
+              <p className="text-xs text-neutral-400">
+                Customizable bulletin dispatches displayed on the top banner and on the star-grid bulletin board.
+              </p>
+            </div>
+            <a
+              href="/#bulletin-board"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 bg-neutral-900 border border-neutral-700 hover:border-white text-neutral-200 text-xs font-mono font-bold uppercase flex items-center gap-1.5"
+            >
+              <span>VIEW PUBLIC BULLETIN BOARD</span>
+              <GrungeGlyph name="external" className="w-3.5 h-3.5" />
+            </a>
           </div>
 
-          <form
-            onSubmit={handleCreateUpdate}
-            className="p-6 bg-[#0E0E0E] border-2 border-neutral-800 space-y-4 text-xs"
-          >
-            <span className="font-heading font-black text-sm uppercase text-[#E50914] block">
-              POST NEW BULLETIN
-            </span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Form */}
+            <form
+              onSubmit={handleCreateUpdate}
+              className="lg:col-span-7 p-6 bg-[#0E0E0E] border-2 border-neutral-800 space-y-4 text-xs"
+            >
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                <span className="font-heading font-black text-sm uppercase text-[#E50914] block">
+                  CREATE CUSTOM BULLETIN
+                </span>
+                <span className="font-mono text-[10px] text-neutral-500">
+                  STARTS IN REAL-TIME
+                </span>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="sm:col-span-2">
-                <input
-                  type="text"
+              {/* Title & Category */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+                    Bulletin Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newUpdateTitle}
+                    onChange={(e) => setNewUpdateTitle(e.target.value)}
+                    placeholder="e.g. Battle of the Bands 3.0"
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none focus:border-[#E50914]"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+                    Category
+                  </label>
+                  <select
+                    value={newUpdateCategory}
+                    onChange={(e) => setNewUpdateCategory(e.target.value)}
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none focus:border-[#E50914]"
+                  >
+                    <option value="Announcement">Announcement</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Event / Gig">Event / Gig</option>
+                    <option value="Safehouse Aid">Safehouse Aid</option>
+                    <option value="Volunteer Call">Volunteer Call</option>
+                    <option value="Creative & Art">Creative &amp; Art</option>
+                    <option value="Urgent Alert">Urgent Alert</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Card Style Selector */}
+              <div>
+                <label className="block uppercase font-bold text-neutral-400 mb-1.5 text-[11px]">
+                  Card Visual Style
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { id: 'zine' as BulletinCardStyle, label: 'Zine Note', desc: 'Taped dark paper' },
+                    { id: 'polaroid' as BulletinCardStyle, label: 'Polaroid', desc: 'Photo + caption' },
+                    { id: 'stamp' as BulletinCardStyle, label: 'Crimson Stamp', desc: 'Brutalist official' },
+                    { id: 'doodle' as BulletinCardStyle, label: 'Punk Doodle', desc: 'Sketch & marker' },
+                  ].map((style) => (
+                    <button
+                      key={style.id}
+                      type="button"
+                      onClick={() => setNewUpdateCardStyle(style.id)}
+                      className={`p-2.5 text-left border transition-all ${
+                        newUpdateCardStyle === style.id
+                          ? 'border-[#E50914] bg-red-950/30 text-white'
+                          : 'border-neutral-800 bg-[#141414] text-neutral-400 hover:border-neutral-600'
+                      }`}
+                    >
+                      <div className="font-bold text-[11px] uppercase">{style.label}</div>
+                      <div className="text-[9px] text-neutral-500 font-mono mt-0.5">{style.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <div>
+                <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+                  Bulletin Message Content
+                </label>
+                <textarea
                   required
-                  value={newUpdateTitle}
-                  onChange={(e) => setNewUpdateTitle(e.target.value)}
-                  placeholder="Bulletin Title"
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
+                  rows={3}
+                  value={newUpdateContent}
+                  onChange={(e) => setNewUpdateContent(e.target.value)}
+                  placeholder="Details of the announcement, venue, dates, or safehouse updates..."
+                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none resize-none focus:border-[#E50914]"
                 />
               </div>
+
+              {/* Sticker / Picture Picker */}
               <div>
-                <select
-                  value={newUpdateCategory}
-                  onChange={(e) => setNewUpdateCategory(e.target.value)}
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                >
-                  <option value="Urgent Alert">Urgent Alert</option>
-                  <option value="Recruitment">Recruitment</option>
-                  <option value="Legal Notice">Legal Notice</option>
-                  <option value="Workshop">Workshop</option>
-                </select>
+                <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+                  Attach Sticker or Picture
+                </label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {[
+                    { label: 'None', val: '' },
+                    { label: '🎧 Headphones', val: '/assets/headphones-sticker.png' },
+                    { label: '🪩 Disco Ball', val: '/assets/discoball-sticker.png' },
+                    { label: '✦ Spiral Star', val: '/assets/punk-red-spiral-star-clean.png' },
+                  ].map((stk) => (
+                    <button
+                      key={stk.val}
+                      type="button"
+                      onClick={() => setNewUpdateImageUrl(stk.val)}
+                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors ${
+                        newUpdateImageUrl === stk.val
+                          ? 'border-[#E50914] bg-[#E50914] text-white font-bold'
+                          : 'border-neutral-800 bg-[#161616] text-neutral-400 hover:border-neutral-600'
+                      }`}
+                    >
+                      {stk.label}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  value={newUpdateImageUrl}
+                  onChange={(e) => setNewUpdateImageUrl(e.target.value)}
+                  placeholder="Or paste custom image URL / photo link"
+                  className="w-full p-2 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px] focus:border-[#E50914]"
+                />
+              </div>
+
+              {/* Optional Call to Action Button */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+                    Action Link URL (Optional)
+                  </label>
+                  <input
+                    type="url"
+                    value={newUpdateLinkUrl}
+                    onChange={(e) => setNewUpdateLinkUrl(e.target.value)}
+                    placeholder="https://example.com/rsvp"
+                    className="w-full p-2 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px] focus:border-[#E50914]"
+                  />
+                </div>
+                <div>
+                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+                    Button Label
+                  </label>
+                  <input
+                    type="text"
+                    value={newUpdateLinkText}
+                    onChange={(e) => setNewUpdateLinkText(e.target.value)}
+                    placeholder="e.g. REGISTER NOW"
+                    className="w-full p-2 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px] focus:border-[#E50914]"
+                  />
+                </div>
+              </div>
+
+              {/* Top Banner Checkbox */}
+              <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={newUpdateIsBanner}
+                  onChange={(e) => setNewUpdateIsBanner(e.target.checked)}
+                  className="accent-[#E50914] w-4 h-4 cursor-pointer"
+                />
+                <span className="font-mono text-xs text-neutral-300 font-bold">
+                  Show as top website banner above Hero
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={actionLoading}
+                className="w-full py-3 bg-[#E50914] text-white font-heading font-black text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {actionLoading ? (
+                  <span>POSTING BULLETIN...</span>
+                ) : (
+                  <>
+                    <GrungeGlyph name="megaphone" className="w-4 h-4" />
+                    <span>POST BULLETIN TO BOARD &amp; BANNER</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Live Visual Preview */}
+            <div className="lg:col-span-5 p-5 bg-[#0A0A0A] border-2 border-neutral-800 space-y-3">
+              <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-wider block">
+                LIVE STAR-GRID BOARD PREVIEW
+              </span>
+
+              {/* Mini Star Grid Sandbox */}
+              <div className="p-4 bg-[#080808] border border-neutral-800 bg-star-gridlines rounded-sm min-h-[220px] flex items-center justify-center relative overflow-hidden">
+                <div className="w-full max-w-sm">
+                  {/* Polaroid Preview */}
+                  {newUpdateCardStyle === 'polaroid' && (
+                    <div className="bg-[#EDEDED] text-black p-3 shadow-[4px_4px_0px_#000000] rotate-[-1deg]">
+                      <div className="relative w-full h-28 bg-[#181818] mb-2 flex items-center justify-center overflow-hidden">
+                        {newUpdateImageUrl ? (
+                          <Image
+                            src={newUpdateImageUrl}
+                            alt="Preview"
+                            fill
+                            className="object-contain p-1"
+                          />
+                        ) : (
+                          <span className="text-[10px] text-neutral-500 font-mono">PHOTO SPACE</span>
+                        )}
+                        <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
+                          {newUpdateCategory}
+                        </span>
+                      </div>
+                      <div className="font-heading font-black text-xs text-black uppercase truncate">
+                        {newUpdateTitle || 'BULLETIN TITLE'}
+                      </div>
+                      <div className="font-mono text-[10px] text-neutral-700 line-clamp-2 mt-1">
+                        {newUpdateContent || 'Message content preview will appear here on the polaroid card...'}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stamp Preview */}
+                  {newUpdateCardStyle === 'stamp' && (
+                    <div className="bg-[#120606] border-2 border-[#E50914] p-4 text-white space-y-2 shadow-[4px_4px_0px_#E50914]">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
+                          {newUpdateCategory}
+                        </span>
+                        <span className="font-mono text-[8px] text-[#E50914] font-bold">★ STAMPED</span>
+                      </div>
+                      <div className="font-heading font-black text-xs uppercase text-white truncate">
+                        {newUpdateTitle || 'BULLETIN TITLE'}
+                      </div>
+                      <div className="font-sans text-[10px] text-neutral-300 line-clamp-2">
+                        {newUpdateContent || 'Message content preview will appear here in brutalist format...'}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Doodle Preview */}
+                  {newUpdateCardStyle === 'doodle' && (
+                    <div className="bg-[#0C0C0C] border-2 border-dashed border-neutral-600 p-4 text-white space-y-2 rotate-[1deg]">
+                      <div className="flex items-center justify-between">
+                        <span className="px-1.5 py-0.5 bg-neutral-800 text-white font-mono text-[8px] uppercase">
+                          {newUpdateCategory}
+                        </span>
+                        <span className="text-[#E50914] text-xs font-bold">★</span>
+                      </div>
+                      <div className="font-heading font-black text-xs uppercase tracking-tight text-white truncate">
+                        {newUpdateTitle || 'BULLETIN TITLE'}
+                      </div>
+                      <div className="font-mono text-[10px] text-neutral-300 line-clamp-2">
+                        {newUpdateContent || 'Message content preview will appear here in punk doodle format...'}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Zine Note Preview */}
+                  {newUpdateCardStyle === 'zine' && (
+                    <div className="bg-[#121212] border-2 border-neutral-800 p-4 text-white space-y-2 relative">
+                      <div className="zine-tape absolute -top-2 left-4 w-12 h-3" />
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
+                          {newUpdateCategory}
+                        </span>
+                      </div>
+                      <div className="font-heading font-black text-xs uppercase text-white truncate">
+                        {newUpdateTitle || 'BULLETIN TITLE'}
+                      </div>
+                      <div className="font-sans text-[10px] text-neutral-300 line-clamp-2">
+                        {newUpdateContent || 'Message content preview will appear here on zine paper...'}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+          </div>
 
-            <textarea
-              required
-              rows={3}
-              value={newUpdateContent}
-              onChange={(e) => setNewUpdateContent(e.target.value)}
-              placeholder="Content of the announcement..."
-              className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none resize-none"
-            />
+          {/* List of Posted Bulletins */}
+          <div className="space-y-3 pt-4 border-t border-neutral-800">
+            <span className="font-mono text-[11px] text-neutral-400 uppercase font-bold block">
+              POSTED BULLETINS ({updates.length})
+            </span>
 
-            <button
-              type="submit"
-              className="px-5 py-2.5 bg-[#E50914] text-white font-bold uppercase hover:bg-white hover:text-black"
-            >
-              POST BULLETIN
-            </button>
-          </form>
-
-          <div className="space-y-3">
-            {updates.map((u) => (
-              <div
-                key={u.id}
-                className="p-4 bg-[#0E0E0E] border border-neutral-800 flex items-center justify-between gap-4 text-xs"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-[#E50914] text-white text-[9px] font-bold uppercase">
-                      {u.category}
-                    </span>
-                    <span className="font-bold text-white">{u.title}</span>
-                  </div>
-                  <p className="text-neutral-400 text-[11px] mt-1">{u.content}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteUpdate(u.id)}
-                  className="p-1.5 text-neutral-500 hover:text-red-500"
-                  title="Delete Bulletin"
-                >
-                  <GrungeGlyph name="trash" className="w-4 h-4" />
-                </button>
+            {updates.length === 0 ? (
+              <div className="p-4 bg-[#101010] border border-neutral-800 text-neutral-500 font-mono text-xs">
+                No bulletins posted yet. Create your first bulletin above.
               </div>
-            ))}
+            ) : (
+              updates.map((u) => {
+                const parsed = parseBulletinPayload(u);
+                return (
+                  <div
+                    key={u.id}
+                    className="p-4 bg-[#0E0E0E] border border-neutral-800 flex items-center justify-between gap-4 text-xs"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {parsed.image_url && (
+                        <div className="relative w-8 h-8 shrink-0 bg-neutral-900 border border-neutral-800">
+                          <Image
+                            src={parsed.image_url}
+                            alt={u.title}
+                            fill
+                            className="object-contain p-1"
+                          />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 bg-[#E50914] text-white text-[9px] font-bold uppercase shrink-0">
+                            {u.category}
+                          </span>
+                          <span className="font-bold text-white truncate">{u.title}</span>
+                          <span className="text-neutral-500 text-[10px] font-mono shrink-0">
+                            [{parsed.card_style}]
+                          </span>
+                          {parsed.is_banner && (
+                            <span className="text-emerald-400 text-[9px] font-mono uppercase shrink-0">
+                              • Top Banner
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-neutral-400 text-[11px] mt-1 line-clamp-1">{parsed.body}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteUpdate(u.id)}
+                      className="p-2 text-neutral-500 hover:text-red-500 hover:bg-neutral-900 transition-colors shrink-0"
+                      title="Delete Bulletin"
+                    >
+                      <GrungeGlyph name="trash" className="w-4 h-4" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       )}

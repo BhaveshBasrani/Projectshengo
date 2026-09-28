@@ -454,24 +454,57 @@ export async function getAllUpdatesAdmin(): Promise<SiteUpdate[]> {
 }
 
 export async function saveUpdate(item: Partial<SiteUpdate> & { title: string; content: string }): Promise<SiteUpdate> {
+  let contentString = item.content;
+
+  // If rich properties are provided and content is not already JSON, package them cleanly
+  if (item.image_url || item.card_style || item.is_banner !== undefined || item.link_url || item.doodle_icon) {
+    if (!item.content.trim().startsWith('{')) {
+      contentString = JSON.stringify({
+        body: item.content,
+        image_url: item.image_url,
+        card_style: item.card_style || 'zine',
+        is_banner: item.is_banner ?? true,
+        link_url: item.link_url,
+        link_text: item.link_text,
+        doodle_icon: item.doodle_icon || 'star',
+      });
+    }
+  }
+
   const updateData: SiteUpdate = {
     id: item.id || 'up-' + Math.random().toString(36).substring(2, 9),
     title: item.title,
-    content: item.content,
+    content: contentString,
     category: item.category || 'General',
     status: item.status || 'published',
     created_at: item.created_at || new Date().toISOString(),
+    image_url: item.image_url,
+    card_style: item.card_style,
+    is_banner: item.is_banner,
+    link_url: item.link_url,
+    link_text: item.link_text,
+    doodle_icon: item.doodle_icon,
   };
 
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServer();
+      // Only insert core columns supported by the Supabase table schema
+      const dbPayload = {
+        id: updateData.id,
+        title: updateData.title,
+        content: updateData.content,
+        category: updateData.category,
+        status: updateData.status,
+        created_at: updateData.created_at,
+      };
+
       if (!item.id) {
-        const { data, error } = await supabase.from('updates').insert(updateData).select().single();
-        if (!error && data) return data as SiteUpdate;
+        const { data, error } = await supabase.from('updates').insert(dbPayload).select().single();
+        if (!error && data) return { ...data, ...updateData } as SiteUpdate;
       } else {
-        const { data, error } = await supabase.from('updates').update(updateData).eq('id', item.id).select().single();
-        if (!error && data) return data as SiteUpdate;
+        const { data, error } = await supabase.from('updates').update(dbPayload).eq('id', item.id).select().single();
+        if (!error && data) return { ...data, ...updateData } as SiteUpdate;
       }
     } catch (e) {
       console.warn('Supabase saveUpdate failed:', e);
@@ -541,24 +574,19 @@ export async function updateSiteConfig(newConfig: Partial<SiteConfig>): Promise<
 
 // --- USER PROFILES & AUTH SYNC ---
 
-export async function syncUserProfile(profile: { id: string; email: string; display_name: string; avatar_url?: string | null }): Promise<UserProfile | null> {
+export async function syncUserProfile(profile: { id: string; email: string; display_name: string; avatar_url?: string | null }): Promise<UserProfile> {
   const cleanEmail = profile.email.trim().toLowerCase();
 
-  // Check if this account was permanently deleted by the administrator
+  // If this account was previously flagged in deleted_accounts, unblock it on active authenticated login
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServer();
-      const { data: deletedMatch } = await supabase
+      await supabase
         .from('deleted_accounts')
-        .select('id')
-        .or(`id.eq.${profile.id},email.eq.${cleanEmail}`)
-        .limit(1);
-
-      if (deletedMatch && deletedMatch.length > 0) {
-        return null; // Account is deleted by admin; refuse re-creation
-      }
+        .delete()
+        .or(`id.eq.${profile.id},email.eq.${cleanEmail}`);
     } catch (e) {
-      console.warn('Supabase check deleted_accounts failed:', e);
+      // Non-critical cleanup
     }
   }
 
@@ -567,7 +595,7 @@ export async function syncUserProfile(profile: { id: string; email: string; disp
     id: profile.id,
     email: profile.email,
     display_name: profile.display_name || profile.email.split('@')[0],
-    avatar_url: profile.avatar_url || null,
+    avatar_url: profile.avatar_url || existing?.avatar_url || null,
     is_admin: existing ? existing.is_admin : cleanEmail === (process.env.ADMIN_EMAIL || 'admin@projectshe.org').toLowerCase(),
     email_subscribed: existing ? existing.email_subscribed : true,
     created_at: existing ? existing.created_at : new Date().toISOString(),
@@ -644,31 +672,9 @@ export async function getAllUsersAdmin(): Promise<UserProfile[]> {
 }
 
 export async function deleteUserAdmin(id: string): Promise<boolean> {
-  let userEmail: string | null = null;
-  const memUser = memoryProfiles.find((p) => p.id === id);
-  if (memUser) userEmail = memUser.email;
-
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServer();
-
-      // Retrieve email if not in memory
-      if (!userEmail) {
-        const { data: dbUser } = await supabase.from('profiles').select('email').eq('id', id).single();
-        if (dbUser?.email) userEmail = dbUser.email;
-      }
-
-      // Record in deleted_accounts so automatic client auth doesn't resurrect this account
-      await supabase.from('deleted_accounts').upsert(
-        {
-          id,
-          email: userEmail ? userEmail.toLowerCase() : null,
-          deleted_at: new Date().toISOString(),
-        },
-        { onConflict: 'id' }
-      );
-
-      // Permanently remove from profiles
       const { error } = await supabase.from('profiles').delete().eq('id', id);
       if (!error) {
         memoryProfiles = memoryProfiles.filter((p) => p.id !== id);

@@ -61,6 +61,9 @@ export interface BlogPost {
   updated_at?: string;
 }
 
+export type BulletinCardStyle = 'polaroid' | 'zine' | 'stamp' | 'doodle';
+export type BulletinDoodleIcon = 'star' | 'lightning' | 'heart' | 'starburst' | 'headphones' | 'discoball';
+
 export interface SiteUpdate {
   id: string;
   title: string;
@@ -68,6 +71,51 @@ export interface SiteUpdate {
   category: string;
   status: PostStatus;
   created_at: string;
+  image_url?: string;
+  card_style?: BulletinCardStyle;
+  is_banner?: boolean;
+  link_url?: string;
+  link_text?: string;
+  doodle_icon?: BulletinDoodleIcon;
+}
+
+export interface ParsedBulletin {
+  body: string;
+  image_url?: string;
+  card_style: BulletinCardStyle;
+  is_banner: boolean;
+  link_url?: string;
+  link_text?: string;
+  doodle_icon?: BulletinDoodleIcon;
+}
+
+export function parseBulletinPayload(update: SiteUpdate): ParsedBulletin {
+  try {
+    if (update.content && update.content.trim().startsWith('{') && update.content.trim().endsWith('}')) {
+      const parsed = JSON.parse(update.content);
+      if (typeof parsed.body === 'string') {
+        return {
+          body: parsed.body,
+          image_url: parsed.image_url || update.image_url,
+          card_style: (parsed.card_style as BulletinCardStyle) || update.card_style || 'zine',
+          is_banner: parsed.is_banner !== undefined ? Boolean(parsed.is_banner) : (update.is_banner ?? true),
+          link_url: parsed.link_url || update.link_url,
+          link_text: parsed.link_text || update.link_text,
+          doodle_icon: (parsed.doodle_icon as BulletinDoodleIcon) || update.doodle_icon || 'star',
+        };
+      }
+    }
+  } catch (e) {}
+
+  return {
+    body: update.content || '',
+    image_url: update.image_url,
+    card_style: update.card_style || 'zine',
+    is_banner: update.is_banner ?? true,
+    link_url: update.link_url,
+    link_text: update.link_text,
+    doodle_icon: update.doodle_icon || 'star',
+  };
 }
 
 export interface SiteConfig {
