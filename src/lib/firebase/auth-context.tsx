@@ -79,14 +79,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (e) {}
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       setUser(fbUser);
       if (fbUser) {
-        await syncWithBackend(fbUser.uid, fbUser.email || '', fbUser.displayName || '', fbUser.photoURL || null);
+        // Sync profile in background — never block or clear auth state on failure
+        syncWithBackend(fbUser.uid, fbUser.email || '', fbUser.displayName || '', fbUser.photoURL || null)
+          .finally(() => setLoading(false));
       } else {
         setProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();

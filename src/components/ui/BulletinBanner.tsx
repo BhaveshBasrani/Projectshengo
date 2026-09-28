@@ -51,7 +51,7 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
   const isVisible = Boolean(
     bannerUpdate &&
     bannerUpdate.id !== dismissedId &&
-    pathname !== '/bulletin'
+    pathname === '/'
   );
 
   // Broadcast visibility to FloatingNavbar so it adjusts top position smoothly

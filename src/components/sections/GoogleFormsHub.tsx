@@ -154,7 +154,7 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
       </div>
 
       {/* Notice with Brutalist Stencil */}
-      <div className="mt-8 p-4 bg-[#181818] border-2 border-neutral-700 font-mono text-xs text-neutral-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[4px_4px_0px_#000000]">
+      <div className="mt-8 p-4 bg-[#181818] border-2 border-neutral-700 font-mono text-xs text-neutral-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[4px_4px_0px_#000000] relative z-10">
         <p className="text-xs sm:text-sm font-semibold leading-relaxed flex items-center gap-2.5 text-neutral-200">
           <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914] shrink-0" />
           <span>All forms open directly in Google Forms so your responses go straight to the team.</span>

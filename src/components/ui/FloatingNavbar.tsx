@@ -61,9 +61,7 @@ export default function FloatingNavbar() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -100,7 +98,7 @@ export default function FloatingNavbar() {
     return clean.slice(0, 2).toUpperCase() || 'U';
   };
 
-  const isPushedDown = hasTopBanner && !isScrolled && pathname !== '/bulletin';
+  const isPushedDown = hasTopBanner && !isScrolled && pathname === '/';
 
   return (
     <>
@@ -109,14 +107,17 @@ export default function FloatingNavbar() {
           isPushedDown ? 'top-12 sm:top-14' : 'top-3 sm:top-4'
         }`}
       >
-        <nav className="w-full transition-all duration-200 border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md flex items-center justify-between relative overflow-hidden">
-          {/* Authentic Crimson Grunge Background Texture */}
-          <div
-            className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none opacity-30 mix-blend-screen"
-            style={{ backgroundImage: `url('/assets/punk-navbar-grunge.jpg')` }}
-          />
-          {/* Contrast scrim so nav buttons and typography remain crisp */}
-          <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/85 via-black/75 to-black/85 pointer-events-none" />
+        <nav className="w-full transition-all duration-200 border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md flex items-center justify-between relative">
+          {/* Grunge background textures - clipped to nav bounds */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            {/* Authentic Crimson Grunge Background Texture */}
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-screen"
+              style={{ backgroundImage: `url('/assets/punk-navbar-grunge.jpg')` }}
+            />
+            {/* Contrast scrim so nav buttons and typography remain crisp */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/75 to-black/85" />
+          </div>
 
           {/* Brand Logo & Tag */}
           <Link href="/" className="flex items-center gap-2.5 group min-h-[44px] relative z-10">
