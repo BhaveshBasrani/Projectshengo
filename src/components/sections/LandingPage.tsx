@@ -27,14 +27,14 @@ export default function LandingPage({ config }: LandingPageProps) {
       {/* Chapter 2: WHAT WE DO — Founder's Story + Three Pillars */}
       <FlowSection aria-label="Our Mission" className="relative bg-[#070707] overflow-hidden">
         {/* Layered Punk Grid Texture */}
-        <div className="absolute inset-0 bg-punk-grid opacity-35 pointer-events-none" />
+        <div className="absolute inset-0 bg-punk-grid opacity-20 pointer-events-none" />
         
         {/* Ambient Top Crimson Radial Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[32rem] bg-[radial-gradient(ellipse_70%_50%_at_50%_0%,rgba(229,9,20,0.18),transparent)] pointer-events-none" />
         
         {/* Atmospheric Halftone Stars Vignette */}
         <div 
-          className="absolute inset-0 opacity-12 mix-blend-screen pointer-events-none bg-cover bg-center"
+          className="absolute inset-0 opacity-[0.025] mix-blend-screen pointer-events-none bg-cover bg-center"
           style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
         />
 

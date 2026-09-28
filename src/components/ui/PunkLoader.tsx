@@ -77,7 +77,7 @@ export default function PunkLoader({
         
         {/* Minimalist Emblem with subtle crimson breathing glow */}
         <div className="relative w-16 h-16 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(229,9,20,0.35)_0%,transparent_70%)] animate-pulse [animation-duration:2.5s] pointer-events-none" />
+          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(229,9,20,0.35)_0%,transparent_70%)] pointer-events-none" />
           <div className="relative w-12 h-12">
             <Image
               src="/assets/logo-clean.png"

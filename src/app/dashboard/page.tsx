@@ -107,7 +107,7 @@ export default function UserDashboard() {
           </div>
           <h1 className="font-heading font-black text-3xl sm:text-5xl uppercase tracking-tight text-white flex items-center gap-3">
             <span>WELCOME, {profile?.display_name || user.displayName || user.email?.split('@')[0]}</span>
-            <GrungeGlyph name="star" className="w-5 h-5 text-[#E50914] shrink-0 inline-block animate-pulse" />
+            <GrungeGlyph name="star" className="w-5 h-5 text-[#E50914] shrink-0 inline-block" />
           </h1>
           <p className="text-xs text-neutral-400">
             Account ID: <span className="font-mono text-neutral-300 bg-neutral-900 px-1.5 py-0.5 border border-neutral-800">{user.uid}</span>

@@ -20,9 +20,9 @@ export default function MissionPillars() {
     {
       id: 0,
       part: 'PART 01',
-      title: 'THE CATALYST',
+      title: 'HOW IT STARTED',
       subtitle: 'August 2024 • The RG Kar Case',
-      badge: 'GENESIS',
+      badge: 'THE STORY',
       render: () => (
         <div className="space-y-4 text-neutral-200 font-sans text-sm sm:text-base md:text-lg leading-relaxed animate-fade-in-up">
           <p className="text-white text-base sm:text-lg font-semibold">
@@ -42,8 +42,8 @@ export default function MissionPillars() {
       id: 1,
       part: 'PART 02',
       title: 'THE STATEMENTS',
-      subtitle: 'Street Interviews & Victim-Blaming',
-      badge: 'MINDSET',
+      subtitle: 'Street Interviews & Public Reactions',
+      badge: 'REACTIONS',
       render: () => (
         <div className="space-y-4 font-sans text-sm sm:text-base leading-relaxed animate-fade-in-up">
           <p className="text-neutral-300 text-sm sm:text-base font-medium">
@@ -81,9 +81,9 @@ export default function MissionPillars() {
     {
       id: 2,
       part: 'PART 03',
-      title: 'THE STATISTICS',
-      subtitle: 'Disturbing National & Global Realities',
-      badge: 'EVIDENCE',
+      title: 'THE FACTS & NUMBERS',
+      subtitle: 'Realities Women Face Every Day',
+      badge: 'THE FACTS',
       render: () => (
         <div className="space-y-4 font-sans text-sm sm:text-base leading-relaxed animate-fade-in-up">
           <p className="text-neutral-300">
@@ -140,9 +140,9 @@ export default function MissionPillars() {
     {
       id: 3,
       part: 'PART 04',
-      title: 'THE MOVEMENT',
-      subtitle: '29 April 2025 • Project S.H.E. Founded',
-      badge: 'ACTION',
+      title: 'STARTING PROJECT S.H.E.',
+      subtitle: '29 April 2025 • How We Began',
+      badge: 'OUR START',
       render: () => (
         <div className="space-y-4 text-neutral-200 font-sans text-sm sm:text-base md:text-lg leading-relaxed animate-fade-in-up">
           <p className="text-neutral-300">
@@ -260,16 +260,7 @@ export default function MissionPillars() {
             />
           </div>
 
-          {/* Authentic 35mm Film Strip Documentary Reel */}
-          <div className="hidden xl:block absolute -left-8 top-12 w-14 h-[80%] opacity-45 pointer-events-none select-none -rotate-2 z-20 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-            <Image
-              src="/assets/punk-film-strip.png"
-              alt="35mm Film Strip Reel"
-              fill
-              className="object-contain"
-              sizes="56px"
-            />
-          </div>
+
 
           {/* Authentic Red Barbed Wire Vertical Accent */}
           <div className="hidden md:block absolute -right-3 top-8 w-8 h-80 opacity-60 pointer-events-none select-none z-20">
@@ -534,11 +525,11 @@ export default function MissionPillars() {
 
           {/* Pillar 01: Fundraising (4 Cols) */}
           <div className="lg:col-span-4 p-6 sm:p-8 bg-[#0E0E0E] border border-neutral-800 hover:border-[#E50914] flex flex-col justify-between transition-all relative group overflow-hidden">
-            {/* Battle of the Bands Red Warlock Guitar Watermark */}
-            <div className="absolute -right-2 -bottom-2 w-48 h-80 opacity-25 group-hover:opacity-40 group-hover:rotate-6 transition-all duration-300 pointer-events-none select-none">
+            {/* Battle of the Bands Headphones & Stars Watermark */}
+            <div className="absolute -right-3 -bottom-3 w-48 h-48 opacity-25 group-hover:opacity-50 group-hover:rotate-6 transition-all duration-300 pointer-events-none select-none">
               <Image
-                src="/assets/punk-warlock-guitar.png"
-                alt="Battle of the Bands Red Guitar"
+                src="/assets/headphones-sticker.png"
+                alt="Headphones & Red Stars"
                 fill
                 className="object-contain"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

@@ -22,8 +22,8 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
       badge: 'CORE & VOLUNTEERS',
       actionText: 'APPLY TO JOIN US',
       themeBorder: 'border-neutral-800 hover:border-[#E50914]',
-      assetSrc: '/assets/punk-warlock-guitar.png',
-      assetClass: 'w-36 h-64 -bottom-4 -right-2 opacity-30 group-hover:opacity-50 -rotate-12',
+      assetSrc: '/assets/headphones-sticker.png',
+      assetClass: 'w-36 h-36 sm:w-44 sm:h-44 -bottom-3 -right-3 opacity-30 group-hover:opacity-60 -rotate-12 transition-all duration-300 pointer-events-none select-none',
     },
     {
       id: 'art',
@@ -36,8 +36,8 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
       badge: 'ARTISTIC VOICE',
       actionText: 'SUBMIT CREATIVE WORK',
       themeBorder: 'border-neutral-800 hover:border-[#E50914]',
-      assetSrc: '/assets/punk-film-strip.png',
-      assetClass: 'w-32 h-64 -bottom-4 -right-2 opacity-30 group-hover:opacity-50 -rotate-6 transition-transform duration-500',
+      assetSrc: '/assets/discoball-sticker.png',
+      assetClass: 'w-36 h-36 sm:w-44 sm:h-44 -bottom-3 -right-3 opacity-30 group-hover:opacity-60 -rotate-6 transition-all duration-300 pointer-events-none select-none',
     },
     {
       id: 'confessions',
@@ -51,7 +51,7 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
       actionText: 'SHARE YOUR STORY',
       themeBorder: 'border-[#E50914]',
       assetSrc: '/assets/punk-red-spiral-star-clean.png',
-      assetClass: 'w-40 h-40 -bottom-2 -right-2 opacity-30 group-hover:opacity-50 transition-opacity',
+      assetClass: 'w-36 h-36 sm:w-44 sm:h-44 -bottom-3 -right-3 opacity-30 group-hover:opacity-60 transition-opacity pointer-events-none select-none',
     },
   ];
 
@@ -61,7 +61,7 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
       {/* Immersive Dark-Punk Atmospheric Background */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-[0.05] mix-blend-screen"
+          className="absolute inset-0 bg-cover bg-center opacity-[0.02] mix-blend-screen"
           style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
         />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[500px] bg-[radial-gradient(ellipse,rgba(229,9,20,0.08)_0%,transparent_70%)] blur-3xl pointer-events-none" />
@@ -154,11 +154,14 @@ export default function GoogleFormsHub({ config }: GoogleFormsHubProps) {
       </div>
 
       {/* Notice with Brutalist Stencil */}
-      <div className="mt-8 p-4 bg-[#121212] border-2 border-[#222222] font-mono text-xs text-neutral-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <p className="text-[11px] leading-relaxed flex items-center gap-2">
+      <div className="mt-8 p-4 bg-[#181818] border-2 border-neutral-700 font-mono text-xs text-neutral-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[4px_4px_0px_#000000]">
+        <p className="text-xs sm:text-sm font-semibold leading-relaxed flex items-center gap-2.5 text-neutral-200">
           <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914] shrink-0" />
           <span>All forms open directly in Google Forms so your responses go straight to the team.</span>
         </p>
+        <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 bg-black border border-neutral-600 text-neutral-300 shrink-0">
+          DIRECT GOOGLE FORMS
+        </span>
       </div>
 
     </section>

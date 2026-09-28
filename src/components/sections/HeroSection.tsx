@@ -15,10 +15,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
   const tickerItems = (
     <div className="flex items-center space-x-6 sm:space-x-8 px-4 font-mono text-[11px] sm:text-xs uppercase tracking-widest text-[#EDEDED] font-black whitespace-nowrap">
       <span className="flex items-center gap-1.5 text-[#E50914] font-black drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E50914]"></span>
-        </span>
+        <span className="w-2 h-2 bg-[#E50914] inline-block shadow-[0_0_6px_#E50914]"></span>
         DISMANTLING GENDER-BASED VIOLENCE
       </span>
       <span className="text-neutral-500 font-bold">★</span>
@@ -52,7 +49,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
 
       {/* Atmospheric Halftone Stars Radial Vignette */}
       <div 
-        className="absolute top-0 right-0 w-[500px] h-[500px] z-0 opacity-20 pointer-events-none bg-contain bg-no-repeat [mask-image:radial-gradient(circle_at_top_right,black_30%,transparent_70%)]"
+        className="absolute top-0 right-0 w-[500px] h-[500px] z-0 opacity-[0.05] pointer-events-none bg-contain bg-no-repeat [mask-image:radial-gradient(circle_at_top_right,black_30%,transparent_70%)]"
         style={{ backgroundImage: `url('/assets/punk-bg-stars.jpg')` }}
       />
 

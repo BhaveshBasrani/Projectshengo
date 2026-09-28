@@ -19,10 +19,10 @@ import {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const { user, profile, loading, logout, isAdmin } = useAuth();
-  
+
   // Navigation tabs
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'reviews' | 'feedback' | 'posts' | 'updates' | 'email' | 'config'>('overview');
-  
+
   // Authentication states
   const [adminSecret, setAdminSecret] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -502,8 +502,8 @@ export default function AdminDashboardPage() {
       emailTarget === 'test_admin'
         ? 'Test to your Admin Email'
         : emailTarget === 'all'
-        ? 'ALL registered members'
-        : 'SUBSCRIBED members only';
+          ? 'ALL registered members'
+          : 'SUBSCRIBED members only';
 
     if (!confirm(`Are you sure you want to send this newsletter to ${recipientDesc}?`)) return;
 
@@ -697,7 +697,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="pt-24 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono">
-      
+
       {/* Top Banner */}
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b-2 border-current">
         <div className="space-y-1">
@@ -794,11 +794,10 @@ export default function AdminDashboardPage() {
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id as any)}
-            className={`py-2 px-3 sm:px-4 border-2 transition-all shrink-0 flex items-center gap-1.5 ${
-              activeTab === tab.id
-                ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
-                : 'border-transparent bg-[#121212] text-neutral-400 hover:text-white hover:border-neutral-700'
-            }`}
+            className={`py-2 px-3 sm:px-4 border-2 transition-all shrink-0 flex items-center gap-1.5 ${activeTab === tab.id
+              ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
+              : 'border-transparent bg-[#121212] text-neutral-400 hover:text-white hover:border-neutral-700'
+              }`}
           >
             <span>{tab.label}</span>
             {tab.count !== null && tab.count !== undefined && tab.count > 0 && (
@@ -815,7 +814,7 @@ export default function AdminDashboardPage() {
         <div className="space-y-8">
           {/* Real Metrics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            
+
             <div
               onClick={() => setActiveTab('users')}
               className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#000000] cursor-pointer hover:-translate-y-1 transition-transform"
@@ -880,7 +879,7 @@ export default function AdminDashboardPage() {
 
           {/* Quick Actions & Live Telemetry Box */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+
             {/* Quick Actions */}
             <div className="p-6 bg-[#0E0E0E] border border-neutral-800 space-y-4">
               <span className="font-heading font-black text-lg text-white uppercase block">
@@ -954,7 +953,7 @@ export default function AdminDashboardPage() {
                   100% LIVE DATA
                 </span>
               </div>
-              
+
               <div className="space-y-2 text-[11px] text-neutral-300 relative z-10">
                 <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
                   <span className="text-neutral-400">Database Connection</span>
@@ -1029,11 +1028,10 @@ export default function AdminDashboardPage() {
                   key={sub}
                   type="button"
                   onClick={() => setUserSubscriptionFilter(sub)}
-                  className={`px-3 py-2 uppercase font-bold border ${
-                    userSubscriptionFilter === sub
-                      ? 'border-[#E50914] bg-[#E50914] text-white'
-                      : 'border-neutral-700 bg-[#141414] text-neutral-400 hover:text-white'
-                  }`}
+                  className={`px-3 py-2 uppercase font-bold border ${userSubscriptionFilter === sub
+                    ? 'border-[#E50914] bg-[#E50914] text-white'
+                    : 'border-neutral-700 bg-[#141414] text-neutral-400 hover:text-white'
+                    }`}
                 >
                   {sub}
                 </button>
@@ -1051,10 +1049,10 @@ export default function AdminDashboardPage() {
               {filteredUsers.map((u) => {
                 const joinedDate = u.created_at
                   ? new Date(u.created_at).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })
                   : 'Recently';
 
                 return (
@@ -1142,11 +1140,10 @@ export default function AdminDashboardPage() {
                   key={f}
                   type="button"
                   onClick={() => setReviewFilter(f)}
-                  className={`px-3 py-1.5 uppercase font-bold border transition-colors ${
-                    reviewFilter === f
-                      ? 'border-[#E50914] bg-[#E50914] text-white'
-                      : 'border-neutral-700 bg-[#141414] text-neutral-400 hover:text-white'
-                  }`}
+                  className={`px-3 py-1.5 uppercase font-bold border transition-colors ${reviewFilter === f
+                    ? 'border-[#E50914] bg-[#E50914] text-white'
+                    : 'border-neutral-700 bg-[#141414] text-neutral-400 hover:text-white'
+                    }`}
                 >
                   {f}
                 </button>
@@ -1175,15 +1172,14 @@ export default function AdminDashboardPage() {
                         ))}
                       </div>
                       <span
-                        className={`px-2 py-0.5 text-[9px] uppercase font-bold shrink-0 ${
-                          rev.status === 'approved'
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                            : rev.status === 'pending'
+                        className={`px-2 py-0.5 text-[9px] uppercase font-bold shrink-0 ${rev.status === 'approved'
+                          ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                          : rev.status === 'pending'
                             ? 'bg-amber-950 text-amber-400 border border-amber-800'
                             : rev.status === 'archived'
-                            ? 'bg-neutral-800 text-neutral-300 border border-neutral-600'
-                            : 'bg-red-950 text-red-400 border border-red-800'
-                        }`}
+                              ? 'bg-neutral-800 text-neutral-300 border border-neutral-600'
+                              : 'bg-red-950 text-red-400 border border-red-800'
+                          }`}
                       >
                         {rev.status}
                       </span>
@@ -1273,11 +1269,10 @@ export default function AdminDashboardPage() {
                   key={t}
                   type="button"
                   onClick={() => setFeedbackTypeFilter(t)}
-                  className={`px-3 py-1.5 uppercase font-bold border ${
-                    feedbackTypeFilter === t
-                      ? 'border-[#E50914] bg-[#E50914] text-white'
-                      : 'border-neutral-700 bg-[#141414] text-neutral-400'
-                  }`}
+                  className={`px-3 py-1.5 uppercase font-bold border ${feedbackTypeFilter === t
+                    ? 'border-[#E50914] bg-[#E50914] text-white'
+                    : 'border-neutral-700 bg-[#141414] text-neutral-400'
+                    }`}
                 >
                   {t}
                 </button>
@@ -1504,11 +1499,10 @@ export default function AdminDashboardPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className={`p-5 bg-[#0E0E0E] border-2 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs stencil-cut ${
-                  post.is_pinned
-                    ? 'border-[#E50914] bg-[#120505]'
-                    : 'border-neutral-800'
-                }`}
+                className={`p-5 bg-[#0E0E0E] border-2 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs stencil-cut ${post.is_pinned
+                  ? 'border-[#E50914] bg-[#120505]'
+                  : 'border-neutral-800'
+                  }`}
               >
                 <div className="space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
@@ -1519,13 +1513,12 @@ export default function AdminDashboardPage() {
                       </span>
                     )}
                     <span
-                      className={`px-2 py-0.5 text-[9px] uppercase font-bold ${
-                        post.status === 'published'
-                          ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                          : post.status === 'draft'
+                      className={`px-2 py-0.5 text-[9px] uppercase font-bold ${post.status === 'published'
+                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                        : post.status === 'draft'
                           ? 'bg-amber-950 text-amber-400 border border-amber-800'
                           : 'bg-neutral-900 text-neutral-500 border border-neutral-700'
-                      }`}
+                        }`}
                     >
                       {post.status}
                     </span>
@@ -1547,11 +1540,10 @@ export default function AdminDashboardPage() {
                     type="button"
                     onClick={() => handleTogglePinPost(post)}
                     disabled={actionLoading}
-                    className={`px-3 py-2 border flex items-center gap-1.5 font-bold text-xs stencil-cut transition-all ${
-                      post.is_pinned
-                        ? 'border-[#E50914] bg-[#E50914]/20 text-[#E50914] hover:bg-[#E50914] hover:text-white'
-                        : 'border-neutral-700 text-neutral-400 hover:border-white hover:text-white'
-                    }`}
+                    className={`px-3 py-2 border flex items-center gap-1.5 font-bold text-xs stencil-cut transition-all ${post.is_pinned
+                      ? 'border-[#E50914] bg-[#E50914]/20 text-[#E50914] hover:bg-[#E50914] hover:text-white'
+                      : 'border-neutral-700 text-neutral-400 hover:border-white hover:text-white'
+                      }`}
                     title={post.is_pinned ? 'Unpin this blog' : 'Pin to top of blog archive (Max 3)'}
                   >
                     <Image
@@ -1559,9 +1551,8 @@ export default function AdminDashboardPage() {
                       alt="Pin"
                       width={14}
                       height={14}
-                      className={`w-3.5 h-3.5 object-contain transition-transform ${
-                        post.is_pinned ? '-rotate-12 scale-110' : 'opacity-60 grayscale'
-                      }`}
+                      className={`w-3.5 h-3.5 object-contain transition-transform ${post.is_pinned ? '-rotate-12 scale-110' : 'opacity-60 grayscale'
+                        }`}
                     />
                     <span>{post.is_pinned ? 'PINNED' : 'PIN (MAX 3)'}</span>
                   </button>
@@ -1718,11 +1709,10 @@ export default function AdminDashboardPage() {
                   Send To
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${
-                    emailTarget === 'subscribed_only'
-                      ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
-                      : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
-                  }`}>
+                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${emailTarget === 'subscribed_only'
+                    ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
+                    : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
+                    }`}>
                     <input
                       type="radio"
                       name="targetAudience"
@@ -1735,11 +1725,10 @@ export default function AdminDashboardPage() {
                     <span className="text-[10px] text-neutral-500 font-mono">({stats?.emailSubscribers || 0})</span>
                   </label>
 
-                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${
-                    emailTarget === 'all'
-                      ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
-                      : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
-                  }`}>
+                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${emailTarget === 'all'
+                    ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
+                    : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
+                    }`}>
                     <input
                       type="radio"
                       name="targetAudience"
@@ -1752,11 +1741,10 @@ export default function AdminDashboardPage() {
                     <span className="text-[10px] text-neutral-500 font-mono">({stats?.totalUsers || 0})</span>
                   </label>
 
-                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${
-                    emailTarget === 'test_admin'
-                      ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 font-bold'
-                      : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
-                  }`}>
+                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${emailTarget === 'test_admin'
+                    ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 font-bold'
+                    : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
+                    }`}>
                     <input
                       type="radio"
                       name="targetAudience"
@@ -1864,8 +1852,8 @@ export default function AdminDashboardPage() {
                     {actionLoading
                       ? 'SENDING NEWSLETTER...'
                       : emailTarget === 'test_admin'
-                      ? 'SEND TEST EMAIL TO ADMIN'
-                      : 'SEND NEWSLETTER TO MEMBERS'}
+                        ? 'SEND TEST EMAIL TO ADMIN'
+                        : 'SEND NEWSLETTER TO MEMBERS'}
                   </span>
                 </button>
               </div>

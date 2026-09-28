@@ -129,7 +129,7 @@ function UnsubscribeContent() {
             >
               {loading ? (
                 <>
-                  <GrungeGlyph name="refresh" className="w-3.5 h-3.5 animate-spin" />
+                  <GrungeGlyph name="loader" className="w-3.5 h-3.5 animate-spin" />
                   <span>PROCESSING...</span>
                 </>
               ) : (
