@@ -514,7 +514,7 @@ export default function AdminDashboardPage() {
         setEmailSubject('');
         setEmailContent('');
       } else {
-        alert(data.error || 'Newsletter send error');
+        alert(data.error || data.message || 'Newsletter send error');
       }
     } catch (e: any) {
       alert('Error sending newsletter: ' + e.message);

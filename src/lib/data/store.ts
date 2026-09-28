@@ -728,4 +728,36 @@ export async function subscribeNewsletter(email: string, source = 'homepage_moda
   return { success: true, message: 'Subscribed successfully' };
 }
 
+export async function getAllNewsletterSubscribers(): Promise<string[]> {
+  const emails: Set<string> = new Set();
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data } = await supabase
+        .from('newsletter_subscribers')
+        .select('email')
+        .eq('is_active', true);
+      if (data) {
+        data.forEach((r: any) => {
+          if (r.email) emails.add(r.email.trim().toLowerCase());
+        });
+      }
+    } catch (e) {
+      console.warn('Supabase fetch newsletter subscribers warning:', e);
+    }
+  }
+
+  // Also include registered users who opted into emails
+  const users = await getAllUsersAdmin();
+  users.forEach((u) => {
+    if (u.email && u.email_subscribed) {
+      emails.add(u.email.trim().toLowerCase());
+    }
+  });
+
+  return Array.from(emails);
+}
+
+
 

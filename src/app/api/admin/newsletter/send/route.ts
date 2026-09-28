@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizedAdmin } from '@/lib/admin/auth';
-import { getAllUsersAdmin } from '@/lib/data/store';
+import { getAllUsersAdmin, getAllNewsletterSubscribers } from '@/lib/data/store';
 import { sendEmailViaAppsScript } from '@/lib/email/google-apps-script';
 
 export async function POST(req: NextRequest) {
@@ -16,23 +16,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Newsletter subject and content are required' }, { status: 400 });
     }
 
-    const allUsers = await getAllUsersAdmin();
-    // Strictly filter by subscription preference: only opted-in users receive newsletters
-    const recipients = targetAudience === 'all'
-      ? allUsers.map((u) => u.email)
-      : allUsers.filter((u) => u.email_subscribed).map((u) => u.email);
+    // 1. Gather subscribers from both newsletter table and opted-in user accounts
+    const newsletterSubscribers = await getAllNewsletterSubscribers();
+    let recipients: string[] = [];
 
-    if (recipients.length === 0) {
-      return NextResponse.json({
-        success: false,
-        error: 'No subscribed recipients found in the database.',
-      }, { status: 400 });
+    if (targetAudience === 'all') {
+      const allUsers = await getAllUsersAdmin();
+      const combined = new Set([...newsletterSubscribers, ...allUsers.map((u) => u.email.trim().toLowerCase())]);
+      recipients = Array.from(combined).filter(Boolean);
+    } else {
+      recipients = newsletterSubscribers;
     }
 
-    // Call server-side Google Apps Script integration
+    // 2. Dispatch via Google Apps Script (If recipients array is empty, Apps Script will safely broadcast to all active subscribers in Google Sheets Subscribers tab!)
     const result = await sendEmailViaAppsScript({
       action: 'newsletter_broadcast',
-      recipients,
+      recipients: recipients.length > 0 ? recipients : undefined,
       subject: subject.trim(),
       body: content.trim(),
       metadata: {
@@ -41,10 +40,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (!result.success) {
+      return NextResponse.json({
+        success: false,
+        error: result.message || 'Failed to dispatch newsletter via Google Apps Script',
+        message: result.message,
+      }, { status: 500 });
+    }
+
     return NextResponse.json({
-      success: result.success,
+      success: true,
       recipientCount: recipients.length,
-      message: result.message || `Newsletter successfully queued for ${recipients.length} subscribers.`,
+      message: result.message || `Newsletter successfully dispatched!`,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Failed to dispatch newsletter' }, { status: 500 });

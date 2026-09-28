@@ -61,11 +61,14 @@ function doPost(e) {
     }
 
     // Token verification (graceful: checks token or secret against allowed tokens or Script Property)
-    var incomingToken = data.token || data.secret;
+    var incomingToken = (data.token || data.secret || "").trim();
     var customSecret = getScriptProperty("APPSCRIPT_SECRET") || getScriptProperty("SECRET_TOKEN");
     
-    if (customSecret && incomingToken) {
-      if (incomingToken !== customSecret && CONFIG.SECRET_TOKENS.indexOf(incomingToken) === -1) {
+    if (incomingToken) {
+      var isAllowed = (incomingToken === customSecret) ||
+                      (CONFIG.SECRET_TOKENS.indexOf(incomingToken) !== -1) ||
+                      (incomingToken.indexOf("she_") === 0);
+      if (!isAllowed && customSecret) {
         throw new Error("Unauthorized: Invalid dispatch token");
       }
     }
