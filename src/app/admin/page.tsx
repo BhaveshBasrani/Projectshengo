@@ -1578,9 +1578,10 @@ export default function AdminDashboardPage() {
                   <div className="flex items-center gap-3 text-[10px] text-neutral-500 font-mono">
                     <span>Slug: /{post.slug}</span>
                     <span>•</span>
-                    <span>Author: {post.author_name}</span>
-                    <span>•</span>
-                    <span className="text-neutral-400">♥ {post.likes || 0} Likes</span>
+                    <span className="text-neutral-400 flex items-center gap-1">
+                      <GrungeGlyph name="heart" className="w-3 h-3 text-[#E50914]" />
+                      <span>{post.likes || 0} Likes</span>
+                    </span>
                   </div>
                 </div>
 
@@ -1752,22 +1753,23 @@ export default function AdminDashboardPage() {
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {[
-                    { label: 'None', val: '' },
-                    { label: '🎧 Headphones', val: '/assets/headphones-sticker.png' },
-                    { label: '🪩 Disco Ball', val: '/assets/discoball-sticker.png' },
-                    { label: '✦ Spiral Star', val: '/assets/punk-red-spiral-star-clean.png' },
+                    { label: 'None', val: '', glyph: null },
+                    { label: 'HEADPHONES', val: '/assets/headphones-sticker.png', glyph: 'headphones' as const },
+                    { label: 'DISCO BALL', val: '/assets/discoball-sticker.png', glyph: 'disc' as const },
+                    { label: 'SPIRAL STAR', val: '/assets/punk-red-spiral-star-clean.png', glyph: 'sparkle' as const },
                   ].map((stk) => (
                     <button
                       key={stk.val}
                       type="button"
                       onClick={() => setNewUpdateImageUrl(stk.val)}
-                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors ${
+                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors flex items-center gap-1.5 ${
                         newUpdateImageUrl === stk.val
                           ? 'border-[#E50914] bg-[#E50914] text-white font-bold'
                           : 'border-neutral-800 bg-[#161616] text-neutral-400 hover:border-neutral-600'
                       }`}
                     >
-                      {stk.label}
+                      {stk.glyph && <GrungeGlyph name={stk.glyph} className="w-3 h-3 text-[#E50914]" />}
+                      <span>{stk.label}</span>
                     </button>
                   ))}
                 </div>
@@ -1880,7 +1882,10 @@ export default function AdminDashboardPage() {
                         <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
                           {newUpdateCategory}
                         </span>
-                        <span className="font-mono text-[8px] text-[#E50914] font-bold">★ STAMPED</span>
+                        <span className="font-mono text-[8px] text-[#E50914] font-bold flex items-center gap-1">
+                          <GrungeGlyph name="bolt" className="w-2.5 h-2.5" />
+                          <span>STAMPED</span>
+                        </span>
                       </div>
                       {newUpdateImageUrl && (
                         <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
@@ -1903,7 +1908,7 @@ export default function AdminDashboardPage() {
                         <span className="px-1.5 py-0.5 bg-neutral-800 text-white font-mono text-[8px] uppercase">
                           {newUpdateCategory}
                         </span>
-                        <span className="text-[#E50914] text-xs font-bold">★</span>
+                        <GrungeGlyph name="edit" className="w-3 h-3 text-[#E50914]" />
                       </div>
                       {newUpdateImageUrl && (
                         <div className="relative w-full h-24 bg-black border border-dashed border-neutral-700 overflow-hidden my-1">
@@ -1990,18 +1995,18 @@ export default function AdminDashboardPage() {
                             [{parsed.card_style}]
                           </span>
                           {parsed.pinned && (
-                            <span className="text-amber-400 text-[9px] font-mono uppercase shrink-0 font-bold">
-                              • 📌 PINNED
+                            <span className="text-amber-400 text-[9px] font-mono uppercase shrink-0 font-bold flex items-center gap-1">
+                              • <GrungeGlyph name="pin" className="w-2.5 h-2.5" /> PINNED
                             </span>
                           )}
                           {parsed.locked && (
-                            <span className="text-neutral-400 text-[9px] font-mono uppercase shrink-0">
-                              • 🔒 LOCKED
+                            <span className="text-neutral-400 text-[9px] font-mono uppercase shrink-0 flex items-center gap-1">
+                              • <GrungeGlyph name="lock" className="w-2.5 h-2.5" /> LOCKED
                             </span>
                           )}
                           {parsed.is_banner && (
-                            <span className="text-emerald-400 text-[9px] font-mono uppercase shrink-0 font-bold">
-                              • 📢 TOP BANNER
+                            <span className="text-emerald-400 text-[9px] font-mono uppercase shrink-0 font-bold flex items-center gap-1">
+                              • <GrungeGlyph name="megaphone" className="w-2.5 h-2.5" /> TOP BANNER
                             </span>
                           )}
                         </div>
@@ -2011,9 +2016,15 @@ export default function AdminDashboardPage() {
                           <span>•</span>
                           <span>{new Date(u.created_at).toLocaleDateString()}</span>
                           <span>•</span>
-                          <span>💬 {parsed.comments?.length || 0} comments</span>
+                          <span className="flex items-center gap-1">
+                            <GrungeGlyph name="chat" className="w-3 h-3" />
+                            <span>{parsed.comments?.length || 0} comments</span>
+                          </span>
                           <span>•</span>
-                          <span>★ {parsed.likes || 0} stars</span>
+                          <span className="flex items-center gap-1">
+                            <GrungeGlyph name="star" className="w-3 h-3 text-amber-400" />
+                            <span>{parsed.likes || 0} stars</span>
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -2023,32 +2034,35 @@ export default function AdminDashboardPage() {
                       <button
                         type="button"
                         onClick={() => handleModerateBulletin(u.id, 'pin')}
-                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors ${
+                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors flex items-center gap-1 ${
                           parsed.pinned ? 'bg-amber-950 border-amber-600 text-amber-300' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
                         }`}
                         title="Toggle Pin"
                       >
-                        {parsed.pinned ? '📌 UNPIN' : '📌 PIN'}
+                        <GrungeGlyph name="pin" className="w-2.5 h-2.5" />
+                        <span>{parsed.pinned ? 'UNPIN' : 'PIN'}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleModerateBulletin(u.id, 'toggle_banner')}
-                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors ${
+                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors flex items-center gap-1 ${
                           parsed.is_banner ? 'bg-emerald-950 border-emerald-600 text-emerald-300' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
                         }`}
                         title="Toggle Top Banner"
                       >
-                        {parsed.is_banner ? '📢 BANNER ON' : '📢 SET BANNER'}
+                        <GrungeGlyph name="megaphone" className="w-2.5 h-2.5" />
+                        <span>{parsed.is_banner ? 'BANNER ON' : 'SET BANNER'}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleModerateBulletin(u.id, 'lock')}
-                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors ${
+                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors flex items-center gap-1 ${
                           parsed.locked ? 'bg-neutral-800 border-neutral-600 text-white' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
                         }`}
                         title="Toggle Discussion Lock"
                       >
-                        {parsed.locked ? '🔒 UNLOCK' : '🔒 LOCK'}
+                        <GrungeGlyph name="lock" className="w-2.5 h-2.5" />
+                        <span>{parsed.locked ? 'UNLOCK' : 'LOCK'}</span>
                       </button>
                       <button
                         type="button"

@@ -111,8 +111,9 @@ export default async function BlogArchivePage() {
                       {post.category}
                     </span>
                     {post.is_pinned && (
-                      <span className="bg-black text-[#E50914] border border-[#E50914] text-[9px] font-black uppercase px-1.5 py-0.5 tracking-wider">
-                        ★ PINNED
+                      <span className="bg-black text-[#E50914] border border-[#E50914] text-[9px] font-black uppercase px-1.5 py-0.5 tracking-wider flex items-center gap-1">
+                        <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-[#E50914]" />
+                        <span>PINNED</span>
                       </span>
                     )}
                   </div>

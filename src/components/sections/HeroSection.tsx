@@ -18,23 +18,23 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
         <span className="w-2 h-2 bg-[#E50914] inline-block shadow-[0_0_6px_#E50914]"></span>
         DISMANTLING GENDER-BASED VIOLENCE
       </span>
-      <span className="text-neutral-500 font-bold">★</span>
+      <GrungeGlyph name="star" className="w-3 h-3 text-[#E50914] inline-block" />
       <span className="hover:text-[#E50914] transition-colors">EXTENDING SUPPORT TO SURVIVOR SAFE HOUSES</span>
-      <span className="text-neutral-500 font-bold">★</span>
+      <GrungeGlyph name="star" className="w-3 h-3 text-[#E50914] inline-block" />
       <span className="px-2 py-0.5 bg-[#E50914] text-white border border-white/20 text-[10px] tracking-wider font-extrabold shadow-[2px_2px_0px_#000000]">
         SAHODAYA HELP HOME PARTNER
       </span>
-      <span className="text-neutral-500 font-bold">★</span>
+      <GrungeGlyph name="star" className="w-3 h-3 text-[#E50914] inline-block" />
       <span className="text-emerald-400 font-black drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
         ₹2,00,000+ RAISED &amp; DELIVERED
       </span>
-      <span className="text-neutral-500 font-bold">★</span>
+      <GrungeGlyph name="star" className="w-3 h-3 text-[#E50914] inline-block" />
       <span className="text-[#E50914] drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]">
         BATTLE OF THE BANDS (BOTB 1.0 &amp; 2.0)
       </span>
-      <span className="text-neutral-500 font-bold">★</span>
+      <GrungeGlyph name="star" className="w-3 h-3 text-[#E50914] inline-block" />
       <span className="text-neutral-300">SARVA NIRBHAYA FOUNDATION (SEC. 8)</span>
-      <span className="text-neutral-500 font-bold">★</span>
+      <GrungeGlyph name="star" className="w-3 h-3 text-[#E50914] inline-block" />
     </div>
   );
 

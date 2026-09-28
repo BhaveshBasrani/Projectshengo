@@ -331,11 +331,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
       <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-neutral-800 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[#E50914] text-sm leading-none font-black">★</span>
+            <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" />
             <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest font-black">
               COMMUNITY BULLETIN &amp; TOPICS
             </span>
-            <span className="text-[#E50914] text-sm leading-none font-black">★</span>
+            <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" />
           </div>
           <h2 className="font-heading font-black text-2xl sm:text-4xl uppercase tracking-tight text-white mt-1">
             COMMUNITY BULLETIN BOARD
@@ -395,9 +395,10 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white text-xs"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+                aria-label="Clear search"
               >
-                ✕
+                <GrungeGlyph name="close" className="w-3 h-3" />
               </button>
             )}
           </div>
@@ -492,8 +493,9 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                       </span>
 
                       {parsed.pinned && (
-                        <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-black text-amber-300 font-mono text-[8px] font-bold uppercase tracking-wider border border-amber-400">
-                          📌 PINNED
+                        <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-black text-amber-300 font-mono text-[8px] font-bold uppercase tracking-wider border border-amber-400 flex items-center gap-1">
+                          <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
+                          <span>PINNED</span>
                         </span>
                       )}
                     </div>
@@ -515,11 +517,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                             onClick={(e) => handleLikeBulletin(update.id, e)}
                             className={`flex items-center gap-1 hover:text-[#E50914] ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
                           >
-                            <span>★</span>
+                            <GrungeGlyph name="star" className="w-3 h-3" />
                             <span>{likeCount}</span>
                           </button>
                           <span className="flex items-center gap-1">
-                            <span>💬</span>
+                            <GrungeGlyph name="chat" className="w-3 h-3" />
                             <span>{commentCount}</span>
                           </span>
                         </div>
@@ -538,11 +540,15 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           {update.category}
                         </span>
                         {parsed.pinned && (
-                          <span className="text-amber-400 font-mono text-[9px] font-bold">📌 PINNED</span>
+                          <span className="text-amber-400 font-mono text-[9px] font-bold flex items-center gap-1">
+                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
+                            <span>PINNED</span>
+                          </span>
                         )}
                       </div>
-                      <span className="border border-[#E50914] text-[#E50914] px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-wider">
-                        ★ OFFICIAL
+                      <span className="border border-[#E50914] text-[#E50914] px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <GrungeGlyph name="bolt" className="w-2.5 h-2.5" />
+                        <span>OFFICIAL</span>
                       </span>
                     </div>
 
@@ -572,11 +578,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           onClick={(e) => handleLikeBulletin(update.id, e)}
                           className={`flex items-center gap-1 hover:text-white ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
                         >
-                          <span>★</span>
+                          <GrungeGlyph name="star" className="w-3 h-3" />
                           <span>{likeCount}</span>
                         </button>
                         <span className="flex items-center gap-1">
-                          <span>💬</span>
+                          <GrungeGlyph name="chat" className="w-3 h-3" />
                           <span>{commentCount}</span>
                         </span>
                       </div>
@@ -594,10 +600,16 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           {update.category}
                         </span>
                         {parsed.pinned && (
-                          <span className="text-amber-400 font-mono text-[9px]">📌 PINNED</span>
+                          <span className="text-amber-400 font-mono text-[9px] flex items-center gap-1">
+                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
+                            <span>PINNED</span>
+                          </span>
                         )}
                       </div>
-                      <span className="text-[#E50914] text-xs font-bold">★ DOODLE</span>
+                      <span className="text-[#E50914] text-xs font-bold flex items-center gap-1">
+                        <GrungeGlyph name="edit" className="w-3 h-3" />
+                        <span>DOODLE</span>
+                      </span>
                     </div>
 
                     <h3 className="font-heading font-black text-base uppercase tracking-tight text-white leading-tight">
@@ -626,11 +638,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           onClick={(e) => handleLikeBulletin(update.id, e)}
                           className={`flex items-center gap-1 hover:text-white ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
                         >
-                          <span>★</span>
+                          <GrungeGlyph name="star" className="w-3 h-3" />
                           <span>{likeCount}</span>
                         </button>
                         <span className="flex items-center gap-1">
-                          <span>💬</span>
+                          <GrungeGlyph name="chat" className="w-3 h-3" />
                           <span>{commentCount}</span>
                         </span>
                       </div>
@@ -650,7 +662,10 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           {update.category}
                         </span>
                         {parsed.pinned && (
-                          <span className="text-amber-400 font-mono text-[9px] font-bold">📌 PINNED</span>
+                          <span className="text-amber-400 font-mono text-[9px] font-bold flex items-center gap-1">
+                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
+                            <span>PINNED</span>
+                          </span>
                         )}
                       </div>
                       <span className="font-mono text-[10px] text-neutral-500">
@@ -684,11 +699,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           onClick={(e) => handleLikeBulletin(update.id, e)}
                           className={`flex items-center gap-1 hover:text-white ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
                         >
-                          <span>★</span>
+                          <GrungeGlyph name="star" className="w-3 h-3" />
                           <span>{likeCount}</span>
                         </button>
                         <span className="flex items-center gap-1">
-                          <span>💬</span>
+                          <GrungeGlyph name="chat" className="w-3 h-3" />
                           <span>{commentCount}</span>
                         </span>
                       </div>
@@ -731,13 +746,15 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                     {selectedUpdate.category}
                   </span>
                   {parsedModal.pinned && (
-                    <span className="px-2 py-0.5 bg-black text-amber-300 border border-amber-400 font-mono text-[9px] font-bold uppercase">
-                      📌 PINNED
+                    <span className="px-2 py-0.5 bg-black text-amber-300 border border-amber-400 font-mono text-[9px] font-bold uppercase flex items-center gap-1">
+                      <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
+                      <span>PINNED</span>
                     </span>
                   )}
                   {parsedModal.locked && (
-                    <span className="px-2 py-0.5 bg-neutral-800 text-neutral-300 font-mono text-[9px] uppercase">
-                      🔒 LOCKED
+                    <span className="px-2 py-0.5 bg-neutral-800 text-neutral-300 font-mono text-[9px] uppercase flex items-center gap-1">
+                      <GrungeGlyph name="lock" className="w-2.5 h-2.5" />
+                      <span>LOCKED</span>
                     </span>
                   )}
                   <span className="text-neutral-400 font-mono text-xs">
@@ -817,7 +834,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                         : 'border-neutral-700 bg-neutral-900 text-neutral-300 hover:border-white hover:text-white'
                     }`}
                   >
-                    <span>★</span>
+                    <GrungeGlyph name="star" className="w-3.5 h-3.5" />
                     <span>{isLikedByMe ? 'STARRED' : 'STAR TOPIC'}</span>
                     <span className="px-1.5 py-0.2 bg-black/40 text-[10px] rounded">
                       {parsedModal.likes || 0}
@@ -880,7 +897,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                     </div>
                     {parsedModal.locked && (
                       <span className="font-mono text-[10px] text-amber-400 flex items-center gap-1">
-                        <span>🔒</span>
+                        <GrungeGlyph name="lock" className="w-3 h-3 text-amber-400" />
                         <span>Replies locked by admin</span>
                       </span>
                     )}
@@ -935,7 +952,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                                 onClick={() => handleLikeComment(selectedUpdate.id, cm.id)}
                                 className={`flex items-center gap-1 hover:text-white ${isCommentLiked ? 'text-[#E50914] font-bold' : ''}`}
                               >
-                                <span>★</span>
+                                <GrungeGlyph name="star" className="w-3 h-3" />
                                 <span>{cm.likes || 0}</span>
                               </button>
 
@@ -974,9 +991,10 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                           <button
                             type="button"
                             onClick={() => setReplyTarget(null)}
-                            className="text-neutral-500 hover:text-white"
+                            className="text-neutral-500 hover:text-white flex items-center gap-1"
                           >
-                            ✕ Cancel
+                            <GrungeGlyph name="close" className="w-3 h-3" />
+                            <span>Cancel</span>
                           </button>
                         </div>
                       )}
@@ -1036,8 +1054,9 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                       </div>
                     </form>
                   ) : (
-                    <div className="p-3 bg-neutral-900 border border-neutral-800 text-center text-xs text-neutral-400 font-mono">
-                      🔒 Replies on this bulletin have been closed by community moderators.
+                    <div className="p-3 bg-neutral-900 border border-neutral-800 text-center text-xs text-neutral-400 font-mono flex items-center justify-center gap-2">
+                      <GrungeGlyph name="lock" className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Replies on this bulletin have been closed by community moderators.</span>
                     </div>
                   )}
 
@@ -1170,22 +1189,23 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                 </label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {[
-                    { label: 'None', val: '' },
-                    { label: '🎧 Headphones', val: '/assets/headphones-sticker.png' },
-                    { label: '🪩 Disco Ball', val: '/assets/discoball-sticker.png' },
-                    { label: '✦ Spiral Star', val: '/assets/punk-red-spiral-star-clean.png' },
+                    { label: 'None', val: '', glyph: null },
+                    { label: 'HEADPHONES', val: '/assets/headphones-sticker.png', glyph: 'headphones' as const },
+                    { label: 'DISCO BALL', val: '/assets/discoball-sticker.png', glyph: 'disc' as const },
+                    { label: 'SPIRAL STAR', val: '/assets/punk-red-spiral-star-clean.png', glyph: 'sparkle' as const },
                   ].map((stk) => (
                     <button
                       key={stk.val}
                       type="button"
                       onClick={() => setNewTopicImageUrl(stk.val)}
-                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors ${
+                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors flex items-center gap-1.5 ${
                         newTopicImageUrl === stk.val
                           ? 'border-[#E50914] bg-[#E50914] text-white font-bold'
                           : 'border-neutral-800 bg-[#161616] text-neutral-400 hover:border-neutral-600'
                       }`}
                     >
-                      {stk.label}
+                      {stk.glyph && <GrungeGlyph name={stk.glyph} className="w-3 h-3 text-[#E50914]" />}
+                      <span>{stk.label}</span>
                     </button>
                   ))}
                 </div>

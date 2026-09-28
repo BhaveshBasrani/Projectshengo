@@ -311,9 +311,10 @@ function ReviewsArchiveContent() {
               <button
                 type="button"
                 onClick={() => setSelectedReview(null)}
-                className="px-2.5 py-1 border border-neutral-700 hover:border-[#E50914] text-neutral-400 hover:text-white text-xs font-bold uppercase transition-colors shrink-0 stencil-cut"
+                className="px-2.5 py-1 border border-neutral-700 hover:border-[#E50914] text-neutral-400 hover:text-white text-xs font-bold uppercase transition-colors shrink-0 stencil-cut flex items-center gap-1.5"
               >
-                ✕ CLOSE
+                <GrungeGlyph name="close" className="w-3.5 h-3.5" />
+                <span>CLOSE</span>
               </button>
             </div>
 

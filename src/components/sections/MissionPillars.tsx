@@ -68,7 +68,7 @@ export default function MissionPillars() {
                 key={idx}
                 className="p-3.5 bg-[#121212] border border-neutral-800 hover:border-[#E50914] text-neutral-200 flex items-start gap-3 transition-colors shadow-sm"
               >
-                <span className="text-[#E50914] text-base leading-none shrink-0 font-black">★</span>
+                <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914] shrink-0 mt-0.5" />
                 <span className="italic font-medium text-xs sm:text-sm text-neutral-100">
                   {item.custom ? item.custom : `“${item.text}”`}
                 </span>
@@ -91,7 +91,7 @@ export default function MissionPillars() {
           </p>
           <div className="space-y-2.5 pt-1 text-xs sm:text-sm">
             <div className="p-3 bg-[#140808] border-l-4 border-[#E50914] border-y border-r border-neutral-800 flex items-start gap-3">
-              <span className="text-[#E50914] text-base leading-none shrink-0 font-black">★</span>
+              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914] shrink-0 mt-0.5" />
               <div>
                 <strong className="text-white block font-heading text-sm sm:text-base tracking-tight">
                   87 <BrushCensor tilt={-1}>rape</BrushCensor> cases occur daily throughout India
@@ -103,7 +103,7 @@ export default function MissionPillars() {
             </div>
 
             <div className="p-3 bg-[#140808] border-l-4 border-[#E50914] border-y border-r border-neutral-800 flex items-start gap-3">
-              <span className="text-[#E50914] text-base leading-none shrink-0 font-black">★</span>
+              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914] shrink-0 mt-0.5" />
               <div>
                 <strong className="text-white block font-heading text-sm sm:text-base tracking-tight">
                   Over 370 million girls and women globally were <BrushCensor tilt={1}>raped</BrushCensor> or{' '}
@@ -114,7 +114,7 @@ export default function MissionPillars() {
             </div>
 
             <div className="p-3 bg-[#140808] border-l-4 border-[#E50914] border-y border-r border-neutral-800 flex items-start gap-3">
-              <span className="text-[#E50914] text-base leading-none shrink-0 font-black">★</span>
+              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914] shrink-0 mt-0.5" />
               <div>
                 <strong className="text-white block font-heading text-sm sm:text-base tracking-tight">
                   840 million women have endured either partner violence or non-partner{' '}
@@ -125,7 +125,7 @@ export default function MissionPillars() {
             </div>
 
             <div className="p-3 bg-[#140808] border-l-4 border-[#E50914] border-y border-r border-neutral-800 flex items-start gap-3">
-              <span className="text-[#E50914] text-base leading-none shrink-0 font-black">★</span>
+              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914] shrink-0 mt-0.5" />
               <div>
                 <strong className="text-white block font-heading text-sm sm:text-base tracking-tight">
                   Approximately 94.6% of reported <BrushCensor tilt={-1}>rapes</BrushCensor> in India are committed by someone known to the victim
@@ -292,10 +292,20 @@ export default function MissionPillars() {
                     type="button"
                     onClick={() => setIsPlaying(!isPlaying)}
                     aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-                    className="px-2.5 py-1.5 bg-[#161616] hover:bg-[#222222] border border-neutral-800 text-xs text-neutral-300 hover:text-white transition-colors font-mono"
+                    className="px-2.5 py-1.5 bg-[#161616] hover:bg-[#222222] border border-neutral-800 text-xs text-neutral-300 hover:text-white transition-colors font-mono flex items-center gap-1.5"
                     title={isPlaying ? 'Pause auto-advance' : 'Resume auto-advance'}
                   >
-                    {isPlaying ? '⏸ PAUSE' : '▶ AUTO'}
+                    {isPlaying ? (
+                      <>
+                        <GrungeGlyph name="pause" className="w-2.5 h-2.5" />
+                        <span>PAUSE</span>
+                      </>
+                    ) : (
+                      <>
+                        <GrungeGlyph name="play" className="w-2.5 h-2.5" />
+                        <span>AUTO</span>
+                      </>
+                    )}
                   </button>
 
                   <button

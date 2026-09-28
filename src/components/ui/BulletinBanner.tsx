@@ -88,7 +88,7 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 overflow-hidden">
           {/* Glowing Red Punk Badge */}
           <span className="shrink-0 px-2 sm:px-2.5 py-0.5 bg-[#E50914] text-white font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-wider border border-white/20 shadow-[2px_2px_0px_#000000] flex items-center gap-1.5">
-            <span className="text-white text-[11px] leading-none animate-pulse">★</span>
+            <GrungeGlyph name="bolt" className="w-2.5 h-2.5 text-white animate-pulse" />
             <span className="hidden xs:inline">BULLETIN • </span>
             <span>{bannerUpdate.category.toUpperCase()}</span>
           </span>
