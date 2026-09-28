@@ -14,18 +14,30 @@ interface HeroSectionProps {
 export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
   const tickerItems = (
     <div className="flex items-center space-x-6 sm:space-x-8 px-4 font-mono text-[11px] sm:text-xs uppercase tracking-widest text-[#EDEDED] font-black whitespace-nowrap">
-      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] DISMANTLING GENDER-BASED VIOLENCE</span>
-      <span>/</span>
-      <span>EXTENDING SUPPORT TO SURVIVOR SAFE HOUSES</span>
-      <span>/</span>
-      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] SAHODAYA WOMEN&apos;S HELP HOME PARTNER</span>
-      <span>/</span>
-      <span>OVER ₹2,00,000 RAISED &amp; CONTRIBUTED</span>
-      <span>/</span>
-      <span className="text-[#E50914] drop-shadow-[1px_1px_0px_#000000]">[+] BATTLE OF THE BANDS (BOTB 1.0 &amp; 2.0)</span>
-      <span>/</span>
-      <span>SARVA NIRBHAYA FOUNDATION (SEC. 8)</span>
-      <span>/</span>
+      <span className="flex items-center gap-1.5 text-[#E50914] font-black drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E50914]"></span>
+        </span>
+        DISMANTLING GENDER-BASED VIOLENCE
+      </span>
+      <span className="text-neutral-500 font-bold">★</span>
+      <span className="hover:text-[#E50914] transition-colors">EXTENDING SUPPORT TO SURVIVOR SAFE HOUSES</span>
+      <span className="text-neutral-500 font-bold">★</span>
+      <span className="px-2 py-0.5 bg-[#E50914] text-white border border-white/20 text-[10px] tracking-wider font-extrabold shadow-[2px_2px_0px_#000000]">
+        SAHODAYA HELP HOME PARTNER
+      </span>
+      <span className="text-neutral-500 font-bold">★</span>
+      <span className="text-emerald-400 font-black drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
+        ₹2,00,000+ RAISED &amp; DELIVERED
+      </span>
+      <span className="text-neutral-500 font-bold">★</span>
+      <span className="text-[#E50914] drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]">
+        BATTLE OF THE BANDS (BOTB 1.0 &amp; 2.0)
+      </span>
+      <span className="text-neutral-500 font-bold">★</span>
+      <span className="text-neutral-300">SARVA NIRBHAYA FOUNDATION (SEC. 8)</span>
+      <span className="text-neutral-500 font-bold">★</span>
     </div>
   );
 
@@ -203,13 +215,13 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
 
       </div>
 
-      {/* Full-Bleed Continuous Edge-to-Edge Marquee Ticker with Hazard Stripes - Reaches Page Borders on Any Device */}
-      <div className="w-full mt-6 sm:mt-8 border-y-2 border-x-0 sm:border-y-4 border-[#E50914] bg-[#080808] select-none overflow-hidden shrink-0 z-10">
-        {/* Top Hazard Rail */}
-        <div className="w-full h-2 sm:h-2.5 bg-hazard-stripes" />
+      {/* Full-Bleed Continuous Edge-to-Edge Marquee Ticker with Animated Hazard Stripes */}
+      <div className="w-full mt-6 sm:mt-8 border-y-2 border-x-0 sm:border-y-4 border-[#E50914] bg-[#070707] select-none overflow-hidden shrink-0 z-10 group/marquee">
+        {/* Top Animated Hazard Rail */}
+        <div className="w-full h-2.5 sm:h-3 bg-hazard-stripes shadow-[0_0_10px_rgba(229,9,20,0.5)]" />
 
-        {/* Marquee Content Rail */}
-        <div className="py-2.5 sm:py-3.5 flex overflow-hidden">
+        {/* Marquee Content Rail with Hover Pause */}
+        <div className="py-2.5 sm:py-3 flex overflow-hidden group-hover/marquee:[&_.animate-marquee]:[animation-play-state:paused]">
           <div className="flex shrink-0 min-w-full items-center justify-around animate-marquee">
             {tickerItems}
           </div>
@@ -218,8 +230,8 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
           </div>
         </div>
 
-        {/* Bottom Hazard Rail */}
-        <div className="w-full h-2 sm:h-2.5 bg-hazard-stripes" />
+        {/* Bottom Counter-Sliding Hazard Rail */}
+        <div className="w-full h-2.5 sm:h-3 bg-hazard-stripes-reverse shadow-[0_0_10px_rgba(229,9,20,0.5)]" />
       </div>
 
     </section>

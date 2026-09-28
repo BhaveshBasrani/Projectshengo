@@ -10,33 +10,51 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { subject, content, targetAudience = 'subscribed_only' } = body;
+    const {
+      subject,
+      headline,
+      subtitle,
+      content,
+      ctaText,
+      ctaUrl,
+      targetAudience = 'subscribed_only',
+    } = body;
 
     if (!subject || !subject.trim() || !content || !content.trim()) {
       return NextResponse.json({ error: 'Newsletter subject and content are required' }, { status: 400 });
     }
 
-    // 1. Gather subscribers from both newsletter table and opted-in user accounts
-    const newsletterSubscribers = await getAllNewsletterSubscribers();
     let recipients: string[] = [];
 
-    if (targetAudience === 'all') {
+    // Case 1: Test send to Admin inbox only
+    if (targetAudience === 'test_admin') {
+      const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'projectshe.ngo@gmail.com';
+      recipients = [adminEmail];
+    } else if (targetAudience === 'all') {
+      // Case 2: All registered accounts + newsletter subscribers
+      const newsletterSubscribers = await getAllNewsletterSubscribers();
       const allUsers = await getAllUsersAdmin();
       const combined = new Set([...newsletterSubscribers, ...allUsers.map((u) => u.email.trim().toLowerCase())]);
       recipients = Array.from(combined).filter(Boolean);
     } else {
-      recipients = newsletterSubscribers;
+      // Case 3: Subscribed members only
+      recipients = await getAllNewsletterSubscribers();
     }
 
-    // 2. Dispatch via Google Apps Script (If recipients array is empty, Apps Script will safely broadcast to all active subscribers in Google Sheets Subscribers tab!)
+    // Dispatch via Google Apps Script (If recipients array is empty, Apps Script broadcasts to active sheet subscribers)
     const result = await sendEmailViaAppsScript({
       action: 'newsletter_broadcast',
       recipients: recipients.length > 0 ? recipients : undefined,
       subject: subject.trim(),
+      headline: (headline || subject).trim(),
+      subtitle: subtitle ? subtitle.trim() : undefined,
       body: content.trim(),
+      ctaText: ctaText ? ctaText.trim() : undefined,
+      ctaUrl: ctaUrl ? ctaUrl.trim() : undefined,
       metadata: {
         sentAt: new Date().toISOString(),
         totalSubscribers: recipients.length,
+        audience: targetAudience,
       },
     });
 
@@ -51,7 +69,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       recipientCount: recipients.length,
-      message: result.message || `Newsletter successfully dispatched!`,
+      message: targetAudience === 'test_admin'
+        ? `Test newsletter sent to ${recipients[0]}`
+        : `Newsletter successfully sent to ${recipients.length} subscriber(s)!`,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Failed to dispatch newsletter' }, { status: 500 });

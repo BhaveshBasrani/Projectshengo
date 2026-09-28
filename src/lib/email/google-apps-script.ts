@@ -23,12 +23,16 @@ function getAdminEmail(): string {
 }
 
 interface EmailPayload {
-  action: 'admin_notification' | 'newsletter_broadcast' | 'welcome_user' | 'newsletter_signup';
+  action: 'admin_notification' | 'newsletter_broadcast' | 'welcome_user' | 'newsletter_signup' | 'newsletter_unsubscribe';
   to?: string;
   email?: string;
   source?: string;
   recipients?: string[];
   subject: string;
+  headline?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaUrl?: string;
   body: string;
   metadata?: Record<string, any>;
 }

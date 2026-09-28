@@ -54,8 +54,12 @@ export default function AdminDashboardPage() {
   const [newUpdateCategory, setNewUpdateCategory] = useState('Urgent Alert');
 
   const [emailSubject, setEmailSubject] = useState('');
+  const [emailHeadline, setEmailHeadline] = useState('');
+  const [emailSubtitle, setEmailSubtitle] = useState('');
   const [emailContent, setEmailContent] = useState('');
-  const [emailTarget, setEmailTarget] = useState<'subscribed_only' | 'all'>('subscribed_only');
+  const [emailCtaText, setEmailCtaText] = useState('VISIT OUR WEBSITE');
+  const [emailCtaUrl, setEmailCtaUrl] = useState('https://projectshe.org');
+  const [emailTarget, setEmailTarget] = useState<'subscribed_only' | 'all' | 'test_admin'>('subscribed_only');
 
   // Search & Filters
   const [userSearch, setUserSearch] = useState('');
@@ -494,7 +498,13 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    const recipientDesc = emailTarget === 'all' ? 'ALL registered members' : 'SUBSCRIBED members only';
+    const recipientDesc =
+      emailTarget === 'test_admin'
+        ? 'Test to your Admin Email'
+        : emailTarget === 'all'
+        ? 'ALL registered members'
+        : 'SUBSCRIBED members only';
+
     if (!confirm(`Are you sure you want to send this newsletter to ${recipientDesc}?`)) return;
 
     setActionLoading(true);
@@ -504,15 +514,23 @@ export default function AdminDashboardPage() {
         headers: getHeaders(),
         body: JSON.stringify({
           subject: emailSubject.trim(),
+          headline: (emailHeadline || emailSubject).trim(),
+          subtitle: emailSubtitle.trim(),
           content: emailContent.trim(),
+          ctaText: emailCtaText.trim(),
+          ctaUrl: emailCtaUrl.trim(),
           targetAudience: emailTarget,
         }),
       });
       const data = await res.json();
       if (data.success) {
         showToast(data.message || 'Newsletter sent successfully!');
-        setEmailSubject('');
-        setEmailContent('');
+        if (emailTarget !== 'test_admin') {
+          setEmailSubject('');
+          setEmailHeadline('');
+          setEmailSubtitle('');
+          setEmailContent('');
+        }
       } else {
         alert(data.error || data.message || 'Newsletter send error');
       }
@@ -714,11 +732,11 @@ export default function AdminDashboardPage() {
             type="button"
             onClick={handleRefreshData}
             disabled={actionLoading}
-            className="px-3 py-2 bg-[#141414] border border-neutral-700 hover:border-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors hover-lift stencil-cut"
+            className="px-3 py-2 bg-[#141414] border border-neutral-700 hover:border-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors hover-lift stencil-cut disabled:opacity-50"
             title="Refresh database records"
           >
             <GrungeGlyph name="refresh" className={`w-3.5 h-3.5 ${actionLoading ? 'animate-spin' : ''}`} />
-            <span>REFRESH</span>
+            <span>{actionLoading ? 'REFRESHING...' : 'REFRESH'}</span>
           </button>
           <button
             type="button"
@@ -1664,97 +1682,270 @@ export default function AdminDashboardPage() {
       {/* TAB 7: EMAIL NEWSLETTER */}
       {activeTab === 'email' && (
         <div className="space-y-6">
-          <div>
-            <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-              EMAIL NEWSLETTER
-            </h2>
-            <p className="text-xs text-neutral-400 font-sans">
-              Send updates directly to members who have opted into newsletters.
-            </p>
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
+                EMAIL NEWSLETTER
+              </h2>
+              <p className="text-xs text-neutral-400 font-sans">
+                Compose and send updates to subscribers with customizable buttons, headline, and live preview.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 bg-[#141414] border border-neutral-800 text-[11px] font-mono text-neutral-300">
+                Active Subscribers: <strong className="text-[#E50914]">{stats?.emailSubscribers || 0}</strong>
+              </span>
+            </div>
           </div>
 
-          <form
-            onSubmit={handleSendNewsletter}
-            className="p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut"
-          >
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <span className="font-heading font-black text-sm uppercase text-[#E50914]">
-                COMPOSE EMAIL ANNOUNCEMENT
-              </span>
-              <span className="text-[10px] text-neutral-400 font-mono">
-                Opted-in Subscribers: <strong>{stats?.emailSubscribers || 0}</strong>
-              </span>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left: Compose Form (7 cols) */}
+            <form
+              onSubmit={handleSendNewsletter}
+              className="lg:col-span-7 p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut"
+            >
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                <span className="font-heading font-black text-sm uppercase text-[#E50914]">
+                  COMPOSE NEWSLETTER
+                </span>
+                <span className="text-[10px] text-neutral-400 font-mono">
+                  Standard HTML Template
+                </span>
+              </div>
 
-            <div>
-              <label className="block text-neutral-400 uppercase font-bold mb-1">
-                Recipient Group
-              </label>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="targetAudience"
-                    value="subscribed_only"
-                    checked={emailTarget === 'subscribed_only'}
-                    onChange={() => setEmailTarget('subscribed_only')}
-                  />
-                  <span>Subscribed Members Only ({stats?.emailSubscribers || 0})</span>
+              <div>
+                <label className="block text-neutral-400 uppercase font-bold mb-1.5">
+                  Send To
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer text-neutral-500">
-                  <input
-                    type="radio"
-                    name="targetAudience"
-                    value="all"
-                    checked={emailTarget === 'all'}
-                    onChange={() => setEmailTarget('all')}
-                  />
-                  <span>All Registered Members ({stats?.totalUsers || 0})</span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${
+                    emailTarget === 'subscribed_only'
+                      ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
+                      : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="targetAudience"
+                      value="subscribed_only"
+                      checked={emailTarget === 'subscribed_only'}
+                      onChange={() => setEmailTarget('subscribed_only')}
+                      className="sr-only"
+                    />
+                    <span className="text-xs">Subscribed Only</span>
+                    <span className="text-[10px] text-neutral-500 font-mono">({stats?.emailSubscribers || 0})</span>
+                  </label>
+
+                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${
+                    emailTarget === 'all'
+                      ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
+                      : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="targetAudience"
+                      value="all"
+                      checked={emailTarget === 'all'}
+                      onChange={() => setEmailTarget('all')}
+                      className="sr-only"
+                    />
+                    <span className="text-xs">All Members</span>
+                    <span className="text-[10px] text-neutral-500 font-mono">({stats?.totalUsers || 0})</span>
+                  </label>
+
+                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${
+                    emailTarget === 'test_admin'
+                      ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 font-bold'
+                      : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
+                  }`}>
+                    <input
+                      type="radio"
+                      name="targetAudience"
+                      value="test_admin"
+                      checked={emailTarget === 'test_admin'}
+                      onChange={() => setEmailTarget('test_admin')}
+                      className="sr-only"
+                    />
+                    <span className="text-xs">Test (Admin Only)</span>
+                    <span className="text-[10px] text-emerald-500 font-mono">Safe Preview</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-neutral-400 uppercase font-bold mb-1">
+                  Email Subject Line *
                 </label>
+                <input
+                  type="text"
+                  required
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="e.g. Project S.H.E. Monthly Newsletter: Upcoming Workshops & News"
+                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-neutral-400 uppercase font-bold mb-1">
+                    Main Headline (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={emailHeadline}
+                    onChange={(e) => setEmailHeadline(e.target.value)}
+                    placeholder="Defaults to subject if empty"
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-neutral-400 uppercase font-bold mb-1">
+                    Subtitle / Tagline (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={emailSubtitle}
+                    onChange={(e) => setEmailSubtitle(e.target.value)}
+                    placeholder="e.g. Field Update &amp; Legal Literacy"
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-neutral-400 uppercase font-bold mb-1">
+                  Email Message *
+                </label>
+                <textarea
+                  required
+                  rows={6}
+                  value={emailContent}
+                  onChange={(e) => setEmailContent(e.target.value)}
+                  placeholder="Write your newsletter text here. Line breaks are preserved in the email..."
+                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-sans"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-800">
+                <div>
+                  <label className="block text-neutral-400 uppercase font-bold mb-1">
+                    Call-to-Action Button Text
+                  </label>
+                  <input
+                    type="text"
+                    value={emailCtaText}
+                    onChange={(e) => setEmailCtaText(e.target.value)}
+                    placeholder="e.g. READ FULL STORY"
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none uppercase font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-neutral-400 uppercase font-bold mb-1">
+                    Button Destination URL
+                  </label>
+                  <input
+                    type="url"
+                    value={emailCtaUrl}
+                    onChange={(e) => setEmailCtaUrl(e.target.value)}
+                    placeholder="https://projectshe.org/#donate"
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px]"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="submit"
+                  disabled={actionLoading}
+                  className="flex-1 py-3 bg-[#E50914] text-white hover:bg-white hover:text-black font-heading font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 stencil-cut shadow-[3px_3px_0px_#000000]"
+                >
+                  <GrungeGlyph name="send" className="w-4 h-4" />
+                  <span>
+                    {actionLoading
+                      ? 'SENDING NEWSLETTER...'
+                      : emailTarget === 'test_admin'
+                      ? 'SEND TEST EMAIL TO ADMIN'
+                      : 'SEND NEWSLETTER TO MEMBERS'}
+                  </span>
+                </button>
+              </div>
+            </form>
+
+            {/* Right: Live Interactive Mockup (5 cols) */}
+            <div className="lg:col-span-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs uppercase font-bold text-neutral-400 font-mono">
+                  LIVE EMAIL PREVIEW
+                </span>
+                <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/60 px-2 py-0.5 border border-emerald-800">
+                  REAL-TIME PREVIEW
+                </span>
+              </div>
+
+              {/* Realistic Email Box */}
+              <div className="bg-[#0C0C0C] border-2 border-[#E50914] shadow-[6px_6px_0px_#E50914] overflow-hidden text-xs">
+                {/* Top Crimson Accent */}
+                <div className="h-1 bg-[#E50914]" />
+
+                <div className="p-5 space-y-4">
+                  {/* Brand Header */}
+                  <div className="border-b border-neutral-800 pb-3 flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] font-mono text-[#E50914] font-black uppercase tracking-widest block">
+                        // PROJECT S.H.E. NEWSLETTER
+                      </span>
+                      <h4 className="font-heading font-black text-lg text-white uppercase tracking-tight">
+                        PROJECT S.H.E.
+                      </h4>
+                    </div>
+                    <span className="text-[9px] font-mono text-neutral-500">
+                      SUPPORT • HELP • EMPOWER
+                    </span>
+                  </div>
+
+                  {/* Headline & Subtitle */}
+                  <div>
+                    <h3 className="font-heading font-extrabold text-base text-white uppercase leading-snug">
+                      {emailHeadline || emailSubject || 'Newsletter Headline'}
+                    </h3>
+                    {emailSubtitle && (
+                      <p className="text-[11px] font-mono text-[#E50914] uppercase tracking-wider font-bold mt-1">
+                        {emailSubtitle}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="text-neutral-300 leading-relaxed font-sans whitespace-pre-line text-xs min-h-[80px]">
+                    {emailContent || 'Your email message will appear here with clean paragraph breaks and high-contrast typography.'}
+                  </div>
+
+                  {/* Action Button */}
+                  {emailCtaText && (
+                    <div className="pt-2">
+                      <span className="inline-block px-5 py-2.5 bg-[#E50914] text-white font-mono font-black text-[11px] uppercase tracking-wider shadow-[3px_3px_0px_#000000]">
+                        {emailCtaText} &rarr;
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Helpline box */}
+                  <div className="p-3 bg-[#141414] border border-neutral-800 text-[10px] text-neutral-400 font-mono space-y-1">
+                    <span className="text-[#E50914] font-bold block uppercase">24/7 CRISIS RESPONSE</span>
+                    <span>National Women Helpline: 1091 / 181</span>
+                  </div>
+
+                  {/* Unsubscribe Footer */}
+                  <div className="pt-3 border-t border-neutral-800 text-center text-[10px] font-mono text-neutral-500 space-y-1">
+                    <p>Sent to member@example.com • Project S.H.E. NGO</p>
+                    <p className="text-[#E50914] underline font-bold cursor-pointer">
+                      Unsubscribe from this newsletter
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div>
-              <label className="block text-neutral-400 uppercase font-bold mb-1">
-                Email Subject *
-              </label>
-              <input
-                type="text"
-                required
-                value={emailSubject}
-                onChange={(e) => setEmailSubject(e.target.value)}
-                placeholder="e.g. Project S.H.E. Monthly Newsletter: Upcoming Workshops & Community News"
-                className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="block text-neutral-400 uppercase font-bold mb-1">
-                Email Message *
-              </label>
-              <textarea
-                required
-                rows={6}
-                value={emailContent}
-                onChange={(e) => setEmailContent(e.target.value)}
-                placeholder="Write your email announcement here..."
-                className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-sans"
-              />
-            </div>
-
-            <div className="p-3 bg-[#141414] border border-neutral-800 text-[10px] text-neutral-400 leading-relaxed font-sans">
-              Emails are safely delivered to members without exposing private server credentials.
-            </div>
-
-            <button
-              type="submit"
-              disabled={actionLoading}
-              className="w-full py-3 bg-[#E50914] text-white hover:bg-white hover:text-black font-heading font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 stencil-cut"
-            >
-              <GrungeGlyph name="send" className="w-4 h-4" />
-              <span>{actionLoading ? 'SENDING NEWSLETTER...' : 'SEND NEWSLETTER TO SUBSCRIBERS'}</span>
-            </button>
-          </form>
+          </div>
         </div>
       )}
 
@@ -1865,6 +2056,19 @@ export default function AdminDashboardPage() {
                   value={config.contact_email}
                   onChange={(e) => setConfig({ ...config, contact_email: e.target.value })}
                   className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block uppercase font-bold text-neutral-400 mb-1">
+                  Instagram Profile Link
+                </label>
+                <input
+                  type="url"
+                  value={config.instagram_url || ''}
+                  onChange={(e) => setConfig({ ...config, instagram_url: e.target.value })}
+                  placeholder="https://instagram.com/projectshe.ngo"
+                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px]"
                 />
               </div>
             </div>
