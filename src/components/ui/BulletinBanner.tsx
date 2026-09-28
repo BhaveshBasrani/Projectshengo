@@ -16,6 +16,8 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
   const [updates, setUpdates] = useState<SiteUpdate[]>(initialUpdates || []);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
   // Check dismissal state in session storage per bulletin ID
   useEffect(() => {
     try {
@@ -24,6 +26,16 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
         setDismissedId(storedId);
       }
     } catch (e) {}
+  }, []);
+
+  // Listen to window scroll to slide banner away on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Fetch updates if none provided or sync with public endpoint
@@ -48,20 +60,29 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
       ? updates[0]
       : null);
 
-  const isVisible = Boolean(
+  const isBannerActive = Boolean(
     bannerUpdate &&
     bannerUpdate.id !== dismissedId &&
     pathname === '/'
   );
 
+  const isBannerShowing = isBannerActive && !isScrolled;
+
   // Broadcast visibility to FloatingNavbar so it adjusts top position smoothly
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      (window as any).__she_banner_showing = isBannerShowing;
       window.dispatchEvent(
-        new CustomEvent('bulletin-banner-state', { detail: { visible: isVisible } })
+        new CustomEvent('bulletin-banner-state', {
+          detail: {
+            visible: isBannerShowing,
+            active: isBannerActive,
+            height: 48,
+          },
+        })
       );
     }
-  }, [isVisible]);
+  }, [isBannerShowing, isBannerActive]);
 
   const handleDismiss = () => {
     if (bannerUpdate) {
@@ -71,13 +92,16 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
       } catch (e) {}
     }
     if (typeof window !== 'undefined') {
+      (window as any).__she_banner_showing = false;
       window.dispatchEvent(
-        new CustomEvent('bulletin-banner-state', { detail: { visible: false } })
+        new CustomEvent('bulletin-banner-state', {
+          detail: { visible: false, active: false, showing: false },
+        })
       );
     }
   };
 
-  if (!isVisible || !bannerUpdate) return null;
+  if (!isBannerActive || !bannerUpdate) return null;
 
   const parsed = parseBulletinPayload(bannerUpdate);
 
@@ -85,12 +109,16 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
     <div
       role="banner"
       aria-label="Community Announcement Banner"
-      className="fixed top-0 left-0 right-0 z-[60] bg-[#0A0A0A] border-b-2 border-[#E50914] text-white banner-glow select-none animate-fadeIn transition-transform duration-300"
+      className={`fixed top-0 left-0 right-0 z-[60] bg-[#0A0A0A] text-white select-none transition-all duration-300 ease-out border-b border-[#E50914]/30 h-[44px] sm:h-[48px] box-border ${
+        isBannerShowing
+          ? 'translate-y-0 opacity-100'
+          : '-translate-y-full opacity-0 pointer-events-none'
+      }`}
     >
       {/* Animated Top Hazard Stripes Pinstripe */}
       <div className="h-1 w-full bg-hazard-stripes opacity-90" />
 
-      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 h-10 sm:h-11 flex items-center justify-between gap-2.5 sm:gap-4 font-mono text-xs">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 h-[40px] sm:h-[44px] flex items-center justify-between gap-2.5 sm:gap-4 font-mono text-xs">
         
         {/* Left: Indicator, Thumbnail & Headline */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 overflow-hidden">

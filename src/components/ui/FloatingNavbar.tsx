@@ -24,6 +24,10 @@ export default function FloatingNavbar() {
   useEffect(() => {
     setMounted(true);
 
+    if (typeof window !== 'undefined' && (window as any).__she_banner_showing !== undefined) {
+      setHasTopBanner(Boolean((window as any).__she_banner_showing));
+    }
+
     const handleBannerState = (e: any) => {
       setHasTopBanner(Boolean(e.detail?.visible));
     };
@@ -98,16 +102,24 @@ export default function FloatingNavbar() {
     return clean.slice(0, 2).toUpperCase() || 'U';
   };
 
-  const isPushedDown = hasTopBanner && !isScrolled && pathname === '/';
+  const isDocked = hasTopBanner && !isScrolled && pathname === '/';
 
   return (
     <>
       <header
-        className={`fixed left-0 right-0 z-50 px-3 sm:px-6 max-w-7xl mx-auto select-none transition-all duration-300 ease-out ${
-          isPushedDown ? 'top-12 sm:top-14' : 'top-3 sm:top-4'
+        className={`fixed left-0 right-0 z-50 select-none transition-all duration-300 ease-out ${
+          isDocked
+            ? 'top-[44px] sm:top-[48px] w-full px-0 max-w-none bg-[#0A0A0A]/95 backdrop-blur-md border-b-2 border-[#E50914] shadow-[0_8px_24px_rgba(0,0,0,0.85)]'
+            : 'top-3 sm:top-4 px-3 sm:px-6 max-w-7xl mx-auto bg-transparent border-none shadow-none'
         }`}
       >
-        <nav className="w-full transition-all duration-200 border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md flex items-center justify-between relative">
+        <nav
+          className={`w-full transition-all duration-300 flex items-center justify-between relative ${
+            isDocked
+              ? 'max-w-7xl mx-auto px-3.5 sm:px-6 py-2 text-[#EDEDED] bg-transparent border-0 shadow-none'
+              : 'border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md'
+          }`}
+        >
           {/* Grunge background textures - clipped to nav bounds */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             {/* Authentic Crimson Grunge Background Texture */}
@@ -331,7 +343,11 @@ export default function FloatingNavbar() {
 
         {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-2 p-4 border-2 bg-[#0E0E0E] border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-white font-mono text-xs space-y-3 animate-fadeIn">
+          <div
+            className={`lg:hidden mt-2 p-4 border-2 bg-[#0E0E0E] border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-white font-mono text-xs space-y-3 animate-fadeIn ${
+              isDocked ? 'mx-3 sm:mx-6 mb-3' : ''
+            }`}
+          >
             <div className="flex flex-col space-y-1 border-b border-neutral-800 pb-3">
               {navLinks.map((link) => (
                 <Link
