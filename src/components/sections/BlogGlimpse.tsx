@@ -126,10 +126,10 @@ export default function BlogGlimpse() {
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="p-8 bg-[#0E0E0E] border border-neutral-800 text-center space-y-3 max-w-lg mx-auto stencil-cut">
-            <p className="text-white font-bold text-sm">NO ARTICLES PUBLISHED YET</p>
+          <div className="p-8 bg-[#0E0E0E] border-2 border-dashed border-neutral-800 text-center space-y-3 max-w-lg mx-auto stencil-cut">
+            <p className="text-white font-bold text-sm uppercase">NO ARTICLES YET</p>
             <p className="text-xs text-neutral-400 font-sans">
-              Stay tuned for upcoming articles and stories.
+              No articles have been published yet. Our team will post updates and stories soon.
             </p>
           </div>
         ) : (

@@ -3,13 +3,15 @@
  * Keeps secret URLs and execution credentials strictly on the backend.
  */
 
-const APPSCRIPT_URL = process.env.GOOGLE_APPSCRIPT_URL || process.env.NEXT_PUBLIC_APPSCRIPT_URL || '';
-const APPSCRIPT_SECRET = process.env.APPSCRIPT_SECRET || '';
+const APPSCRIPT_URL = process.env.GOOGLE_APPSCRIPT_URL || process.env.GOOGLE_APPS_SCRIPT_URL || process.env.NEXT_PUBLIC_APPSCRIPT_URL || '';
+const APPSCRIPT_SECRET = process.env.APPSCRIPT_SECRET || process.env.GOOGLE_APPS_SCRIPT_TOKEN || 'she_gas_secret_key_2026';
 const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'projectshe.ngo@gmail.com';
 
 interface EmailPayload {
-  action: 'admin_notification' | 'newsletter_broadcast' | 'welcome_user';
+  action: 'admin_notification' | 'newsletter_broadcast' | 'welcome_user' | 'newsletter_signup';
   to?: string;
+  email?: string;
+  source?: string;
   recipients?: string[];
   subject: string;
   body: string;
@@ -26,25 +28,32 @@ export async function sendEmailViaAppsScript(payload: EmailPayload): Promise<{ s
   }
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12-second safety timeout
+
     const res = await fetch(APPSCRIPT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      signal: controller.signal,
       body: JSON.stringify({
         ...payload,
         secret: APPSCRIPT_SECRET,
+        token: APPSCRIPT_SECRET,
         timestamp: new Date().toISOString(),
       }),
     });
+
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       throw new Error(`Google Apps Script responded with HTTP ${res.status}`);
     }
 
-    const data = await res.json().catch(() => ({ status: 'success' }));
+    const data = await res.json().catch(() => ({ success: true, message: 'Dispatched' }));
     return {
-      success: true,
+      success: data.success !== false,
       message: data.message || 'Email successfully processed by Google Apps Script',
     };
   } catch (error: any) {

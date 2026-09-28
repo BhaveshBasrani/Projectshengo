@@ -72,8 +72,11 @@ export default async function BlogArchivePage() {
 
       {/* Grid */}
       {posts.length === 0 ? (
-        <div className="p-16 text-center border-2 border-dashed border-neutral-800 text-xs text-neutral-500">
-          No published articles available at this time. Check back soon.
+        <div className="p-16 text-center border-2 border-dashed border-neutral-800 text-xs text-neutral-400 max-w-xl mx-auto space-y-3 stencil-cut">
+          <p className="text-white font-bold text-sm uppercase">NO ARTICLES YET</p>
+          <p className="font-sans">
+            No articles have been published yet. Check back soon for stories and articles from our team.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

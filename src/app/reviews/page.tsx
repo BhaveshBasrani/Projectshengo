@@ -13,14 +13,14 @@ function ReviewsArchiveContent() {
 
   const [reviews, setReviews] = useState<PublicReview[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState<'likes' | 'rating' | 'newest'>('likes');
+  const [starFilter, setStarFilter] = useState<number | 'all'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<PublicReview | null>(null);
   const [likedReviews, setLikedReviews] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    fetchReviews(sortBy);
-  }, [sortBy]);
+    fetchReviews();
+  }, []);
 
   // Handle URL selection & auto-enlarge
   useEffect(() => {
@@ -43,10 +43,10 @@ function ReviewsArchiveContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const fetchReviews = async (sort: string) => {
+  const fetchReviews = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/reviews?sort=${sort}`);
+      const res = await fetch('/api/reviews?sort=stars');
       const data = await res.json();
       if (data.success && Array.isArray(data.reviews)) {
         setReviews(data.reviews);
@@ -122,28 +122,30 @@ function ReviewsArchiveContent() {
         </button>
       </div>
 
-      {/* Sort Filter Tabs & Stats Bar */}
+      {/* Star Filter Tabs & Count */}
       <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-1.5 text-xs flex-wrap w-full sm:w-auto">
-          <span className="text-[10px] sm:text-[11px] text-neutral-500 uppercase mr-1 sm:mr-2 font-bold">SORT:</span>
-          {(['likes', 'rating', 'newest'] as const).map((tab) => (
+          <span className="text-[10px] sm:text-[11px] text-neutral-500 uppercase mr-1 sm:mr-2 font-bold">STARS:</span>
+          {(['all', 5, 4, 3] as const).map((filterVal) => (
             <button
-              key={tab}
+              key={String(filterVal)}
               type="button"
-              onClick={() => setSortBy(tab)}
+              onClick={() => setStarFilter(filterVal)}
               className={`px-3 py-1.5 uppercase font-bold text-[11px] sm:text-xs border transition-all ${
-                sortBy === tab
+                starFilter === filterVal
                   ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
                   : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:text-white hover:border-neutral-700'
               }`}
             >
-              {tab === 'likes' ? '★ MOST LIKED' : tab === 'rating' ? 'HIGHEST RATED' : 'NEWEST'}
+              {filterVal === 'all' ? 'ALL' : `${filterVal} STARS`}
             </button>
           ))}
         </div>
 
         <div className="text-[11px] text-neutral-400 font-mono">
-          <span>SHOWING {reviews.length} VERIFIED REVIEWS</span>
+          <span>
+            {reviews.filter((r) => starFilter === 'all' || r.rating === starFilter).length} REVIEWS
+          </span>
         </div>
       </div>
 
@@ -158,26 +160,28 @@ function ReviewsArchiveContent() {
             </div>
           ))}
         </div>
-      ) : reviews.length === 0 ? (
+      ) : reviews.filter((r) => starFilter === 'all' || r.rating === starFilter).length === 0 ? (
         <div className="p-12 sm:p-16 text-center border-2 border-dashed border-neutral-800 text-xs text-neutral-500 relative z-10 max-w-xl mx-auto space-y-4 stencil-cut">
           <div className="w-12 h-12 mx-auto border border-[#E50914] bg-black flex items-center justify-center text-[#E50914]">
             <GrungeGlyph name="star" className="w-6 h-6" />
           </div>
-          <p className="text-white font-bold text-sm">NO APPROVED REVIEWS PUBLISHED YET</p>
+          <p className="text-white font-bold text-sm uppercase">NO REVIEWS YET</p>
           <p className="font-sans text-neutral-400">
-            Be the first to share your experience with our team, grassroots fundraisers, or advocacy work.
+            No reviews have been published yet. Be the first to share your experience with Project S.H.E.
           </p>
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-2.5 bg-[#E50914] text-white font-bold text-xs uppercase"
+            className="px-6 py-2.5 bg-[#E50914] text-white hover:bg-white hover:text-black font-bold text-xs uppercase transition-all shadow-[2px_2px_0px_0px_#000000]"
           >
-            SUBMIT FIRST TESTIMONIAL
+            WRITE A REVIEW
           </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 relative z-10">
-          {reviews.map((rev) => {
+          {reviews
+            .filter((r) => starFilter === 'all' || r.rating === starFilter)
+            .map((rev) => {
             const hasLiked = likedReviews[rev.id];
 
             return (
@@ -355,7 +359,7 @@ function ReviewsArchiveContent() {
       <ReviewModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSuccess={() => fetchReviews(sortBy)}
+        onSuccess={() => fetchReviews()}
       />
     </div>
   );

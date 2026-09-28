@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateUserSubscription, subscribeNewsletter } from '@/lib/data/store';
+import { sendEmailViaAppsScript } from '@/lib/email/google-apps-script';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,20 +14,14 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: result.message }, { status: 400 });
       }
 
-      // If Google Apps Script webhook is configured, dispatch notification asynchronously
-      const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-      if (scriptUrl) {
-        fetch(scriptUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'newsletter_signup',
-            email: email.trim().toLowerCase(),
-            source: source || 'center_modal',
-            timestamp: new Date().toISOString(),
-          }),
-        }).catch((err) => console.warn('AppScript dispatch failed:', err));
-      }
+      // Dispatch notification via resilient Apps Script engine asynchronously
+      sendEmailViaAppsScript({
+        action: 'newsletter_signup',
+        email: email.trim().toLowerCase(),
+        source: source || 'center_modal',
+        subject: 'New Newsletter Subscriber',
+        body: `Subscriber: ${email.trim().toLowerCase()} via ${source || 'center_modal'}`,
+      }).catch((err) => console.warn('AppScript dispatch warning:', err));
 
       return NextResponse.json({ success: true, message: 'Welcome to the movement' });
     }

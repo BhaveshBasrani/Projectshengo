@@ -21,103 +21,9 @@ export const DEFAULT_CONFIG: SiteConfig = {
   instagram_url: 'https://instagram.com/projectshe.ngo',
 };
 
-// Authentic seed data strictly based on Project S.H.E. events & initiatives
-const SEED_REVIEWS: PublicReview[] = [
-  {
-    id: 'rev-seed-1',
-    user_id: null,
-    display_name: 'Aarav S.',
-    role_or_relation: 'Volunteer',
-    rating: 5,
-    review_text: 'Volunteering at the bake sales and Battle of the Bands was a great experience. Seeing student efforts directly fund day-care and safehouse needs in Hyderabad makes all the difference.',
-    likes: 34,
-    status: 'approved',
-    created_at: new Date('2026-08-01').toISOString(),
-    reviewed_at: new Date('2026-08-01').toISOString(),
-  },
-  {
-    id: 'rev-seed-2',
-    user_id: null,
-    display_name: 'Meera K.',
-    role_or_relation: 'Event Attendee',
-    rating: 5,
-    review_text: 'Attended BOTB 2.0 with my friends. The music was amazing, and knowing the ticket funds were contributed directly to Sahodaya, Snehalaya, and Ammani Foundation was inspiring.',
-    likes: 28,
-    status: 'approved',
-    created_at: new Date('2026-08-18').toISOString(),
-    reviewed_at: new Date('2026-08-18').toISOString(),
-  },
-  {
-    id: 'rev-seed-3',
-    user_id: null,
-    display_name: 'Pooja N.',
-    role_or_relation: 'Community Ally',
-    rating: 5,
-    review_text: 'Proud to support Project S.H.E. Hyderabad students raising over Rs. 2,00,000 for survivor safe houses and childcare spaces shows what student community action can achieve.',
-    likes: 23,
-    status: 'approved',
-    created_at: new Date('2026-09-05').toISOString(),
-    reviewed_at: new Date('2026-09-05').toISOString(),
-  },
-];
-
-const SEED_POSTS: BlogPost[] = [
-  {
-    id: 'post-seed-1',
-    title: 'Fundraising: Over Rs. 2,00,000 Raised for Survivor Care',
-    slug: 'fundraising-and-battle-of-the-bands',
-    cover_image_url: '/assets/statue_lady_justice.jpg',
-    excerpt: 'Whether through Battle of the Bands or bake sales, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.',
-    body: 'Whether through enigmatic events like the two editions of Battle of the Bands, or through wholesome bake sales and community fundraisers, Project S.H.E. has remained committed to mobilising community support through both monetary contributions and meaningful presence. Through these events and endeavours, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.',
-    category: 'Fundraising',
-    tags: ['Battle of the Bands', 'Fundraising', 'Survivor Care'],
-    author_name: 'Project S.H.E.',
-    likes: 54,
-    is_pinned: true,
-    status: 'published',
-    published_at: new Date('2026-06-15').toISOString(),
-    created_at: new Date('2026-06-15').toISOString(),
-    updated_at: new Date('2026-06-15').toISOString(),
-  },
-  {
-    id: 'post-seed-2',
-    title: 'Direct Support for Survivors: Sahodaya Day-Care Centre',
-    slug: 'direct-support-for-survivors',
-    cover_image_url: '/assets/riot_lady_justice.jpg',
-    excerpt: 'Our partnership with Sahodaya Women’s Help Home has contributed towards establishing a day-care centre for children of domestic violence survivors.',
-    body: 'Our partnership with Sahodaya Women’s Help Home has contributed towards the establishment of a day-care centre for the children of domestic violence survivors—a nurturing space for them while their mothers work towards rebuilding their lives. More recently, funds raised through BOTB 2.0 were contributed to Sahodaya, Ammani Foundation, Snehalaya, and NIEPID, and helped support improvements in infrastructure and essential services across communities facing marginalisation.',
-    category: 'Direct Support',
-    tags: ['Sahodaya', 'Safehouses', 'Childcare'],
-    author_name: 'Project S.H.E.',
-    likes: 47,
-    is_pinned: true,
-    status: 'published',
-    published_at: new Date('2026-07-20').toISOString(),
-    created_at: new Date('2026-07-20').toISOString(),
-    updated_at: new Date('2026-07-20').toISOString(),
-  },
-  {
-    id: 'post-seed-3',
-    title: 'Advocacy and Dialogue: Turning Support into Tangible Change',
-    slug: 'advocacy-and-dialogue',
-    cover_image_url: '/assets/punk_paper_bg.jpg',
-    excerpt: 'Our team of writers and designers covers topics from media misogyny to case posts that shed light on violence faced by women and children.',
-    body: 'Our dedicated team of writers and designers brings forward an expansive range of topics, from articles examining issues such as misogyny in the media to case posts that shed light on the violence faced by women and children. Our goal has always been to turn community support into tangible change—channelling that collective engagement towards advocacy and awareness-building.',
-    category: 'Advocacy',
-    tags: ['Advocacy', 'Awareness', 'Writers'],
-    author_name: 'Project S.H.E.',
-    likes: 61,
-    is_pinned: true,
-    status: 'published',
-    published_at: new Date('2026-08-10').toISOString(),
-    created_at: new Date('2026-08-10').toISOString(),
-    updated_at: new Date('2026-08-10').toISOString(),
-  },
-];
-
-// Production Data Store
-let memoryReviews: PublicReview[] = [...SEED_REVIEWS];
-let memoryPosts: BlogPost[] = [...SEED_POSTS];
+// In-Memory Data Store (Used if Supabase is offline or not configured)
+let memoryReviews: PublicReview[] = [];
+let memoryPosts: BlogPost[] = [];
 let memoryUpdates: SiteUpdate[] = [];
 let memoryFeedback: SuggestionFeedback[] = [];
 let memoryProfiles: UserProfile[] = [];
@@ -125,7 +31,7 @@ let memoryConfig: SiteConfig = { ...DEFAULT_CONFIG };
 
 // --- REVIEWS ---
 
-export async function getPublicReviews(sortBy: 'likes' | 'rating' | 'newest' = 'likes'): Promise<PublicReview[]> {
+export async function getPublicReviews(sortBy: 'stars' | 'likes' | 'rating' | 'newest' = 'stars'): Promise<PublicReview[]> {
   let list: PublicReview[] = [];
   if (isSupabaseConfigured()) {
     try {
@@ -134,8 +40,7 @@ export async function getPublicReviews(sortBy: 'likes' | 'rating' | 'newest' = '
         .from('reviews')
         .select('*')
         .eq('status', 'approved');
-      if (!error && data && data.length > 0) {
-        // Strict filter: purge any lorem ipsum, blind text, or placeholder dummy submissions
+      if (!error && data) {
         list = (data as PublicReview[]).filter(
           (r) =>
             !r.review_text.toLowerCase().includes('blind text') &&
@@ -146,29 +51,16 @@ export async function getPublicReviews(sortBy: 'likes' | 'rating' | 'newest' = '
       }
     } catch (e) {
       console.warn('Supabase fetch failed, falling back to memory store:', e);
+      list = memoryReviews.filter((r) => r.status === 'approved');
     }
+  } else {
+    list = memoryReviews.filter((r) => r.status === 'approved');
   }
 
-  if (list.length < 3) {
-    const memoryApproved = memoryReviews.filter((r) => r.status === 'approved');
-    const existingIds = new Set(list.map((r) => r.id));
-    for (const mr of memoryApproved) {
-      if (!existingIds.has(mr.id)) {
-        list.push(mr);
-        existingIds.add(mr.id);
-        if (list.length >= 3) break;
-      }
-    }
-  }
-
+  // Pure sorting: highest star rating first, then newest
   return list.sort((a, b) => {
-    if (sortBy === 'likes') {
-      const diff = (b.likes || 0) - (a.likes || 0);
-      if (diff !== 0) return diff;
-    } else if (sortBy === 'rating') {
-      const diff = (b.rating || 5) - (a.rating || 5);
-      if (diff !== 0) return diff;
-    }
+    const starDiff = (b.rating || 5) - (a.rating || 5);
+    if (starDiff !== 0) return starDiff;
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 }
@@ -366,24 +258,15 @@ export async function getPublishedPosts(): Promise<BlogPost[]> {
         .from('posts')
         .select('*')
         .eq('status', 'published');
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         list = data as BlogPost[];
       }
     } catch (e) {
-      console.warn('Supabase fetch failed:', e);
+      console.warn('Supabase fetch failed, falling back to memory store:', e);
+      list = memoryPosts.filter((p) => p.status === 'published');
     }
-  }
-
-  if (list.length < 3) {
-    const memoryPublished = memoryPosts.filter((p) => p.status === 'published');
-    const existingIds = new Set(list.map((p) => p.id));
-    for (const mp of memoryPublished) {
-      if (!existingIds.has(mp.id)) {
-        list.push(mp);
-        existingIds.add(mp.id);
-        if (list.length >= 3) break;
-      }
-    }
+  } else {
+    list = memoryPosts.filter((p) => p.status === 'published');
   }
 
   // Pinned posts always appear at the top (max 3), followed by newest published

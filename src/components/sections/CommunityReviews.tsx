@@ -131,17 +131,17 @@ export default function CommunityReviews() {
             ))}
           </div>
         ) : topReviews.length === 0 ? (
-          <div className="p-8 bg-[#0E0E0E] border border-neutral-800 text-center space-y-3 max-w-lg mx-auto">
-            <p className="text-white font-bold text-sm">NO APPROVED REVIEWS YET</p>
+          <div className="p-8 bg-[#0E0E0E] border-2 border-dashed border-neutral-800 text-center space-y-3 max-w-lg mx-auto stencil-cut">
+            <p className="text-white font-bold text-sm uppercase">NO REVIEWS YET</p>
             <p className="text-xs text-neutral-400 font-sans">
-              Be the first to share your experience with our team or events.
+              No reviews have been published yet. Be the first to share your experience with Project S.H.E.
             </p>
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className="px-5 py-2 bg-[#E50914] text-white font-bold text-xs uppercase"
+              className="px-5 py-2.5 bg-[#E50914] text-white hover:bg-white hover:text-black font-bold text-xs uppercase transition-all shadow-[2px_2px_0px_0px_#000000]"
             >
-              SUBMIT A REVIEW
+              WRITE A REVIEW
             </button>
           </div>
         ) : (
