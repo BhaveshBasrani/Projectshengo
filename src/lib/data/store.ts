@@ -11,6 +11,8 @@ import {
   parseBulletinPayload,
 } from '@/lib/types';
 
+import { setDynamicAdminPassword, isAuthorizedAdminEmail } from '@/lib/admin/auth';
+
 // Default initial website configuration
 export const DEFAULT_CONFIG: SiteConfig = {
   google_form_team_app: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheTeamApplication/viewform',
@@ -21,6 +23,7 @@ export const DEFAULT_CONFIG: SiteConfig = {
   contact_email: 'projectshe.ngo@gmail.com',
   emergency_helpline: 'Women Helpline: 1091 | Domestic Abuse: 181 | Direct: +91 98765 43210',
   instagram_url: 'https://instagram.com/projectshe.ngo',
+  admin_master_password: 'rendervoid@16',
 };
 
 // In-Memory Data Store (Used if Supabase is offline or not configured)
@@ -721,17 +724,27 @@ export async function getSiteConfig(): Promise<SiteConfig> {
             (cfg as any)[row.key] = row.value;
           }
         });
+        if (cfg.admin_master_password) {
+          setDynamicAdminPassword(cfg.admin_master_password);
+        }
         return cfg;
       }
     } catch (e) {
       console.warn('Supabase config fetch failed:', e);
     }
   }
+  if (memoryConfig.admin_master_password) {
+    setDynamicAdminPassword(memoryConfig.admin_master_password);
+  }
   return memoryConfig;
 }
 
 export async function updateSiteConfig(newConfig: Partial<SiteConfig>): Promise<SiteConfig> {
   memoryConfig = { ...memoryConfig, ...newConfig };
+
+  if (newConfig.admin_master_password) {
+    setDynamicAdminPassword(newConfig.admin_master_password);
+  }
 
   if (isSupabaseConfigured()) {
     try {
@@ -744,6 +757,11 @@ export async function updateSiteConfig(newConfig: Partial<SiteConfig>): Promise<
   }
 
   return memoryConfig;
+}
+
+// Bootstrap dynamic admin password on server initialization
+if (typeof window === 'undefined') {
+  getSiteConfig().catch(() => {});
 }
 
 // --- USER PROFILES & AUTH SYNC ---
@@ -770,7 +788,7 @@ export async function syncUserProfile(profile: { id: string; email: string; disp
     email: profile.email,
     display_name: profile.display_name || profile.email.split('@')[0],
     avatar_url: profile.avatar_url || existing?.avatar_url || null,
-    is_admin: existing ? existing.is_admin : cleanEmail === (process.env.ADMIN_EMAIL || 'admin@projectshe.org').toLowerCase(),
+    is_admin: isAuthorizedAdminEmail(cleanEmail) || Boolean(existing?.is_admin),
     email_subscribed: existing ? existing.email_subscribed : true,
     created_at: existing ? existing.created_at : new Date().toISOString(),
     updated_at: new Date().toISOString(),

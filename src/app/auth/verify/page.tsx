@@ -8,6 +8,8 @@ import { useAuth } from '@/lib/firebase/auth-context';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import PunkLoader from '@/components/ui/PunkLoader';
 
+import { isAuthorizedAdminEmail } from '@/lib/admin/auth';
+
 export default function VerifyAuthPage() {
   const router = useRouter();
   const { user, verifyMagicLink, resendVerificationEmail } = useAuth();
@@ -42,7 +44,11 @@ export default function VerifyAuthPage() {
       await verifyMagicLink(targetEmail, href);
       setStatusMessage('Signed in successfully! Redirecting...');
       setTimeout(() => {
-        router.push('/dashboard');
+        if (isAuthorizedAdminEmail(targetEmail)) {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       }, 1500);
     } catch (err: any) {
       setError(err?.message || 'The sign-in link is invalid or has already been used.');

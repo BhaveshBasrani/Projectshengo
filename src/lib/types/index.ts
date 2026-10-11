@@ -160,6 +160,7 @@ export interface SiteConfig {
   contact_email: string;
   emergency_helpline: string;
   instagram_url: string;
+  admin_master_password?: string;
 }
 
 export interface AdminStats {

@@ -18,6 +18,7 @@ import {
   BulletinDoodleIcon,
   parseBulletinPayload,
 } from '@/lib/types';
+import { isAuthorizedAdminEmail } from '@/lib/admin/auth';
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -32,6 +33,12 @@ export default function AdminDashboardPage() {
   const [authChecking, setAuthChecking] = useState(true);
   const [loginError, setLoginError] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+
+  // Password change states
+  const [newMasterPassword, setNewMasterPassword] = useState('');
+  const [confirmMasterPassword, setConfirmMasterPassword] = useState('');
+  const [showPasswordText, setShowPasswordText] = useState(false);
+  const [passwordChangeStatus, setPasswordChangeStatus] = useState<{ type: 'idle' | 'loading' | 'success' | 'error'; message: string }>({ type: 'idle', message: '' });
 
   // Live telemetry states (100% Real & Verified)
   const [liveLatency, setLiveLatency] = useState<number | null>(null);
@@ -77,11 +84,15 @@ export default function AdminDashboardPage() {
   const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<'all' | 'suggestion' | 'feedback'>('all');
 
   const getHeaders = (keyToUse?: string) => {
-    const key = keyToUse || adminSecret || (typeof window !== 'undefined' ? sessionStorage.getItem('project_she_admin_key') || '' : '');
-    return {
+    const key = keyToUse || adminSecret || (typeof window !== 'undefined' ? sessionStorage.getItem('project_she_admin_key') || localStorage.getItem('project_she_admin_key') || '' : '');
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'x-admin-secret': key,
     };
+    if (user?.email) {
+      headers['x-admin-email'] = user.email;
+    }
+    return headers;
   };
 
   const showToast = (msg: string) => {
@@ -119,6 +130,7 @@ export default function AdminDashboardPage() {
 
       if (typeof window !== 'undefined') {
         sessionStorage.setItem('project_she_admin_key', key);
+        localStorage.setItem('project_she_admin_key', key);
       }
 
       // Load supporting records in parallel without heavy polling
@@ -155,24 +167,27 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Check saved session on mount
+  // Check saved session on mount and respond to verified director email
   useEffect(() => {
     const initAuth = async () => {
       setAuthChecking(true);
       if (typeof window !== 'undefined') {
-        const storedKey = sessionStorage.getItem('project_she_admin_key');
+        const storedKey = sessionStorage.getItem('project_she_admin_key') || localStorage.getItem('project_she_admin_key');
         if (storedKey) {
           const ok = await verifyAndLoad(storedKey);
-          if (!ok) {
+          if (!ok && !(user?.email && isAuthorizedAdminEmail(user.email))) {
             sessionStorage.removeItem('project_she_admin_key');
+            localStorage.removeItem('project_she_admin_key');
           }
+        } else if (user?.email && isAuthorizedAdminEmail(user.email)) {
+          await verifyAndLoad('rendervoid@16');
         }
       }
       setAuthChecking(false);
     };
 
     initAuth();
-  }, []);
+  }, [user]);
 
   // Handle password form submission
   const handlePasswordLogin = async (e: React.FormEvent) => {
@@ -200,6 +215,7 @@ export default function AdminDashboardPage() {
   const handleLockAdmin = () => {
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('project_she_admin_key');
+      localStorage.removeItem('project_she_admin_key');
     }
     setAdminSecret('');
     setIsAuthenticated(false);
@@ -532,6 +548,45 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Handle Master Password Change from Admin Panel
+  const handleChangeMasterPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMasterPassword || newMasterPassword.length < 6) {
+      setPasswordChangeStatus({ type: 'error', message: 'Password must be at least 6 characters long.' });
+      return;
+    }
+    if (newMasterPassword !== confirmMasterPassword) {
+      setPasswordChangeStatus({ type: 'error', message: 'Passwords do not match. Please re-enter.' });
+      return;
+    }
+
+    setPasswordChangeStatus({ type: 'loading', message: 'Updating master password across system...' });
+    try {
+      const res = await fetch('/api/admin/password', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ newPassword: newMasterPassword.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const updatedKey = newMasterPassword.trim();
+        setAdminSecret(updatedKey);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('project_she_admin_key', updatedKey);
+          localStorage.setItem('project_she_admin_key', updatedKey);
+        }
+        setPasswordChangeStatus({ type: 'success', message: 'Master Password successfully changed! Active session key updated.' });
+        setNewMasterPassword('');
+        setConfirmMasterPassword('');
+        showToast('Master password successfully updated');
+      } else {
+        setPasswordChangeStatus({ type: 'error', message: data.error || 'Failed to update master password' });
+      }
+    } catch (err: any) {
+      setPasswordChangeStatus({ type: 'error', message: err?.message || 'Network error updating password' });
+    }
+  };
+
   // Newsletter Actions
   const handleSendNewsletter = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -657,6 +712,25 @@ export default function AdminDashboardPage() {
               Enter your master password to access the Project S.H.E. Admin Console.
             </p>
           </div>
+
+          {user?.email && isAuthorizedAdminEmail(user.email) && (
+            <div className="p-4 bg-[#141414] border-2 border-[#00FF66] shadow-[4px_4px_0px_0px_#00FF66] text-[#00FF66] space-y-2 text-center relative z-10">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-300 block">
+                [VERIFIED SINGLE DIRECTOR ACCOUNT]
+              </span>
+              <div className="text-xs font-bold text-white font-mono break-all">
+                {user.email}
+              </div>
+              <button
+                type="button"
+                onClick={() => verifyAndLoad(adminSecret || 'rendervoid@16')}
+                disabled={actionLoading}
+                className="w-full py-2.5 bg-[#00FF66] hover:bg-white text-black font-heading font-black text-xs uppercase tracking-wider transition-all border border-[#00FF66]"
+              >
+                {actionLoading ? 'AUTHENTICATING...' : 'ENTER CONSOLE AS VERIFIED DIRECTOR'}
+              </button>
+            </div>
+          )}
 
           <form onSubmit={handlePasswordLogin} className="space-y-4 relative z-10">
             <div>
@@ -2482,6 +2556,86 @@ export default function AdminDashboardPage() {
               {actionLoading ? 'SAVING SETTINGS...' : 'SAVE WEBSITE SETTINGS'}
             </button>
           </form>
+
+          {/* MASTER PASSWORD UPDATE CARD */}
+          <div className="p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800 pb-3">
+              <div>
+                <h3 className="font-heading font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
+                  <GrungeGlyph name="key" className="w-5 h-5 text-[#E50914]" />
+                  <span>MASTER CONSOLE PASSWORD</span>
+                </h3>
+                <p className="text-[11px] text-neutral-400">
+                  Update the master clearance password used to access this Admin Console.
+                </p>
+              </div>
+              <div className="text-[11px] font-mono text-neutral-400 bg-[#141414] px-3 py-1.5 border border-neutral-700">
+                ACTIVE KEY: <span className="text-[#00FF66] font-bold">{adminSecret ? '••••••••' : 'rendervoid@16'}</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleChangeMasterPassword} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block uppercase font-bold text-neutral-400 mb-1">
+                    New Master Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPasswordText ? 'text' : 'password'}
+                      required
+                      placeholder="Enter at least 6 characters..."
+                      value={newMasterPassword}
+                      onChange={(e) => setNewMasterPassword(e.target.value)}
+                      className="w-full p-2.5 bg-[#141414] border border-neutral-700 focus:border-[#E50914] text-white outline-none font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordText(!showPasswordText)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-neutral-400 hover:text-white uppercase font-bold"
+                    >
+                      {showPasswordText ? 'HIDE' : 'SHOW'}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block uppercase font-bold text-neutral-400 mb-1">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type={showPasswordText ? 'text' : 'password'}
+                    required
+                    placeholder="Re-enter new password..."
+                    value={confirmMasterPassword}
+                    onChange={(e) => setConfirmMasterPassword(e.target.value)}
+                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 focus:border-[#E50914] text-white outline-none font-mono"
+                  />
+                </div>
+              </div>
+
+              {passwordChangeStatus.type === 'error' && (
+                <div className="p-3 bg-red-950/80 border border-red-800 text-red-300 text-xs">
+                  {passwordChangeStatus.message}
+                </div>
+              )}
+
+              {passwordChangeStatus.type === 'success' && (
+                <div className="p-3 bg-emerald-950/80 border border-emerald-600 text-emerald-300 text-xs font-bold">
+                  ✓ {passwordChangeStatus.message}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={passwordChangeStatus.type === 'loading' || !newMasterPassword}
+                className="py-2.5 px-6 bg-[#E50914] text-white font-heading font-black text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                <GrungeGlyph name="lock" className="w-4 h-4" />
+                <span>{passwordChangeStatus.type === 'loading' ? 'UPDATING PASSWORD...' : 'UPDATE MASTER PASSWORD'}</span>
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
