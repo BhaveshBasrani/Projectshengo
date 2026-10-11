@@ -154,9 +154,8 @@ export default function UserDashboard() {
               <Image
                 src="/assets/punk-lily-clean.png"
                 alt="Tribal Lily"
-                width={144}
-                height={224}
-                style={{ width: 'auto', height: 'auto' }}
+                fill
+                sizes="144px"
                 className="object-contain"
               />
             </div>
@@ -166,9 +165,8 @@ export default function UserDashboard() {
               <Image
                 src="/assets/punk-polly-stars-clean.png"
                 alt="Polly Stars Watermark"
-                width={176}
-                height={176}
-                style={{ width: 'auto', height: 'auto' }}
+                fill
+                sizes="176px"
                 className="object-contain"
               />
             </div>
@@ -282,9 +280,8 @@ export default function UserDashboard() {
               <Image
                 src="/assets/punk-polly-stars-clean.png"
                 alt="Polly Star"
-                width={56}
-                height={80}
-                style={{ width: 'auto', height: 'auto' }}
+                fill
+                sizes="56px"
                 className="object-contain drop-shadow-[0_0_6px_rgba(229,9,20,0.5)] rotate-6"
               />
             </div>

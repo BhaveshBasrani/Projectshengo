@@ -96,10 +96,9 @@ export default function VerifyAuthPage() {
         <Image
           src="/assets/punk-polly-stars-clean.png"
           alt="Barbed Polly Star"
-          width={80}
-          height={110}
+          fill
+          sizes="80px"
           priority
-          style={{ width: 'auto', height: 'auto' }}
           className="object-contain drop-shadow-[0_0_8px_rgba(229,9,20,0.6)] rotate-12"
         />
       </div>

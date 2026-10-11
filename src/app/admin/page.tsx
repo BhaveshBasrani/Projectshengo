@@ -660,10 +660,9 @@ export default function AdminDashboardPage() {
           <Image
             src="/assets/punk-red-spiral-star-clean.png"
             alt="Punk Spiral Star"
-            width={76}
-            height={76}
+            fill
+            sizes="76px"
             priority
-            style={{ width: 'auto', height: 'auto' }}
             className="object-contain drop-shadow-[0_0_10px_rgba(229,9,20,0.7)] animate-[spin_10s_linear_infinite]"
           />
         </div>
@@ -674,10 +673,9 @@ export default function AdminDashboardPage() {
           <Image
             src="/assets/punk-polly-stars-clean.png"
             alt="Polly Star"
-            width={64}
-            height={96}
+            fill
+            sizes="64px"
             priority
-            style={{ width: 'auto', height: 'auto' }}
             className="object-contain drop-shadow-[0_0_8px_rgba(229,9,20,0.6)] -rotate-12"
           />
         </div>
@@ -688,10 +686,9 @@ export default function AdminDashboardPage() {
             <Image
               src="/assets/punk-lily-clean.png"
               alt="Cyber Lily Watermark"
-              width={144}
-              height={208}
+              fill
+              sizes="144px"
               priority
-              style={{ width: 'auto', height: 'auto' }}
               className="object-contain"
             />
           </div>
@@ -879,26 +876,12 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Floating Status Toast */}
+      {/* Status Toast Notification (Top Right to prevent any content or footer overlap) */}
       {feedbackMsg && (
-        <div className="fixed bottom-20 right-6 z-50 p-4 bg-[#E50914] text-white font-mono text-xs font-bold uppercase shadow-[4px_4px_0px_0px_#000000] border-2 border-white animate-bounce stencil-cut">
+        <div className="fixed top-24 right-6 z-50 p-4 bg-[#E50914] text-white font-mono text-xs font-bold uppercase shadow-[4px_4px_0px_0px_#000000] border-2 border-white animate-bounce stencil-cut">
           {feedbackMsg}
         </div>
       )}
-
-      {/* Floating Quick Save Button for easy access anywhere on the dashboard */}
-      <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={handleGlobalSaveChanges}
-          disabled={actionLoading}
-          className="group px-5 py-3 bg-[#E50914] hover:bg-white text-white hover:text-black border-2 border-white shadow-[4px_4px_0px_0px_#000000] text-xs font-heading font-black uppercase flex items-center gap-2 transition-all hover-lift disabled:opacity-50 stencil-cut"
-          title="Save all changes and synchronize database"
-        >
-          <GrungeGlyph name="save" className="w-4 h-4 text-white group-hover:text-black transition-colors" />
-          <span>{actionLoading ? 'SAVING...' : 'SAVE CHANGES'}</span>
-        </button>
-      </div>
 
       {/* Navigation Sub-Tabs */}
       <div className="flex items-center gap-1 overflow-x-auto pb-4 mb-8 text-xs font-bold uppercase border-b border-neutral-800">
