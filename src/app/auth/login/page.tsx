@@ -27,14 +27,21 @@ export default function LoginPage() {
     const cleanPass = password.trim();
 
     // Direct Single Administrator master authentication
-    if (
-      isAuthorizedAdminEmail(cleanEmail) &&
-      (cleanPass === 'rendervoid@16' || cleanPass === 'she_admin_secret_2026_goated' || cleanPass.length >= 6)
-    ) {
-      demoLoginAsAdmin(cleanPass);
-      router.push('/admin');
-      setLoading(false);
-      return;
+    if (isAuthorizedAdminEmail(cleanEmail)) {
+      try {
+        const verifyRes = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: cleanEmail, password: cleanPass }),
+        });
+        const verifyData = await verifyRes.json();
+        if (verifyRes.ok && verifyData.success) {
+          demoLoginAsAdmin(cleanPass);
+          router.push('/admin');
+          setLoading(false);
+          return;
+        }
+      } catch (e) {}
     }
 
     try {
@@ -45,14 +52,21 @@ export default function LoginPage() {
         router.push('/dashboard');
       }
     } catch (err: any) {
-      // Fallback: If Firebase rejected but email is an authorized administrator
-      if (
-        isAuthorizedAdminEmail(cleanEmail) &&
-        (cleanPass === 'rendervoid@16' || cleanPass === 'she_admin_secret_2026_goated')
-      ) {
-        demoLoginAsAdmin(cleanPass);
-        router.push('/admin');
-        return;
+      // Fallback: Check if credentials match server-verified master key
+      if (isAuthorizedAdminEmail(cleanEmail)) {
+        try {
+          const verifyRes = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: cleanEmail, password: cleanPass }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyRes.ok && verifyData.success) {
+            demoLoginAsAdmin(cleanPass);
+            router.push('/admin');
+            return;
+          }
+        } catch (e) {}
       }
       setError(err?.message || 'Login failed. Please check your email and password.');
     } finally {
@@ -236,6 +250,8 @@ export default function LoginPage() {
               <input
                 type="password"
                 required
+                autoComplete="current-password"
+                spellCheck={false}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

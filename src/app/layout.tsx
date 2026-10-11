@@ -7,6 +7,7 @@ import BrutalFooter from '@/components/ui/BrutalFooter';
 import PaperOverlay from '@/components/ui/PaperOverlay';
 import TextureBackground from '@/components/ui/TextureBackground';
 import NewsletterModal from '@/components/ui/NewsletterModal';
+import ClientSecurityShield from '@/components/security/ClientSecurityShield';
 
 export const metadata: Metadata = {
   title: {
@@ -125,6 +126,7 @@ export default async function RootLayout({
         <PaperOverlay />
 
         <AuthProvider>
+          <ClientSecurityShield />
           <BulletinBanner updates={updates} />
           <FloatingNavbar />
           <main className="flex-1 relative z-10">{children}</main>

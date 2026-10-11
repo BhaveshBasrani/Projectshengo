@@ -83,15 +83,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       setUser(fbUser);
       if (fbUser) {
-        if (isAuthorizedAdminEmail(fbUser.email)) {
-          if (typeof window !== 'undefined') {
-            const currentStored = sessionStorage.getItem('project_she_admin_key') || localStorage.getItem('project_she_admin_key');
-            if (!currentStored) {
-              sessionStorage.setItem('project_she_admin_key', 'rendervoid@16');
-              localStorage.setItem('project_she_admin_key', 'rendervoid@16');
-            }
-          }
-        }
         // Sync profile in background — never block or clear auth state on failure
         syncWithBackend(fbUser.uid, fbUser.email || '', fbUser.displayName || '', fbUser.photoURL || null)
           .finally(() => setLoading(false));
@@ -243,10 +234,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Instant demo helper for testing single administrator command center
-  const demoLoginAsAdmin = (secret = 'rendervoid@16') => {
+  const demoLoginAsAdmin = (secret?: string) => {
     const adminUser: any = {
       uid: 'admin-project-she-single',
-      email: 'admin@projectshe.org',
+      email: 'projectshengo@gmail.com',
       displayName: 'Executive Director',
     };
     const adminProfile: UserProfile = {
@@ -260,8 +251,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(adminUser);
     setProfile(adminProfile);
     if (typeof window !== 'undefined') {
-      sessionStorage.setItem('project_she_admin_key', secret);
-      localStorage.setItem('project_she_admin_key', secret);
+      if (secret) {
+        sessionStorage.setItem('project_she_admin_key', secret);
+        localStorage.setItem('project_she_admin_key', secret);
+      }
       localStorage.setItem('project_she_demo_session', JSON.stringify({ user: adminUser, profile: adminProfile }));
     }
   };

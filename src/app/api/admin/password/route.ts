@@ -9,11 +9,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'FORBIDDEN: Hard Administrator Authorization Required' }, { status: 403 });
   }
 
-  const currentPassword = getDynamicAdminPassword();
   return NextResponse.json({
     success: true,
-    currentPassword,
-    message: 'Current master password retrieved',
+    configured: true,
+    masked: '••••••••',
+    message: 'Master password is active and secured.',
   });
 }
 
@@ -58,7 +58,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Admin Master Password successfully updated across system.',
-      newPassword,
     });
   } catch (error: any) {
     return NextResponse.json(

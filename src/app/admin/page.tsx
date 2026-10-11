@@ -180,7 +180,7 @@ export default function AdminDashboardPage() {
             localStorage.removeItem('project_she_admin_key');
           }
         } else if (user?.email && isAuthorizedAdminEmail(user.email)) {
-          await verifyAndLoad('rendervoid@16');
+          await verifyAndLoad('');
         }
       }
       setAuthChecking(false);
@@ -723,7 +723,7 @@ export default function AdminDashboardPage() {
               </div>
               <button
                 type="button"
-                onClick={() => verifyAndLoad(adminSecret || 'rendervoid@16')}
+                onClick={() => verifyAndLoad(adminSecret || '')}
                 disabled={actionLoading}
                 className="w-full py-2.5 bg-[#00FF66] hover:bg-white text-black font-heading font-black text-xs uppercase tracking-wider transition-all border border-[#00FF66]"
               >
@@ -741,6 +741,8 @@ export default function AdminDashboardPage() {
                 type="password"
                 required
                 autoFocus
+                autoComplete="current-password"
+                spellCheck={false}
                 placeholder="Enter admin password..."
                 value={passwordInput}
                 onChange={(e) => {
@@ -2570,7 +2572,7 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <div className="text-[11px] font-mono text-neutral-400 bg-[#141414] px-3 py-1.5 border border-neutral-700">
-                ACTIVE KEY: <span className="text-[#00FF66] font-bold">{adminSecret ? '••••••••' : 'rendervoid@16'}</span>
+                ACTIVE STATUS: <span className="text-[#00FF66] font-bold">PROTECTED &amp; ACTIVE</span>
               </div>
             </div>
 
@@ -2584,6 +2586,8 @@ export default function AdminDashboardPage() {
                     <input
                       type={showPasswordText ? 'text' : 'password'}
                       required
+                      autoComplete="new-password"
+                      spellCheck={false}
                       placeholder="Enter at least 6 characters..."
                       value={newMasterPassword}
                       onChange={(e) => setNewMasterPassword(e.target.value)}
@@ -2606,6 +2610,8 @@ export default function AdminDashboardPage() {
                   <input
                     type={showPasswordText ? 'text' : 'password'}
                     required
+                    autoComplete="new-password"
+                    spellCheck={false}
                     placeholder="Re-enter new password..."
                     value={confirmMasterPassword}
                     onChange={(e) => setConfirmMasterPassword(e.target.value)}

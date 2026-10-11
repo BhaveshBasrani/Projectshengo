@@ -9,7 +9,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const config = await getSiteConfig();
-    return NextResponse.json({ success: true, config });
+    const { admin_master_password, ...safeConfig } = config as any;
+    return NextResponse.json({ success: true, config: safeConfig });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || 'Failed to fetch config' }, { status: 500 });
   }
