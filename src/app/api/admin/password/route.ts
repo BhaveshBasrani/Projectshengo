@@ -6,20 +6,20 @@ import path from 'path';
 
 export async function GET(req: NextRequest) {
   if (!isAuthorizedAdmin(req)) {
-    return NextResponse.json({ error: 'FORBIDDEN: Hard Administrator Authorization Required' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
   }
 
   return NextResponse.json({
     success: true,
     configured: true,
     masked: '••••••••',
-    message: 'Master password is active and secured.',
+    message: 'Password is active and secured.',
   });
 }
 
 export async function POST(req: NextRequest) {
   if (!isAuthorizedAdmin(req)) {
-    return NextResponse.json({ error: 'FORBIDDEN: Hard Administrator Authorization Required' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized: Admin access required.' }, { status: 403 });
   }
 
   try {
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Admin Master Password successfully updated across system.',
+      message: 'Admin password successfully updated.',
     });
   } catch (error: any) {
     return NextResponse.json(

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         {
           success: true,
           authorized: true,
-          message: 'Access granted: Master administrator authorization verified.',
+          message: 'Login successful.',
         },
         {
           headers: {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
           {
             success: true,
             authorized: true,
-            message: 'Access granted: Director authorization verified.',
+            message: 'Login successful.',
           },
           {
             headers: {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Invalid clearance credentials. Access denied.',
+        error: 'Incorrect password. Please try again.',
       },
       {
         status: 401,

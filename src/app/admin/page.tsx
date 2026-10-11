@@ -548,7 +548,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // Handle Master Password Change from Admin Panel
+  // Handle Admin Password Change
   const handleChangeMasterPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMasterPassword || newMasterPassword.length < 6) {
@@ -560,7 +560,7 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    setPasswordChangeStatus({ type: 'loading', message: 'Updating master password across system...' });
+    setPasswordChangeStatus({ type: 'loading', message: 'Saving new password...' });
     try {
       const res = await fetch('/api/admin/password', {
         method: 'POST',
@@ -575,12 +575,12 @@ export default function AdminDashboardPage() {
           sessionStorage.setItem('project_she_admin_key', updatedKey);
           localStorage.setItem('project_she_admin_key', updatedKey);
         }
-        setPasswordChangeStatus({ type: 'success', message: 'Master Password successfully changed! Active session key updated.' });
+        setPasswordChangeStatus({ type: 'success', message: 'Password updated successfully!' });
         setNewMasterPassword('');
         setConfirmMasterPassword('');
-        showToast('Master password successfully updated');
+        showToast('Password updated successfully');
       } else {
-        setPasswordChangeStatus({ type: 'error', message: data.error || 'Failed to update master password' });
+        setPasswordChangeStatus({ type: 'error', message: data.error || 'Failed to update password' });
       }
     } catch (err: any) {
       setPasswordChangeStatus({ type: 'error', message: err?.message || 'Network error updating password' });
@@ -702,21 +702,18 @@ export default function AdminDashboardPage() {
             <div className="inline-flex p-3 bg-[#181818] border-2 border-[#E50914] mb-2 stencil-cut">
               <GrungeGlyph name="lock" className="w-8 h-8 text-[#E50914]" />
             </div>
-            <span className="text-[10px] text-[#E50914] uppercase tracking-widest font-black block">
-              [CLEARANCE LEVEL 4 REQUIRED]
-            </span>
             <h1 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-              ADMINISTRATOR SIGN IN
+              ADMIN LOGIN
             </h1>
             <p className="text-xs text-neutral-400 leading-relaxed font-sans">
-              Enter your master password to access the Project S.H.E. Admin Console.
+              Enter your password to access the Project S.H.E. admin panel.
             </p>
           </div>
 
           {user?.email && isAuthorizedAdminEmail(user.email) && (
             <div className="p-4 bg-[#141414] border-2 border-[#00FF66] shadow-[4px_4px_0px_0px_#00FF66] text-[#00FF66] space-y-2 text-center relative z-10">
               <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-300 block">
-                [VERIFIED SINGLE DIRECTOR ACCOUNT]
+                SIGNED IN AS ADMIN
               </span>
               <div className="text-xs font-bold text-white font-mono break-all">
                 {user.email}
@@ -727,7 +724,7 @@ export default function AdminDashboardPage() {
                 disabled={actionLoading}
                 className="w-full py-2.5 bg-[#00FF66] hover:bg-white text-black font-heading font-black text-xs uppercase tracking-wider transition-all border border-[#00FF66]"
               >
-                {actionLoading ? 'AUTHENTICATING...' : 'ENTER CONSOLE AS VERIFIED DIRECTOR'}
+                {actionLoading ? 'SIGNING IN...' : 'CONTINUE TO ADMIN PANEL'}
               </button>
             </div>
           )}
@@ -735,7 +732,7 @@ export default function AdminDashboardPage() {
           <form onSubmit={handlePasswordLogin} className="space-y-4 relative z-10">
             <div>
               <label className="block text-[11px] uppercase font-bold text-neutral-400 mb-1.5">
-                Admin Password
+                Password
               </label>
               <input
                 type="password"
@@ -743,7 +740,7 @@ export default function AdminDashboardPage() {
                 autoFocus
                 autoComplete="current-password"
                 spellCheck={false}
-                placeholder="Enter admin password..."
+                placeholder="Enter password..."
                 value={passwordInput}
                 onChange={(e) => {
                   setPasswordInput(e.target.value);
@@ -770,7 +767,7 @@ export default function AdminDashboardPage() {
               ) : (
                 <>
                   <GrungeGlyph name="key" className="w-4 h-4" />
-                  <span>SIGN IN TO ADMIN PANEL</span>
+                  <span>SIGN IN</span>
                 </>
               )}
             </button>
@@ -782,7 +779,7 @@ export default function AdminDashboardPage() {
               onClick={() => router.push('/')}
               className="text-xs text-neutral-500 hover:text-neutral-300 uppercase underline underline-offset-4 font-bold"
             >
-              Return to Public Website
+              Back to Website
             </button>
           </div>
         </div>
@@ -868,16 +865,16 @@ export default function AdminDashboardPage() {
             onClick={() => router.push('/')}
             className="px-3 py-2 border border-neutral-700 hover:border-white text-neutral-300 text-xs font-bold uppercase stencil-cut"
           >
-            PUBLIC SITE
+            VIEW WEBSITE
           </button>
           <button
             type="button"
             onClick={handleLockAdmin}
             className="px-3 py-2 bg-red-950/60 border border-red-800 hover:bg-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors stencil-cut"
-            title="Lock Admin Panel"
+            title="Log Out of Admin Panel"
           >
             <GrungeGlyph name="lock" className="w-3.5 h-3.5" />
-            <span>LOCK PANEL</span>
+            <span>LOG OUT</span>
           </button>
         </div>
       </div>
@@ -1071,38 +1068,38 @@ export default function AdminDashboardPage() {
 
               <div className="flex items-center justify-between relative z-10">
                 <span className="font-heading font-black text-lg text-white uppercase block">
-                  LIVE TELEMETRY
+                  SYSTEM STATUS
                 </span>
                 <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
                   <GrungeGlyph name="activity" className="w-3.5 h-3.5" />
-                  100% LIVE DATA
+                  ONLINE
                 </span>
               </div>
 
               <div className="space-y-2 text-[11px] text-neutral-300 relative z-10">
                 <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Database Connection</span>
+                  <span className="text-neutral-400">Database</span>
                   <span className="text-emerald-400 font-bold flex items-center gap-1">
                     <GrungeGlyph name="check" className="w-3.5 h-3.5" />
-                    Supabase Online ({dbStatus === 'connected' ? 'Connected' : 'Syncing'})
+                    Connected
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
                   <span className="text-neutral-400">Response Speed</span>
                   <span className="text-white font-bold">
-                    {liveLatency !== null ? `${liveLatency} ms roundtrip` : 'Checked just now'}
+                    {liveLatency !== null ? `${liveLatency} ms (Normal)` : 'Normal'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Last Verified Sync</span>
+                  <span className="text-neutral-400">Last Synced</span>
                   <span className="text-white font-bold">
                     {lastSyncTime || 'Just now'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Monthly Egress Protection</span>
+                  <span className="text-neutral-400">Website Status</span>
                   <span className="text-emerald-400 font-bold">
-                    Protected (Caching active for 5,600+ followers)
+                    Active &amp; Ready
                   </span>
                 </div>
               </div>
@@ -2431,10 +2428,10 @@ export default function AdminDashboardPage() {
         <div className="space-y-6">
           <div>
             <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-              WEBSITE SETTINGS &amp; GOOGLE FORM URLS
+              WEBSITE SETTINGS &amp; FORM LINKS
             </h2>
             <p className="text-xs text-neutral-400">
-              Update Google Form links and contact info anytime without touching any code.
+              Update Google Form links, contact information, and donation details.
             </p>
           </div>
 
@@ -2445,7 +2442,7 @@ export default function AdminDashboardPage() {
             <div className="space-y-4">
               <div>
                 <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  1. Team Application Google Form Link
+                  Team Application Form Link
                 </label>
                 <input
                   type="url"
@@ -2458,7 +2455,7 @@ export default function AdminDashboardPage() {
 
               <div>
                 <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  2. Artwork &amp; Poetry Google Form Link
+                  Artwork &amp; Poetry Form Link
                 </label>
                 <input
                   type="url"
@@ -2471,7 +2468,7 @@ export default function AdminDashboardPage() {
 
               <div>
                 <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  3. Anonymous Confessions Vault Google Form Link
+                  Anonymous Confessions Form Link
                 </label>
                 <input
                   type="url"
@@ -2559,20 +2556,20 @@ export default function AdminDashboardPage() {
             </button>
           </form>
 
-          {/* MASTER PASSWORD UPDATE CARD */}
+          {/* ADMIN PASSWORD UPDATE CARD */}
           <div className="p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800 pb-3">
               <div>
                 <h3 className="font-heading font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
                   <GrungeGlyph name="key" className="w-5 h-5 text-[#E50914]" />
-                  <span>MASTER CONSOLE PASSWORD</span>
+                  <span>CHANGE ADMIN PASSWORD</span>
                 </h3>
                 <p className="text-[11px] text-neutral-400">
-                  Update the master clearance password used to access this Admin Console.
+                  Update the password used to sign in to the admin panel.
                 </p>
               </div>
               <div className="text-[11px] font-mono text-neutral-400 bg-[#141414] px-3 py-1.5 border border-neutral-700">
-                ACTIVE STATUS: <span className="text-[#00FF66] font-bold">PROTECTED &amp; ACTIVE</span>
+                STATUS: <span className="text-[#00FF66] font-bold">ACTIVE &amp; SECURE</span>
               </div>
             </div>
 
@@ -2580,7 +2577,7 @@ export default function AdminDashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block uppercase font-bold text-neutral-400 mb-1">
-                    New Master Password
+                    New Password
                   </label>
                   <div className="relative">
                     <input
@@ -2638,7 +2635,7 @@ export default function AdminDashboardPage() {
                 className="py-2.5 px-6 bg-[#E50914] text-white font-heading font-black text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 <GrungeGlyph name="lock" className="w-4 h-4" />
-                <span>{passwordChangeStatus.type === 'loading' ? 'UPDATING PASSWORD...' : 'UPDATE MASTER PASSWORD'}</span>
+                <span>{passwordChangeStatus.type === 'loading' ? 'SAVING PASSWORD...' : 'UPDATE PASSWORD'}</span>
               </button>
             </form>
           </div>

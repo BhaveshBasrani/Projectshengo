@@ -348,7 +348,7 @@ export default function UserDashboard() {
                     <span className="font-bold text-white block group-hover:text-[#E50914]">
                       Artwork &amp; Poetry Submissions
                     </span>
-                    <span className="text-[10px] text-neutral-500 font-sans">Creative Resistance</span>
+                    <span className="text-[10px] text-neutral-500 font-sans">Writing, poems, and creative artwork</span>
                   </div>
                 </div>
                 <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E50914]" />
@@ -372,9 +372,9 @@ export default function UserDashboard() {
                   </div>
                   <div>
                     <span className="font-bold text-white block group-hover:text-[#E50914]">
-                      Anonymous Confessions Vault
+                      Anonymous Confessions
                     </span>
-                    <span className="text-[10px] text-neutral-500 font-sans">Untracked Safe Space</span>
+                    <span className="text-[10px] text-neutral-500 font-sans">Safe &amp; Confidential Submissions</span>
                   </div>
                 </div>
                 <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E50914]" />
