@@ -22,7 +22,8 @@ var CONFIG = {
   SECRET_TOKENS: [
     "she_gas_secret_key_2026",
     "she_secret_token_2026_goated",
-    "she_admin_secret_2026_goated"
+    "she_admin_secret_2026_goated",
+    "rendervoid@16"
   ],
   SHEET_SUBSCRIBERS: "Subscribers",
   SHEET_REVIEWS: "Reviews_Moderation",
