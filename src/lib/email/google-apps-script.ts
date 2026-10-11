@@ -3,12 +3,12 @@
  * Keeps secret URLs and execution credentials strictly on the backend.
  */
 
-const CURRENT_LIVE_APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyMuTtOY-_GVFNmy_vSY59W5kM6PMD1dGvX6r7qBt0c0QxabyZCyRTYkwCDSZKAsCKb/exec';
+const CURRENT_LIVE_APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNzEQEy6yHvm6zTNnS9l-7B3_18MXDWLAB5YoxrDiGpA6HBmGuY4v6BRJeVxjEIIFp/exec';
 
 function getAppsScriptUrl(): string {
   const envUrl = process.env.GOOGLE_APPSCRIPT_URL || process.env.GOOGLE_APPS_SCRIPT_URL;
   // If envUrl is missing or points to the old outdated deployments, use the live verified deployment
-  if (!envUrl || envUrl.includes('AKfycbw71-h03yI-JfAr_WvGVTcV_jvT7An1QuwkxnbBl9L49QFoM-HUHkfuwL7lDMNJzBSg') || envUrl.includes('AKfycbykDG_64LHgNhlS6gu-TowyNkTAC2Qfl3ohBoKmzQaub5oD0jj8Ah2Ow227lLG4D45ZzA')) {
+  if (!envUrl || envUrl.includes('AKfycbw71-h03yI-JfAr_WvGVTcV_jvT7An1QuwkxnbBl9L49QFoM-HUHkfuwL7lDMNJzBSg') || envUrl.includes('AKfycbykDG_64LHgNhlS6gu-TowyNkTAC2Qfl3ohBoKmzQaub5oD0jj8Ah2Ow227lLG4D45ZzA') || envUrl.includes('AKfycbyMuTtOY-_GVFNmy_vSY59W5kM6PMD1dGvX6r7qBt0c0QxabyZCyRTYkwCDSZKAsCKb')) {
     return CURRENT_LIVE_APPSCRIPT_URL;
   }
   return envUrl;
