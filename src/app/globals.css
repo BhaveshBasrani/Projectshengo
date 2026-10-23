@@ -1,8 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;700;800&family=Syncopate:wght@700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 
 :root {
   --bg-color: #090909;
@@ -157,6 +158,7 @@ select,
   user-select: none;
   pointer-events: none;
 }
+
 .watermark-outline-red {
   font-family: 'Space Grotesk', 'JetBrains Mono', sans-serif;
   font-weight: 800;
@@ -830,14 +832,12 @@ html[data-theme='light'] {
 
 html.light,
 html.light body,
-html.light main,
 html.light [data-flow-section],
 html.light .flow-art-container,
 html[data-theme='light'],
-html[data-theme='light'] body,
-html[data-theme='light'] main {
-  background-color: #EBE7DF !important;
-  color: #0A0A0A !important;
+html[data-theme='light'] body {
+  background-color: #EBE7DF;
+  color: #0A0A0A;
 }
 
 /* Authentic newsprint paper grain & multiply blend */
@@ -879,13 +879,11 @@ html.light .texture-background-canvas {
 .uk-newspaper-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to right,
-    rgba(8, 8, 8, 0.94) 0%,
-    rgba(8, 8, 8, 0.82) 48%,
-    rgba(8, 8, 8, 0.52) 75%,
-    rgba(8, 8, 8, 0.92) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(8, 8, 8, 0.94) 0%,
+      rgba(8, 8, 8, 0.82) 48%,
+      rgba(8, 8, 8, 0.52) 75%,
+      rgba(8, 8, 8, 0.92) 100%);
   pointer-events: none;
 }
 
@@ -914,13 +912,11 @@ html.light .uk-newspaper-screen {
 html.light .uk-newspaper-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to right,
-    rgba(235, 231, 223, 0.94) 0%,
-    rgba(235, 231, 223, 0.85) 45%,
-    rgba(235, 231, 223, 0.55) 75%,
-    rgba(235, 231, 223, 0.92) 100%
-  );
+  background: linear-gradient(to right,
+      rgba(235, 231, 223, 0.94) 0%,
+      rgba(235, 231, 223, 0.85) 45%,
+      rgba(235, 231, 223, 0.55) 75%,
+      rgba(235, 231, 223, 0.92) 100%);
   pointer-events: none;
 }
 
@@ -1050,11 +1046,11 @@ html.theme-transitioning *,
 html.theme-transitioning *::before,
 html.theme-transitioning *::after {
   transition: background-color 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.25s ease,
-              fill 0.25s ease,
-              stroke 0.25s ease,
-              box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    border-color 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.25s ease,
+    fill 0.25s ease,
+    stroke 0.25s ease,
+    box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
   transition-delay: 0s !important;
 }
 
@@ -1178,8 +1174,8 @@ html.light .bg-\[\#121212\] {
 /* Floating Navbar in Light Mode: Clean Editorial Ivory Glass */
 html.light header nav,
 html[data-theme='light'] header nav {
-  background-color: rgba(250, 248, 243, 0.96) !important;
-  border: 1px solid #0A0A0A !important;
+  background-color: #FAF8F3 !important;
+  border: 1.5px solid #0A0A0A !important;
   box-shadow: 2px 2px 0px 0px #0A0A0A !important;
   color: #0A0A0A !important;
 }
@@ -1189,28 +1185,52 @@ html[data-theme='light'] .navbar-grunge-scrim {
   display: none !important;
 }
 
-html.light header nav a,
-html[data-theme='light'] header nav a {
-  color: #1A1A1A !important;
+/* Nav text anchors only (not buttons) */
+html.light header nav .nav-anchor-link,
+html[data-theme='light'] header nav .nav-anchor-link {
+  color: #0A0A0A !important;
 }
 
-html.light header nav a:hover,
-html[data-theme='light'] header nav a:hover {
+html.light header nav .nav-anchor-link:hover,
+html[data-theme='light'] header nav .nav-anchor-link:hover {
   color: #E6192B !important;
+  text-decoration: underline !important;
+  text-underline-offset: 4px !important;
 }
 
-html.light header nav button,
-html[data-theme='light'] header nav button {
-  color: #1A1A1A !important;
-  border-color: #0A0A0A !important;
+/* Action buttons in header nav (FEEDBACK, REVIEW, Hamburger) */
+html.light header nav button:not(.navbar-keep-style),
+html[data-theme='light'] header nav button:not(.navbar-keep-style) {
+  color: #0A0A0A !important;
+  border: 1.5px solid #0A0A0A !important;
   background-color: #FAF8F3 !important;
+  box-shadow: 1.5px 1.5px 0px 0px #0A0A0A !important;
 }
 
-html.light header nav button:hover,
-html[data-theme='light'] header nav button:hover {
+html.light header nav button:not(.navbar-keep-style):hover,
+html[data-theme='light'] header nav button:not(.navbar-keep-style):hover {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+  border-color: #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+/* The Sign In CTA Button in Light Mode */
+html.light .navbar-signin-btn,
+html[data-theme='light'] .navbar-signin-btn {
   background-color: #E6192B !important;
   color: #FFFFFF !important;
-  border-color: #E6192B !important;
+  border: 1.5px solid #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+html.light .navbar-signin-btn:hover,
+html[data-theme='light'] .navbar-signin-btn:hover {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+  border-color: #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #E6192B !important;
+  transform: translate(-1px, -1px) !important;
 }
 
 /* Punk Loader Light Theme Details */
@@ -1352,19 +1372,6 @@ html.light .navbar-grunge-scrim {
 
 html.light header nav {
   background-color: #FAF8F3 !important;
-  border: 2px solid #0A0A0A !important;
-  box-shadow: 4px 4px 0px 0px #0A0A0A !important;
-  color: #0A0A0A !important;
-}
-
-html.light header nav a {
-  color: #0A0A0A !important;
-}
-
-html.light header nav a:hover {
-  color: #E6192B !important;
-}
-
 html.light header nav span.text-\[\#D1D5DB\] {
   color: #444444 !important;
 }
@@ -1376,8 +1383,14 @@ html.light #navbar-user-profile button {
   box-shadow: 2px 2px 0px 0px #0A0A0A !important;
 }
 
+html.light #navbar-user-profile button:hover {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+  border-color: #0A0A0A !important;
+}
+
 html.light #navbar-user-profile button span {
-  color: #0A0A0A !important;
+  color: inherit !important;
 }
 
 /* Mobile & Profile Menus in Punk Zine Light Mode */
@@ -1395,8 +1408,9 @@ html.light header .bg-\[\#0E0E0E\] button {
 
 html.light header .bg-\[\#0E0E0E\] a:hover,
 html.light header .bg-\[\#0E0E0E\] button:hover {
-  background-color: #E6192B !important;
+  background-color: #0A0A0A !important;
   color: #FFFFFF !important;
+  border-color: #0A0A0A !important;
 }
 
 /* Hero Section CTA Buttons in Punk Zine Light Mode */

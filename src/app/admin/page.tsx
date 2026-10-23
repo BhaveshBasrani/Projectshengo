@@ -1025,10 +1025,35 @@ export default function TeamHubPage() {
         {/* Floating Status Notice */}
         {statusNotice && (
           <div
-            className="fixed bottom-6 right-6 z-50 px-5 py-3 bg-[#111111] border-2 border-[#E6192B] text-white font-mono text-xs shadow-2xl animate-in fade-in duration-200"
-            style={{ borderRadius: '0px' }}
+            className={`fixed bottom-6 right-6 z-[99999] px-5 py-3.5 font-mono text-xs font-bold border-2 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200 select-none ${
+              isLight
+                ? 'border-[#111111] shadow-[4px_4px_0px_0px_#111111]'
+                : 'border-[#E6192B] shadow-[4px_4px_0px_0px_#E6192B]'
+            }`}
+            style={{
+              borderRadius: '0px',
+              backgroundColor: isLight ? '#FFFFFF' : '#111111',
+              color: isLight ? '#111111' : '#FFFFFF',
+              borderColor: isLight ? '#111111' : '#E6192B',
+            }}
           >
-            {statusNotice}
+            <span
+              className="w-2.5 h-2.5 rounded-full bg-[#E6192B] shrink-0 inline-block animate-pulse"
+              style={{ backgroundColor: '#E6192B' }}
+            />
+            <span
+              className="font-mono text-xs font-bold tracking-tight"
+              style={{ color: isLight ? '#111111' : '#FFFFFF' }}
+            >
+              {statusNotice}
+            </span>
+            <button
+              onClick={() => setStatusNotice('')}
+              className="ml-2 text-neutral-400 hover:text-[#E6192B] transition-colors"
+              title="Dismiss notice"
+            >
+              <HiXMark className="w-4 h-4" />
+            </button>
           </div>
         )}
 

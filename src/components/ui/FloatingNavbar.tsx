@@ -20,6 +20,29 @@ export default function FloatingNavbar() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [latestReview, setLatestReview] = useState<PublicReview | null>(null);
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      if (typeof document !== 'undefined') {
+        const isL =
+          document.documentElement.getAttribute('data-theme') === 'light' ||
+          document.documentElement.classList.contains('light');
+        setIsLight(isL);
+      }
+    };
+    checkTheme();
+    window.addEventListener('theme-changed', checkTheme);
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme'],
+    });
+    return () => {
+      window.removeEventListener('theme-changed', checkTheme);
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     setMounted(true);
