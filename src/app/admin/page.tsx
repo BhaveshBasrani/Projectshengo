@@ -159,10 +159,18 @@ export default function TeamHubPage() {
     setAuthChecking(true);
     setLoginError('');
     try {
+      const trimmedKey = secretToTest.trim();
       const res = await fetch('/api/admin/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret: secretToTest.trim() }),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': trimmedKey,
+        },
+        body: JSON.stringify({
+          secret: trimmedKey,
+          password: trimmedKey,
+          passkey: trimmedKey,
+        }),
       });
 
       const data = await res.json();
@@ -290,6 +298,12 @@ export default function TeamHubPage() {
         const data = await res.json();
         if (data.settings) {
           setSiteSettings((prev) => ({ ...prev, ...data.settings }));
+          if (data.settings.default_theme) {
+            localStorage.setItem('project-she-server-default', data.settings.default_theme);
+            localStorage.setItem('project-she-theme', data.settings.default_theme);
+            document.documentElement.setAttribute('data-theme', data.settings.default_theme);
+            window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: data.settings.default_theme } }));
+          }
         }
         showNotice('Website changes saved live for all visitors.');
       } else {
@@ -877,7 +891,11 @@ export default function TeamHubPage() {
             }`}
           >
             <button
-              onClick={() => togglePreviewTheme(isLight ? 'dark' : 'light')}
+              onClick={() => {
+                const next = isLight ? 'dark' : 'light';
+                togglePreviewTheme(next);
+                setSiteSettings((prev) => ({ ...prev, default_theme: next }));
+              }}
               className={`flex items-center gap-1.5 px-2 py-1 border transition-colors ${
                 isLight
                   ? 'border-[#D4CFC4] bg-[#FAF8F5] text-neutral-800 hover:bg-[#EFECE6]'
@@ -1090,12 +1108,15 @@ export default function TeamHubPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <button
                     type="button"
-                    onClick={() =>
-                      setSiteSettings((prev) => ({ ...prev, default_theme: 'dark' }))
-                    }
+                    onClick={() => {
+                      setSiteSettings((prev) => ({ ...prev, default_theme: 'dark' }));
+                      togglePreviewTheme('dark');
+                    }}
                     className={`p-4 border text-left font-mono transition-all flex items-center justify-between ${
                       (siteSettings.default_theme || 'dark') === 'dark'
-                        ? 'border-[#E6192B] bg-[#E6192B]/10 text-white'
+                        ? isLight
+                          ? 'border-[#E6192B] bg-[#E6192B]/10 text-[#111111]'
+                          : 'border-[#E6192B] bg-[#E6192B]/10 text-white'
                         : isLight
                         ? 'border-[#D4CFC4] bg-[#FAF8F5] text-neutral-700 hover:border-black'
                         : 'border-neutral-800 bg-[#0A0A0A] text-neutral-400 hover:border-neutral-700'
@@ -1107,18 +1128,14 @@ export default function TeamHubPage() {
                       <div>
                         <div
                           className={`font-bold text-xs uppercase ${
-                            isLight && siteSettings.default_theme !== 'dark'
-                              ? 'text-[#111111]'
-                              : 'text-white'
+                            isLight ? 'text-[#111111]' : 'text-white'
                           }`}
                         >
                           Dark Brutalist Theme
                         </div>
                         <div
                           className={`text-[11px] ${
-                            isLight && siteSettings.default_theme !== 'dark'
-                              ? 'text-neutral-500'
-                              : 'text-neutral-400'
+                            isLight ? 'text-neutral-600' : 'text-neutral-400'
                           }`}
                         >
                           Rich charcoal canvas, high-contrast imagery
@@ -1132,9 +1149,10 @@ export default function TeamHubPage() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setSiteSettings((prev) => ({ ...prev, default_theme: 'light' }))
-                    }
+                    onClick={() => {
+                      setSiteSettings((prev) => ({ ...prev, default_theme: 'light' }));
+                      togglePreviewTheme('light');
+                    }}
                     className={`p-4 border text-left font-mono transition-all flex items-center justify-between ${
                       siteSettings.default_theme === 'light'
                         ? 'border-[#E6192B] bg-[#E6192B]/10 text-[#111111]'
@@ -1156,7 +1174,7 @@ export default function TeamHubPage() {
                         </div>
                         <div
                           className={`text-[11px] ${
-                            isLight ? 'text-neutral-500' : 'text-neutral-400'
+                            isLight ? 'text-neutral-600' : 'text-neutral-400'
                           }`}
                         >
                           Warm newsprint grain, clean editorial look
@@ -1686,7 +1704,7 @@ export default function TeamHubPage() {
                           isLight ? 'text-neutral-500' : 'text-neutral-400'
                         }`}
                       >
-                        Enter any public image URL or local asset path (default: <code className="font-mono">/assets/donation-qr.png</code>).
+                        Enter any public image URL or local asset path (default: <code className="font-mono">/assets/qr-code.svg</code>).
                       </p>
                     </div>
 
@@ -1698,12 +1716,13 @@ export default function TeamHubPage() {
                       style={{ borderRadius: '0px' }}
                     >
                       {siteSettings.donation_qr_url ? (
-                        <div className="relative w-full h-full flex items-center justify-center">
+                        <div className="relative w-full h-full flex items-center justify-center bg-white p-1">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={siteSettings.donation_qr_url}
                             alt="Live QR Preview"
                             className="max-w-full max-h-full object-contain"
+                            style={{ imageRendering: 'pixelated' }}
                           />
                         </div>
                       ) : (

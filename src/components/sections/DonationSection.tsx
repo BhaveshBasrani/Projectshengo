@@ -55,14 +55,13 @@ export default function DonationSection({ config, settings }: DonationSectionPro
 
             {/* Pristine Solid White Perfect Square framed by Minimalist 1px #333333 Border */}
             <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-white border border-[#333333] p-4 flex items-center justify-center rounded-sm">
-              <div className="relative w-full h-full">
-                <Image
+              <div className="relative w-full h-full flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={qrUrl}
                   alt="Project S.H.E. Official Donation QR Code"
-                  fill
-                  className="object-contain"
-                  priority
-                  sizes="(max-width: 768px) 256px, 288px"
+                  className="w-full h-full object-contain"
+                  style={{ imageRendering: 'pixelated' }}
                 />
               </div>
             </div>

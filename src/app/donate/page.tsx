@@ -1,4 +1,4 @@
-import { getSiteConfig } from '@/lib/data/store';
+import { getSiteConfig, getSiteSettings } from '@/lib/data/store';
 import DonationSection from '@/components/sections/DonationSection';
 import Link from 'next/link';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
@@ -6,7 +6,10 @@ import GrungeGlyph from '@/components/ui/GrungeGlyph';
 export const revalidate = 0;
 
 export default async function DonatePage() {
-  const config = await getSiteConfig();
+  const [config, settings] = await Promise.all([
+    getSiteConfig(),
+    getSiteSettings(),
+  ]);
 
   return (
     <div className="pt-28 pb-20 px-4 max-w-7xl mx-auto min-h-screen select-none font-mono">
@@ -18,7 +21,7 @@ export default async function DonatePage() {
         <span>BACK TO HOMEPAGE</span>
       </Link>
       
-      <DonationSection config={config} />
+      <DonationSection config={config} settings={settings} />
     </div>
   );
 }

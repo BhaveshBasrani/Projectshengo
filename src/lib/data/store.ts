@@ -1,4 +1,6 @@
-import { getSupabaseServer, isSupabaseConfigured } from '@/lib/supabase/server';
+import fs from 'fs';
+import path from 'path';
+import { getSupabaseServer, isSupabaseConfigured, markSupabaseOffline } from '@/lib/supabase/server';
 import {
   PublicReview,
   SuggestionFeedback,
@@ -21,12 +23,52 @@ import { setDynamicAdminPassword, isAuthorizedAdminEmail } from '@/lib/admin/aut
 
 export { DEFAULT_SITE_SETTINGS };
 
+export function getDeletedGalleryIds(): Set<string> {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'deleted-gallery.json');
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return new Set(parsed);
+    }
+  } catch {}
+  return new Set();
+}
+
+export function persistDeletedGalleryId(id: string) {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'deleted-gallery.json');
+    const existing = getDeletedGalleryIds();
+    existing.add(id);
+    fs.writeFileSync(filePath, JSON.stringify(Array.from(existing), null, 2));
+  } catch {}
+}
+
+export function getPersistentSiteSettings(): Partial<SiteSettings> {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'site-settings.json');
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (typeof parsed === 'object' && parsed !== null) return parsed;
+    }
+  } catch {}
+  return {};
+}
+
+export function persistSiteSettings(settings: SiteSettings) {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'site-settings.json');
+    fs.writeFileSync(filePath, JSON.stringify(settings, null, 2));
+  } catch {}
+}
+
 // Default initial website configuration
 export const DEFAULT_CONFIG: SiteConfig = {
   google_form_team_app: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheTeamApplication/viewform',
   google_form_artwork_poetry: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheArtworkPoetry/viewform',
   google_form_anonymous_confessions: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheAnonymousConfessions/viewform',
-  donation_qr_url: '/assets/donation-qr.png',
+  donation_qr_url: '/assets/qr-code.svg',
   donation_upi_id: 'shailajalakshmisarao1974-2@okicici',
   contact_email: 'projectshe.ngo@gmail.com',
   emergency_helpline: 'Women Helpline: 1091 | Domestic Abuse: 181 | Direct: +91 98765 43210',
@@ -42,16 +84,24 @@ let memoryFeedback: SuggestionFeedback[] = [];
 let memoryProfiles: UserProfile[] = [];
 let memoryConfig: SiteConfig = { ...DEFAULT_CONFIG };
 
-let memorySiteSettings: SiteSettings = { ...DEFAULT_SITE_SETTINGS };
+let memorySiteSettings: SiteSettings = {
+  ...DEFAULT_SITE_SETTINGS,
+  ...getPersistentSiteSettings(),
+};
 
-let memoryGalleryItems: GalleryItem[] = (GALLERY_ITEMS || []).map((g) => ({
-  id: g.id,
-  src: g.src,
-  title: g.event || 'Battle of the Bands',
-  aspect: g.aspect,
-  category: g.category,
-  created_at: new Date().toISOString(),
-}));
+let memoryGalleryItems: GalleryItem[] = (GALLERY_ITEMS || [])
+  .filter((g) => !getDeletedGalleryIds().has(g.id))
+  .map((g) => ({
+    id: g.id,
+    src: g.src,
+    title: g.event || 'Battle of the Bands',
+    event: g.event || 'Battle of the Bands 2.0',
+    aspect: g.aspect,
+    category: g.category,
+    width: g.width,
+    height: g.height,
+    created_at: new Date().toISOString(),
+  }));
 
 let memoryVisitorLogs: VisitorLog[] = [
   {
@@ -1028,10 +1078,14 @@ export async function getAllNewsletterSubscribers(): Promise<string[]> {
   return Array.from(emails);
 }
 
-// --- CMS: SITE TEXT & LINKS ---
-
 export async function getSiteSettings(): Promise<SiteSettings> {
-  let base: SiteSettings = { ...DEFAULT_SITE_SETTINGS, ...memorySiteSettings };
+  const diskSettings = getPersistentSiteSettings();
+  let base: SiteSettings = {
+    ...DEFAULT_SITE_SETTINGS,
+    ...diskSettings,
+    ...memorySiteSettings,
+  };
+
   if (isSupabaseConfigured()) {
     try {
       const supabase = getSupabaseServer();
@@ -1043,24 +1097,26 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       if (!error && data) {
         base = {
           ...DEFAULT_SITE_SETTINGS,
+          ...diskSettings,
+          ...memorySiteSettings,
           ...data,
-          marquee_text: data.marquee_text || DEFAULT_SITE_SETTINGS.marquee_text,
-          hero_headline: data.hero_headline || DEFAULT_SITE_SETTINGS.hero_headline,
-          hero_description: data.hero_description || DEFAULT_SITE_SETTINGS.hero_description,
-          footer_quote: data.footer_quote || DEFAULT_SITE_SETTINGS.footer_quote,
-          google_form_team_app: data.google_form_team_app || DEFAULT_SITE_SETTINGS.google_form_team_app,
-          google_form_artwork_poetry: data.google_form_artwork_poetry || DEFAULT_SITE_SETTINGS.google_form_artwork_poetry,
-          google_form_anonymous_confessions: data.google_form_anonymous_confessions || DEFAULT_SITE_SETTINGS.google_form_anonymous_confessions,
-          emergency_helpline: data.emergency_helpline || DEFAULT_SITE_SETTINGS.emergency_helpline,
-          donation_upi_id: data.donation_upi_id || DEFAULT_SITE_SETTINGS.donation_upi_id,
-          contact_email: data.contact_email || DEFAULT_SITE_SETTINGS.contact_email,
-          instagram_url: data.instagram_url || DEFAULT_SITE_SETTINGS.instagram_url,
           updated_at: data.updated_at || new Date().toISOString(),
         };
         memorySiteSettings = base;
+        persistSiteSettings(base);
         return base;
       }
-    } catch (e) {
+      if (error) {
+        const errStr = String(error.message || '') + ' ' + String((error as any).details || '');
+        if (errStr.includes('ENOTFOUND') || errStr.includes('fetch failed')) {
+          markSupabaseOffline(120000);
+        }
+      }
+    } catch (e: any) {
+      const errStr = String(e?.message || e);
+      if (errStr.includes('ENOTFOUND') || errStr.includes('fetch failed')) {
+        markSupabaseOffline(120000);
+      }
       console.warn('Supabase getSiteSettings fallback:', e);
     }
   }
@@ -1068,7 +1124,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 }
 
 export async function updateSiteSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
-  // Only apply non-empty or explicitly set values so unchanged fields never get wiped
+  const diskSettings = getPersistentSiteSettings();
   const cleanUpdates: Partial<SiteSettings> = {};
   for (const [key, val] of Object.entries(updates)) {
     if (val !== undefined && val !== null && String(val).trim() !== '') {
@@ -1078,10 +1134,13 @@ export async function updateSiteSettings(updates: Partial<SiteSettings>): Promis
 
   memorySiteSettings = {
     ...DEFAULT_SITE_SETTINGS,
+    ...diskSettings,
     ...memorySiteSettings,
     ...cleanUpdates,
     updated_at: new Date().toISOString(),
   };
+
+  persistSiteSettings(memorySiteSettings);
 
   // Sync with general site config if form or contact values changed
   const configUpdates: Partial<SiteConfig> = {};
@@ -1092,6 +1151,7 @@ export async function updateSiteSettings(updates: Partial<SiteSettings>): Promis
   if (cleanUpdates.donation_upi_id) configUpdates.donation_upi_id = cleanUpdates.donation_upi_id;
   if (cleanUpdates.contact_email) configUpdates.contact_email = cleanUpdates.contact_email;
   if (cleanUpdates.instagram_url) configUpdates.instagram_url = cleanUpdates.instagram_url;
+  if (cleanUpdates.donation_qr_url) configUpdates.donation_qr_url = cleanUpdates.donation_qr_url;
   if (Object.keys(configUpdates).length > 0) {
     updateSiteConfig(configUpdates).catch(() => {});
   }
@@ -1109,9 +1169,17 @@ export async function updateSiteSettings(updates: Partial<SiteSettings>): Promis
           { onConflict: 'id' }
         );
       if (error) {
+        const errStr = String(error.message || '') + ' ' + String((error as any).details || '');
+        if (errStr.includes('ENOTFOUND') || errStr.includes('fetch failed')) {
+          markSupabaseOffline(120000);
+        }
         console.warn('Supabase updateSiteSettings warning:', error);
       }
-    } catch (e) {
+    } catch (e: any) {
+      const errStr = String(e?.message || e);
+      if (errStr.includes('ENOTFOUND') || errStr.includes('fetch failed')) {
+        markSupabaseOffline(120000);
+      }
       console.warn('Supabase updateSiteSettings fallback:', e);
     }
   }
@@ -1120,30 +1188,6 @@ export async function updateSiteSettings(updates: Partial<SiteSettings>): Promis
 }
 
 // --- CMS: VISUAL CHRONICLES (GALLERY MANAGER) ---
-
-import fs from 'fs';
-import path from 'path';
-
-export function getDeletedGalleryIds(): Set<string> {
-  try {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'deleted-gallery.json');
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, 'utf-8');
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return new Set(parsed);
-    }
-  } catch {}
-  return new Set();
-}
-
-export function persistDeletedGalleryId(id: string) {
-  try {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'deleted-gallery.json');
-    const existing = getDeletedGalleryIds();
-    existing.add(id);
-    fs.writeFileSync(filePath, JSON.stringify(Array.from(existing), null, 2));
-  } catch {}
-}
 
 export async function getGalleryItemsList(): Promise<GalleryItem[]> {
   const deleted = getDeletedGalleryIds();

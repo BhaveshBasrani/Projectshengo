@@ -69,6 +69,9 @@ export const metadata: Metadata = {
   },
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 import CinematicEasterEgg from '@/components/ui/CinematicEasterEgg';
 import { getPublishedUpdates, getSiteSettings } from '@/lib/data/store';
 
@@ -140,8 +143,16 @@ export default async function RootLayout({
               (function() {
                 try {
                   var serverDefault = ${JSON.stringify(defaultTheme)};
-                  var saved = localStorage.getItem('project-she-theme');
-                  var activeTheme = saved ? saved : (serverDefault || 'dark');
+                  var prevServer = localStorage.getItem('project-she-server-default');
+                  var activeTheme;
+                  if (prevServer !== serverDefault) {
+                    localStorage.setItem('project-she-server-default', serverDefault);
+                    localStorage.setItem('project-she-theme', serverDefault);
+                    activeTheme = serverDefault;
+                  } else {
+                    var saved = localStorage.getItem('project-she-theme');
+                    activeTheme = saved ? saved : (serverDefault || 'dark');
+                  }
                   if (activeTheme === 'light') {
                     document.documentElement.classList.remove('dark');
                     document.documentElement.classList.add('light');

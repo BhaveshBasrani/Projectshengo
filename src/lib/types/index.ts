@@ -206,10 +206,13 @@ export interface SiteSettings {
 export interface GalleryItem {
   id: string;
   src: string;
-  title: string;
+  title?: string;
   aspect?: number;
-  category?: string;
-  created_at: string;
+  category?: 'BOTB 2.0' | 'PROJECT SHE 1.0' | string;
+  event?: string;
+  width?: number;
+  height?: number;
+  created_at?: string;
 }
 
 export interface VisitorLog {
@@ -245,7 +248,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   pillar_3_desc: 'Our dedicated team of writers and designers brings forward an expansive range of topics, from articles examining issues such as misogyny in the media to case posts that shed light on the violence faced by women and children. Our goal has always been to turn community support into tangible change- channelling that collective engagement towards advocacy and awareness-building.',
   donation_headline: 'DONATE THROUGH UPI',
   donation_subtext: 'Convenient, safe, and designed to ensure your contribution reaches those who need it most.',
-  donation_qr_url: '/assets/donation-qr.png',
+  donation_qr_url: '/assets/qr-code.svg',
   donation_upi_id: 'shailajalakshmisarao1974-2@okicici',
   footer_quote: 'Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.',
   google_form_team_app: 'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheTeamApplication/viewform',

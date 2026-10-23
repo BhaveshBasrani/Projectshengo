@@ -11,7 +11,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const email = body.email ? String(body.email).trim().toLowerCase() : '';
     const password = body.password ? String(body.password).trim() : '';
-    const secret = req.headers.get('x-admin-secret')?.trim() || password;
+    const bodySecret = body.secret ? String(body.secret).trim() : (body.passkey ? String(body.passkey).trim() : '');
+    const headerSecret = req.headers.get('x-admin-secret')?.trim() || '';
+    const secret = bodySecret || password || headerSecret;
 
     const validSecrets = getValidAdminSecrets();
     const forwarded = req.headers.get('x-forwarded-for');

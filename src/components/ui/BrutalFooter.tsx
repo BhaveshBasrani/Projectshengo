@@ -15,10 +15,6 @@ export default function BrutalFooter() {
     'Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.'
   );
 
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   React.useEffect(() => {
     const syncTheme = () => {
       if (typeof document !== 'undefined') {
@@ -84,6 +80,10 @@ export default function BrutalFooter() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <footer className="brutal-footer w-full bg-[#090909] text-[#EDEDED] border-t border-[#222222] relative overflow-hidden select-none transition-colors duration-200">

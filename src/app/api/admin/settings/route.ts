@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSiteSettings, updateSiteSettings } from '@/lib/data/store';
 import { getValidAdminSecrets } from '@/lib/admin/auth';
+import { SiteSettings } from '@/lib/types';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 /**
  * Live Site Text & Links API.
  * GET is public so frontend hero, ticker marquee, and footer can fetch
- * dynamic content updates immediately without rebuilding or redeploying.
+ * dynamic content updates immediately.
  * PATCH is strictly protected by Team Passkey.
  */
 export async function GET() {
@@ -15,7 +19,7 @@ export async function GET() {
       { success: true, settings },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
         },
       }
     );
@@ -41,27 +45,59 @@ export async function PATCH(req: NextRequest) {
 
     const body = await req.json().catch(() => ({}));
 
-    // Filter allowed fields - only set if non-empty string
-    const updates: Record<string, string> = {};
-    if (typeof body.marquee_text === 'string' && body.marquee_text.trim()) updates.marquee_text = body.marquee_text.trim();
-    if (typeof body.hero_headline === 'string' && body.hero_headline.trim()) updates.hero_headline = body.hero_headline.trim();
-    if (typeof body.hero_description === 'string' && body.hero_description.trim()) updates.hero_description = body.hero_description.trim();
-    if (typeof body.footer_quote === 'string' && body.footer_quote.trim()) updates.footer_quote = body.footer_quote.trim();
-    if (typeof body.google_form_team_app === 'string' && body.google_form_team_app.trim()) updates.google_form_team_app = body.google_form_team_app.trim();
-    if (typeof body.google_form_artwork_poetry === 'string' && body.google_form_artwork_poetry.trim()) updates.google_form_artwork_poetry = body.google_form_artwork_poetry.trim();
-    if (typeof body.google_form_anonymous_confessions === 'string' && body.google_form_anonymous_confessions.trim()) updates.google_form_anonymous_confessions = body.google_form_anonymous_confessions.trim();
-    if (typeof body.emergency_helpline === 'string' && body.emergency_helpline.trim()) updates.emergency_helpline = body.emergency_helpline.trim();
-    if (typeof body.donation_upi_id === 'string' && body.donation_upi_id.trim()) updates.donation_upi_id = body.donation_upi_id.trim();
-    if (typeof body.contact_email === 'string' && body.contact_email.trim()) updates.contact_email = body.contact_email.trim();
-    if (typeof body.instagram_url === 'string' && body.instagram_url.trim()) updates.instagram_url = body.instagram_url.trim();
+    // Explicitly allow and capture all editable website fields
+    const updates: Partial<SiteSettings> = {};
+
+    if (body.default_theme === 'light' || body.default_theme === 'dark') {
+      updates.default_theme = body.default_theme;
+    }
+
+    const textKeys: (keyof SiteSettings)[] = [
+      'marquee_text',
+      'hero_headline',
+      'hero_badge',
+      'hero_subbadge',
+      'hero_description',
+      'about_statement',
+      'pillar_1_title',
+      'pillar_1_desc',
+      'pillar_2_title',
+      'pillar_2_desc',
+      'pillar_3_title',
+      'pillar_3_desc',
+      'donation_headline',
+      'donation_subtext',
+      'donation_upi_id',
+      'donation_qr_url',
+      'footer_quote',
+      'google_form_team_app',
+      'google_form_artwork_poetry',
+      'google_form_anonymous_confessions',
+      'emergency_helpline',
+      'contact_email',
+      'instagram_url',
+    ];
+
+    for (const key of textKeys) {
+      if (typeof body[key] === 'string' && body[key].trim() !== '') {
+        (updates as any)[key] = body[key].trim();
+      }
+    }
 
     const updated = await updateSiteSettings(updates);
 
-    return NextResponse.json({
-      success: true,
-      message: 'Website text and links updated successfully.',
-      settings: updated,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Website text and links updated successfully.',
+        settings: updated,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: 'Failed to update site settings' },

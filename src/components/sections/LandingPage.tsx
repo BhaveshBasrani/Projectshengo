@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import FlowArt, { FlowSection } from '@/components/ui/FlowArt';
 
 import HeroSection from '@/components/sections/HeroSection';
@@ -16,7 +16,30 @@ interface LandingPageProps {
   settings?: SiteSettings;
 }
 
-export default function LandingPage({ config, settings }: LandingPageProps) {
+export default function LandingPage({ config, settings: initialSettings }: LandingPageProps) {
+  const [settings, setSettings] = useState<SiteSettings | undefined>(initialSettings);
+
+  // Sync settings when initial prop updates
+  useEffect(() => {
+    setSettings(initialSettings);
+  }, [initialSettings]);
+
+  // Keep homepage live-synced when switching back from admin tab
+  useEffect(() => {
+    const syncFresh = () => {
+      fetch('/api/admin/settings', { cache: 'no-store' })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.settings) {
+            setSettings(data.settings);
+          }
+        })
+        .catch(() => {});
+    };
+
+    window.addEventListener('focus', syncFresh);
+    return () => window.removeEventListener('focus', syncFresh);
+  }, []);
   return (
     <div className="page-fluid-enter">
       <FlowArt aria-label="Project S.H.E. Story">

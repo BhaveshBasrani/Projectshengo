@@ -6,6 +6,9 @@ import {
 } from '@/lib/data/store';
 import { getValidAdminSecrets } from '@/lib/admin/auth';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * Visual Chronicles (Gallery Manager) API.
  * GET: Retrieves photography archive list.
@@ -15,7 +18,14 @@ import { getValidAdminSecrets } from '@/lib/admin/auth';
 export async function GET() {
   try {
     const items = await getGalleryItemsList();
-    return NextResponse.json({ success: true, items });
+    return NextResponse.json(
+      { success: true, items },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: 'Failed to load visual chronicles' },
