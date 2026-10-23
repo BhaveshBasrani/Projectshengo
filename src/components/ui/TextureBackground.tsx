@@ -179,7 +179,7 @@ export default function TextureBackground({
         pointerEvents: 'none',
         zIndex: 0,
       }}
-      className={className}
+      className={`texture-background-canvas ${className}`}
     />
   );
 }

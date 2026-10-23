@@ -1,27 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;700;800&family=Syncopate:wght@700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-color: #080808;
-  --text-color: #EDEDED;
-  --text-muted: #888888;
-  --accent-red: #E50914;
+  --bg-color: #090909;
+  --text-color: #FFFFFF;
+  --text-muted: #D1D5DB;
+  --accent-red: #E6192B;
   --accent-crimson: #C8102E;
   --paper-grain: #101010;
-  --card-border: #222222;
+  --card-border: #333333;
 }
 
-/* Y2K Cyber-Grunge Crosshair Cursor */
+/* Professional Dark Editorial Cursor & Canvas */
 html,
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
-  cursor: crosshair;
+  cursor: default;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -45,14 +45,17 @@ select,
 ::-webkit-scrollbar {
   width: 10px;
 }
+
 ::-webkit-scrollbar-track {
   background: #080808;
   border-left: 2px solid #222222;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #E50914;
   border: 2px solid #080808;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #FF2A2A;
 }
@@ -73,25 +76,21 @@ select,
 
 /* Animated Hazard Stripes Pattern (Black & Red Diagonal with continuous physical sliding) */
 .bg-hazard-stripes {
-  background: repeating-linear-gradient(
-    -45deg,
-    #080808,
-    #080808 14px,
-    #E50914 14px,
-    #E50914 28px
-  );
+  background: repeating-linear-gradient(-45deg,
+      #080808,
+      #080808 14px,
+      #E50914 14px,
+      #E50914 28px);
   background-size: 39.6px 39.6px;
   animation: hazard-slide 2.2s linear infinite;
 }
 
 .bg-hazard-stripes-reverse {
-  background: repeating-linear-gradient(
-    45deg,
-    #080808,
-    #080808 14px,
-    #E50914 14px,
-    #E50914 28px
-  );
+  background: repeating-linear-gradient(45deg,
+      #080808,
+      #080808 14px,
+      #E50914 14px,
+      #E50914 28px);
   background-size: 39.6px 39.6px;
   animation: hazard-slide-reverse 2.2s linear infinite;
 }
@@ -100,6 +99,7 @@ select,
   from {
     background-position: 0 0;
   }
+
   to {
     background-position: 39.6px 0;
   }
@@ -109,26 +109,25 @@ select,
   from {
     background-position: 0 0;
   }
+
   to {
     background-position: -39.6px 0;
   }
 }
 
 .bg-hazard-stripes-dark {
-  background: repeating-linear-gradient(
-    -45deg,
-    #0E0E0E,
-    #0E0E0E 12px,
-    #222222 12px,
-    #222222 24px
-  );
+  background: repeating-linear-gradient(-45deg,
+      #0E0E0E,
+      #0E0E0E 12px,
+      #222222 12px,
+      #222222 24px);
   background-size: 34px 34px;
   animation: hazard-slide 3s linear infinite;
 }
 
 /* Rich Industrial Punk Grid & Ambient Dot Matrix Backgrounds */
 .bg-punk-grid {
-  background-image: 
+  background-image:
     radial-gradient(rgba(229, 9, 20, 0.16) 1.2px, transparent 1.2px),
     linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
@@ -149,9 +148,27 @@ select,
   text-shadow: 3px 3px 0px #E50914, 6px 6px 0px rgba(0, 0, 0, 0.9);
 }
 
+/* Dark Brutalism Editorial Watermarks */
+.watermark-outline {
+  font-family: 'Space Grotesk', 'JetBrains Mono', sans-serif;
+  font-weight: 800;
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.08);
+  color: transparent;
+  user-select: none;
+  pointer-events: none;
+}
+.watermark-outline-red {
+  font-family: 'Space Grotesk', 'JetBrains Mono', sans-serif;
+  font-weight: 800;
+  -webkit-text-stroke: 1.5px rgba(230, 25, 43, 0.22);
+  color: transparent;
+  user-select: none;
+  pointer-events: none;
+}
+
 /* Brutalist Rigid Borders */
 .border-brutal {
-  border: 2px solid currentColor;
+  border: 1px solid currentColor;
 }
 
 .border-brutal-thick {
@@ -163,10 +180,12 @@ select,
   box-shadow: 4px 4px 0px 0px #E50914;
   transition: transform 0.12s ease-in-out, box-shadow 0.12s ease-in-out;
 }
+
 .btn-brutal-tactile:hover {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0px 0px #E50914;
 }
+
 .btn-brutal-tactile:active {
   transform: translate(4px, 4px);
   box-shadow: 0px 0px 0px 0px #E50914;
@@ -176,11 +195,13 @@ select,
   box-shadow: 4px 4px 0px 0px #222222;
   transition: transform 0.12s ease-in-out, box-shadow 0.12s ease-in-out, border-color 0.12s ease-in-out;
 }
+
 .btn-brutal-dark:hover {
   border-color: #E50914;
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0px 0px #E50914;
 }
+
 .btn-brutal-dark:active {
   transform: translate(4px, 4px);
   box-shadow: 0px 0px 0px 0px #E50914;
@@ -190,6 +211,7 @@ select,
 .card-grunge {
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
+
 .card-grunge:hover {
   filter: contrast(1.1) brightness(1.05);
 }
@@ -210,6 +232,7 @@ select,
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -224,6 +247,7 @@ html {
 .fluid-card {
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
 }
+
 .fluid-card:hover {
   transform: translateY(-4px);
   box-shadow: 8px 8px 0px 0px #E50914;
@@ -234,6 +258,7 @@ html {
 .glow-on-hover {
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
+
 .glow-on-hover:hover {
   box-shadow: 0 0 25px rgba(229, 9, 20, 0.25), 6px 6px 0px 0px #E50914;
   border-color: #E50914;
@@ -243,22 +268,28 @@ html {
 .hover-lift {
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .hover-lift:hover {
   transform: translateY(-2px);
 }
+
 .hover-lift:active {
   transform: translateY(1px);
 }
 
 /* Subtle Breathing Motion for Emblem Badges */
 @keyframes subtleBreath {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.02);
   }
 }
+
 .animate-subtle-breath {
   animation: subtleBreath 4s ease-in-out infinite;
 }
@@ -270,7 +301,7 @@ html {
   background: rgba(244, 241, 234, 0.22);
   border-left: 2px dashed rgba(0, 0, 0, 0.5);
   border-right: 2px dashed rgba(0, 0, 0, 0.5);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(1.5px);
   pointer-events: none;
   z-index: 10;
@@ -278,55 +309,97 @@ html {
 
 /* Angular Chamfered Stencil Cut Corners */
 .stencil-cut {
-  clip-path: polygon(
-    10px 0%,
-    calc(100% - 10px) 0%,
-    100% 10px,
-    100% calc(100% - 10px),
-    calc(100% - 10px) 100%,
-    10px 100%,
-    0% calc(100% - 10px),
-    0% 10px
-  );
+  clip-path: polygon(10px 0%,
+      calc(100% - 10px) 0%,
+      100% 10px,
+      100% calc(100% - 10px),
+      calc(100% - 10px) 100%,
+      10px 100%,
+      0% calc(100% - 10px),
+      0% 10px);
 }
 
 /* Barbed Cyber-Grunge Line Accent */
 .cyber-barbed-border {
-  background-image: repeating-linear-gradient(
-    90deg,
-    #E50914,
-    #E50914 8px,
-    transparent 8px,
-    transparent 14px,
-    #333333 14px,
-    #333333 22px
-  );
+  background-image: repeating-linear-gradient(90deg,
+      #E50914,
+      #E50914 8px,
+      transparent 8px,
+      transparent 14px,
+      #333333 14px,
+      #333333 22px);
   height: 3px;
 }
 
 /* Glitch Typewriter Effect */
 @keyframes typewriter {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0 0 0); }
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }
+
 @keyframes blinkTextCursor {
-  0%, 100% { border-right-color: transparent; }
-  50% { border-right-color: rgba(229, 9, 20, 1); }
+
+  0%,
+  100% {
+    border-right-color: transparent;
+  }
+
+  50% {
+    border-right-color: rgba(229, 9, 20, 1);
+  }
 }
+
 @keyframes glitch-skew {
-  0% { transform: skew(0deg); }
-  20% { transform: skew(-10deg); }
-  21% { transform: skew(10deg); }
-  22% { transform: skew(0deg); }
-  50% { transform: skew(0deg); }
-  51% { transform: skew(5deg); }
-  52% { transform: skew(-5deg); }
-  53% { transform: skew(0deg); }
-  100% { transform: skew(0deg); }
+  0% {
+    transform: skew(0deg);
+  }
+
+  20% {
+    transform: skew(-10deg);
+  }
+
+  21% {
+    transform: skew(10deg);
+  }
+
+  22% {
+    transform: skew(0deg);
+  }
+
+  50% {
+    transform: skew(0deg);
+  }
+
+  51% {
+    transform: skew(5deg);
+  }
+
+  52% {
+    transform: skew(-5deg);
+  }
+
+  53% {
+    transform: skew(0deg);
+  }
+
+  100% {
+    transform: skew(0deg);
+  }
 }
+
 @keyframes loader-slide {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
 }
 
 .animate-typewriter {
@@ -343,57 +416,64 @@ html {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .animate-fade-in-up {
   animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
 }
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
 
 /* Authentic Punk Zine & Paper Cutout Utilities */
 .font-marker {
   font-family: 'Permanent Marker', cursive, sans-serif;
 }
+
 .font-typewriter {
   font-family: 'Special Elite', 'JetBrains Mono', monospace;
 }
+
 .font-poster {
   font-family: 'Anton', 'Bebas Neue', 'Space Grotesk', sans-serif;
 }
 
 .torn-paper-edge-top {
-  clip-path: polygon(
-    0% 4px, 2% 0px, 5% 5px, 8% 1px, 12% 6px, 15% 2px, 18% 5px, 22% 1px, 25% 6px, 29% 2px,
-    33% 5px, 36% 1px, 40% 6px, 44% 2px, 48% 5px, 52% 1px, 55% 6px, 59% 2px, 63% 5px, 67% 1px,
-    71% 6px, 75% 2px, 79% 5px, 83% 1px, 87% 6px, 90% 2px, 94% 5px, 97% 1px, 100% 4px,
-    100% 100%, 0% 100%
-  );
+  clip-path: polygon(0% 4px, 2% 0px, 5% 5px, 8% 1px, 12% 6px, 15% 2px, 18% 5px, 22% 1px, 25% 6px, 29% 2px,
+      33% 5px, 36% 1px, 40% 6px, 44% 2px, 48% 5px, 52% 1px, 55% 6px, 59% 2px, 63% 5px, 67% 1px,
+      71% 6px, 75% 2px, 79% 5px, 83% 1px, 87% 6px, 90% 2px, 94% 5px, 97% 1px, 100% 4px,
+      100% 100%, 0% 100%);
 }
 
 .torn-paper-edge-bottom {
-  clip-path: polygon(
-    0% 0%, 100% 0%, 100% calc(100% - 4px),
-    97% 100%, 94% calc(100% - 5px), 90% calc(100% - 1px), 87% calc(100% - 6px), 83% calc(100% - 2px),
-    79% calc(100% - 5px), 75% calc(100% - 1px), 71% calc(100% - 6px), 67% calc(100% - 2px),
-    63% calc(100% - 5px), 59% calc(100% - 1px), 55% calc(100% - 6px), 52% calc(100% - 2px),
-    48% calc(100% - 5px), 44% calc(100% - 1px), 40% calc(100% - 6px), 36% calc(100% - 2px),
-    33% calc(100% - 5px), 29% calc(100% - 1px), 25% calc(100% - 6px), 22% calc(100% - 2px),
-    18% calc(100% - 5px), 15% calc(100% - 1px), 12% calc(100% - 6px), 8% calc(100% - 2px),
-    5% calc(100% - 5px), 2% 100%, 0% calc(100% - 4px)
-  );
+  clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 4px),
+      97% 100%, 94% calc(100% - 5px), 90% calc(100% - 1px), 87% calc(100% - 6px), 83% calc(100% - 2px),
+      79% calc(100% - 5px), 75% calc(100% - 1px), 71% calc(100% - 6px), 67% calc(100% - 2px),
+      63% calc(100% - 5px), 59% calc(100% - 1px), 55% calc(100% - 6px), 52% calc(100% - 2px),
+      48% calc(100% - 5px), 44% calc(100% - 1px), 40% calc(100% - 6px), 36% calc(100% - 2px),
+      33% calc(100% - 5px), 29% calc(100% - 1px), 25% calc(100% - 6px), 22% calc(100% - 2px),
+      18% calc(100% - 5px), 15% calc(100% - 1px), 12% calc(100% - 6px), 8% calc(100% - 2px),
+      5% calc(100% - 5px), 2% 100%, 0% calc(100% - 4px));
 }
 
 .torn-paper-badge {
-  clip-path: polygon(
-    2% 0%, 98% 0%, 100% 8%, 98% 18%, 100% 28%, 98% 38%, 100% 48%, 98% 58%, 100% 68%, 98% 78%, 100% 88%, 98% 100%,
-    2% 100%, 0% 88%, 2% 78%, 0% 68%, 2% 58%, 0% 48%, 2% 38%, 0% 28%, 2% 18%, 0% 8%
-  );
+  clip-path: polygon(2% 0%, 98% 0%, 100% 8%, 98% 18%, 100% 28%, 98% 38%, 100% 48%, 98% 58%, 100% 68%, 98% 78%, 100% 88%, 98% 100%,
+      2% 100%, 0% 88%, 2% 78%, 0% 68%, 2% 58%, 0% 48%, 2% 38%, 0% 28%, 2% 18%, 0% 8%);
 }
 
 .screenprint-distress {
@@ -402,7 +482,8 @@ html {
 
 /* --- CINEMATIC EASTER EGG (The "Project S.H.E." Event) --- */
 .she-event-overlay {
-  position: fixed !important; /* STRICT VIEWPORT LOCK */
+  position: fixed !important;
+  /* STRICT VIEWPORT LOCK */
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
@@ -482,7 +563,7 @@ html {
 /* Authentic Punk Star Grid: Gridlines with crimson micro-stars at intersections */
 .bg-star-gridlines {
   background-color: #080808;
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
     url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M22 18 L23 21 L26 22 L23 23 L22 26 L21 23 L18 22 L21 21 Z' fill='%23E50914' opacity='0.45'/%3E%3C/svg%3E");
@@ -495,6 +576,7 @@ html {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -507,9 +589,12 @@ html {
 }
 
 @keyframes bannerPulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 4px 18px rgba(229, 9, 20, 0.45);
   }
+
   50% {
     box-shadow: 0 4px 28px rgba(229, 9, 20, 0.7);
   }
@@ -519,3 +604,916 @@ html {
   animation: bannerPulseGlow 3s ease-in-out infinite;
 }
 
+
+/* ==========================================================
+   EDITORIAL THEME (Project S.H.E. redesign)
+   Scoped under .she-editorial so legacy pages are untouched.
+   ========================================================== */
+.she-editorial {
+  background: #F6F2EA;
+  color: #15120F;
+  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  cursor: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+.she-editorial ::selection {
+  background: #B3122B;
+  color: #fff;
+}
+
+.she-editorial a,
+.she-editorial button {
+  cursor: pointer;
+}
+
+.she-editorial .font-serif {
+  font-family: var(--font-serif), Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+.she-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #B3122B;
+}
+
+.she-container {
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .she-container {
+    padding-inline: 2rem;
+  }
+}
+
+.she-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  min-height: 48px;
+  padding: .8rem 1.5rem;
+  font-size: .9rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  border-radius: 999px;
+  transition: background-color .25s, color .25s, border-color .25s, transform .25s;
+}
+
+.she-btn:focus-visible,
+.she-editorial a:focus-visible,
+.she-editorial button:focus-visible {
+  outline: 2px solid #B3122B;
+  outline-offset: 3px;
+}
+
+.she-btn-primary {
+  background: #15120F;
+  color: #F6F2EA;
+}
+
+.she-btn-primary:hover {
+  background: #B3122B;
+  transform: translateY(-1px);
+}
+
+.she-btn-ghost {
+  border: 1px solid #15120F;
+  color: #15120F;
+}
+
+.she-btn-ghost:hover {
+  background: #15120F;
+  color: #F6F2EA;
+}
+
+.she-btn-red {
+  background: #B3122B;
+  color: #fff;
+}
+
+.she-btn-red:hover {
+  background: #8E0E22;
+  transform: translateY(-1px);
+}
+
+.she-card {
+  background: #fff;
+  border: 1px solid #DDD4C3;
+  border-radius: 1.25rem;
+  transition: transform .35s cubic-bezier(.16, 1, .3, 1), box-shadow .35s, border-color .25s;
+}
+
+.she-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px -28px rgba(21, 18, 15, .35);
+  border-color: #c9bda5;
+}
+
+.she-rule {
+  height: 1px;
+  background: #DDD4C3;
+  border: 0;
+}
+
+.she-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .8s cubic-bezier(.16, 1, .3, 1), transform .8s cubic-bezier(.16, 1, .3, 1);
+}
+
+.she-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.she-marquee {
+  animation: she-marquee 48s linear infinite;
+}
+
+.she-marquee-wrap:hover .she-marquee {
+  animation-play-state: paused;
+}
+
+@keyframes she-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes she-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.she-rise {
+  animation: she-rise .9s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.she-redact {
+  background: #15120F;
+  color: transparent;
+  border-radius: 2px;
+  padding: 0 .15em;
+  user-select: none;
+  box-decoration-break: clone;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .she-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .she-marquee,
+  .she-rise {
+    animation: none;
+  }
+}
+
+.she-rise {
+  animation: she-rise .9s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.she-redact {
+  background: #15120F;
+  color: transparent;
+  border-radius: 2px;
+  padding: 0 .15em;
+  user-select: none;
+  box-decoration-break: clone;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .she-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .she-marquee,
+  .she-rise {
+    animation: none;
+  }
+}
+
+/* ==========================================================
+   RAW INDUSTRIAL NEWSPRINT / PUNK ZINE (LIGHT MODE)
+   Tactile underground newsprint, heavy black ink & stark brutalism
+   ========================================================== */
+html.light,
+html[data-theme='light'] {
+  --bg-color: #EBE7DF;
+  --text-color: #0A0A0A;
+  --text-muted: #333333;
+  --card-border: #0A0A0A;
+  --card-bg: #FAF8F3;
+}
+
+html.light,
+html.light body,
+html.light main,
+html.light [data-flow-section],
+html.light .flow-art-container,
+html[data-theme='light'],
+html[data-theme='light'] body,
+html[data-theme='light'] main {
+  background-color: #EBE7DF !important;
+  color: #0A0A0A !important;
+}
+
+/* Authentic newsprint paper grain & multiply blend */
+html.light .paper-texture-overlay {
+  opacity: 0.16 !important;
+  mix-blend-mode: multiply !important;
+}
+
+html.light .bg-punk-dots {
+  opacity: 0.09 !important;
+  background-image: radial-gradient(#0A0A0A 1.2px, transparent 1.2px) !important;
+}
+
+html.light .texture-background-canvas {
+  display: none !important;
+}
+
+/* UK Newspaper Broadsheet Banner - Both Dark and Light Modes */
+.uk-newspaper-banner {
+  display: block;
+}
+
+.uk-newspaper-image {
+  filter: grayscale(100%) contrast(165%) brightness(0.68);
+  mix-blend-mode: screen;
+  opacity: 0.22;
+}
+
+.uk-newspaper-screen {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.12) 0.8px, transparent 0.8px),
+    linear-gradient(to bottom, rgba(8, 8, 8, 0.15) 0%, rgba(8, 8, 8, 0.6) 60%, #080808 100%);
+  background-size: 3.5px 3.5px, 100% 100%;
+  pointer-events: none;
+}
+
+.uk-newspaper-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(8, 8, 8, 0.94) 0%,
+    rgba(8, 8, 8, 0.82) 48%,
+    rgba(8, 8, 8, 0.52) 75%,
+    rgba(8, 8, 8, 0.92) 100%
+  );
+  pointer-events: none;
+}
+
+/* Light Theme Overrides for Authentic Tactile Newsprint */
+html.light .uk-newspaper-banner {
+  display: block;
+}
+
+html.light .uk-newspaper-image {
+  filter: grayscale(100%) contrast(185%) brightness(1.05);
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+
+html.light .uk-newspaper-screen {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(rgba(10, 10, 10, 0.28) 0.8px, transparent 0.8px),
+    linear-gradient(to bottom, rgba(235, 231, 223, 0.15) 0%, rgba(235, 231, 223, 0.6) 65%, #EBE7DF 100%);
+  background-size: 3.5px 3.5px, 100% 100%;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+html.light .uk-newspaper-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(235, 231, 223, 0.94) 0%,
+    rgba(235, 231, 223, 0.85) 45%,
+    rgba(235, 231, 223, 0.55) 75%,
+    rgba(235, 231, 223, 0.92) 100%
+  );
+  pointer-events: none;
+}
+
+/* Watermarks: Raw ink stencil outlines */
+html.light .watermark-outline {
+  -webkit-text-stroke: 1.5px rgba(10, 10, 10, 0.16) !important;
+  color: transparent !important;
+}
+
+html.light .watermark-outline-red {
+  -webkit-text-stroke: 1.5px rgba(230, 25, 43, 0.28) !important;
+  color: transparent !important;
+}
+
+/* Section Backgrounds in Raw Newsprint */
+html.light section,
+html.light .punk-loader-screen,
+html.light .bg-\[\#0A0A0A\],
+html.light .bg-\[\#080808\],
+html.light .bg-\[\#090909\],
+html.light .bg-\[\#070707\],
+html.light .bg-\[\#060606\],
+html.light .bg-\[\#000000\],
+html.light .bg-black {
+  background-color: #EBE7DF !important;
+}
+
+/* Footer Light Theme Full Support */
+html.light footer.brutal-footer,
+html[data-theme='light'] footer.brutal-footer {
+  background-color: #EBE7DF !important;
+  color: #0A0A0A !important;
+  border-top-color: #0A0A0A !important;
+}
+
+html.light footer.brutal-footer .footer-card,
+html[data-theme='light'] footer.brutal-footer .footer-card {
+  background-color: #FAF8F3 !important;
+  color: #0A0A0A !important;
+  border-color: #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+html.light footer.brutal-footer .footer-divider,
+html[data-theme='light'] footer.brutal-footer .footer-divider {
+  border-color: #D1CDCD !important;
+}
+
+html.light footer.brutal-footer h2,
+html.light footer.brutal-footer h3,
+html[data-theme='light'] footer.brutal-footer h2,
+html[data-theme='light'] footer.brutal-footer h3 {
+  color: #0A0A0A !important;
+}
+
+html.light footer.brutal-footer p,
+html[data-theme='light'] footer.brutal-footer p {
+  color: #262626 !important;
+}
+
+html.light footer.brutal-footer strong,
+html[data-theme='light'] footer.brutal-footer strong {
+  color: #0A0A0A !important;
+}
+
+html.light footer.brutal-footer a,
+html[data-theme='light'] footer.brutal-footer a {
+  color: #333333 !important;
+}
+
+html.light footer.brutal-footer a:hover,
+html[data-theme='light'] footer.brutal-footer a:hover {
+  color: #E6192B !important;
+}
+
+html.light footer.brutal-footer .footer-quote,
+html[data-theme='light'] footer.brutal-footer .footer-quote {
+  color: #1A1A1A !important;
+}
+
+html.light footer.brutal-footer .footer-subtext,
+html[data-theme='light'] footer.brutal-footer .footer-subtext {
+  color: #555555 !important;
+}
+
+html.light footer.brutal-footer .footer-btn,
+html[data-theme='light'] footer.brutal-footer .footer-btn {
+  background-color: #FAF8F3 !important;
+  border-color: #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light footer.brutal-footer .footer-btn:hover,
+html[data-theme='light'] footer.brutal-footer .footer-btn:hover {
+  background-color: #E6192B !important;
+  border-color: #E6192B !important;
+  color: #FFFFFF !important;
+}
+
+/* Theme Toggle Component Styling in Light Mode */
+html.light footer.brutal-footer .theme-toggle-container,
+html[data-theme='light'] footer.brutal-footer .theme-toggle-container {
+  background-color: #FAF8F3 !important;
+  border-color: #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+html.light footer.brutal-footer .theme-toggle-track,
+html[data-theme='light'] footer.brutal-footer .theme-toggle-track {
+  background-color: #EBE7DF !important;
+  border-color: #CFCBC2 !important;
+}
+
+html.light footer.brutal-footer .theme-toggle-btn-inactive,
+html[data-theme='light'] footer.brutal-footer .theme-toggle-btn-inactive {
+  color: #555555 !important;
+}
+
+html.light footer.brutal-footer .theme-toggle-btn-inactive:hover,
+html[data-theme='light'] footer.brutal-footer .theme-toggle-btn-inactive:hover {
+  color: #0A0A0A !important;
+}
+
+/* Page-Wide Ultra-Smooth Theme Transition Animation */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.25s ease,
+              fill 0.25s ease,
+              stroke 0.25s ease,
+              box-shadow 0.38s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition-delay: 0s !important;
+}
+
+/* Modern Native View Transition API Animation */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+/* Bulletin Board - Pure White (#FFFFFF) & Deep Black (#111111) with Sharp 1px Borders in Light Mode */
+html.light .bulletin-board-section {
+  background-color: #FFFFFF !important;
+  color: #111111 !important;
+}
+
+html.light .bulletin-board-section h2,
+html.light .bulletin-board-section h3 {
+  color: #111111 !important;
+}
+
+html.light .bulletin-board-section p {
+  color: #444444 !important;
+}
+
+html.light .bulletin-board-canvas {
+  background-color: #FFFFFF !important;
+  border-color: #E5E5E5 !important;
+}
+
+html.light .bulletin-tab-inactive {
+  color: #666666 !important;
+}
+
+html.light .bulletin-tab-inactive:hover {
+  color: #E6192B !important;
+}
+
+html.light .bulletin-search-input {
+  background-color: #F8F8F8 !important;
+  border-color: #E5E5E5 !important;
+  color: #111111 !important;
+}
+
+html.light .bulletin-card {
+  background-color: #FFFFFF !important;
+  color: #111111 !important;
+  border-color: #E5E5E5 !important;
+  box-shadow: 2px 2px 0px 0px #111111 !important;
+}
+
+html.light .bulletin-card:hover {
+  border-color: #E6192B !important;
+}
+
+html.light .bulletin-card h3 {
+  color: #111111 !important;
+}
+
+html.light .bulletin-card p {
+  color: #555555 !important;
+}
+
+html.light .bulletin-card-meta {
+  border-color: #E5E5E5 !important;
+  color: #777777 !important;
+}
+
+html.light .bulletin-modal {
+  background-color: #FFFFFF !important;
+  color: #111111 !important;
+  border-color: #E5E5E5 !important;
+  box-shadow: 4px 4px 0px 0px #111111 !important;
+}
+
+html.light .bulletin-modal h3,
+html.light .bulletin-modal strong {
+  color: #111111 !important;
+}
+
+html.light .bulletin-modal .modal-header,
+html.light .bulletin-modal .modal-footer {
+  background-color: #FAFAFA !important;
+  border-color: #E5E5E5 !important;
+}
+
+html.light .bulletin-modal .modal-body-text {
+  color: #333333 !important;
+  border-left-color: #E6192B !important;
+}
+
+html.light .bulletin-modal textarea,
+html.light .bulletin-modal input {
+  background-color: #F7F7F7 !important;
+  color: #111111 !important;
+  border-color: #E5E5E5 !important;
+}
+
+
+
+/* Tactile Editorial Newsprint Cards: Refined 1px/1.5px Ink Border + Subtle 2px-3px Offset */
+html.light .bg-\[\#0E0E0E\],
+html.light .bg-\[\#0F0F0F\],
+html.light .punk-loader-card {
+  background-color: #FAF8F3 !important;
+  border: 1px solid #0A0A0A !important;
+  box-shadow: 2.5px 2.5px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+/* Inner rows and controls get a clean neutral tone without outer card drop-shadow */
+html.light .bg-\[\#141414\],
+html.light .bg-\[\#121212\] {
+  background-color: #F4F1EA !important;
+  border-color: #D1CDCD !important;
+  color: #0A0A0A !important;
+  box-shadow: none !important;
+}
+
+/* Floating Navbar in Light Mode: Clean Editorial Ivory Glass */
+html.light header nav,
+html[data-theme='light'] header nav {
+  background-color: rgba(250, 248, 243, 0.96) !important;
+  border: 1px solid #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light .navbar-grunge-scrim,
+html[data-theme='light'] .navbar-grunge-scrim {
+  display: none !important;
+}
+
+html.light header nav a,
+html[data-theme='light'] header nav a {
+  color: #1A1A1A !important;
+}
+
+html.light header nav a:hover,
+html[data-theme='light'] header nav a:hover {
+  color: #E6192B !important;
+}
+
+html.light header nav button,
+html[data-theme='light'] header nav button {
+  color: #1A1A1A !important;
+  border-color: #0A0A0A !important;
+  background-color: #FAF8F3 !important;
+}
+
+html.light header nav button:hover,
+html[data-theme='light'] header nav button:hover {
+  background-color: #E6192B !important;
+  color: #FFFFFF !important;
+  border-color: #E6192B !important;
+}
+
+/* Punk Loader Light Theme Details */
+html.light .punk-loader-title {
+  color: #0A0A0A !important;
+}
+
+html.light .punk-loader-percent {
+  color: #262626 !important;
+  font-weight: 700 !important;
+}
+
+html.light .punk-loader-sublabel {
+  color: #555555 !important;
+}
+
+html.light .punk-loader-track {
+  background-color: #E2DDD0 !important;
+  border: 1px solid #0A0A0A !important;
+  height: 5px !important;
+}
+
+html.light .punk-loader-tagline {
+  color: #555555 !important;
+}
+
+html.light .punk-loader-glow {
+  display: none !important;
+}
+
+html.light .punk-loader-sm {
+  color: #0A0A0A !important;
+}
+
+/* Punk Zine Red-Wash Featured Cards */
+html.light .bg-\[\#120808\],
+html.light .bg-\[\#140808\],
+html.light .bg-\[\#140909\] {
+  background-color: #FFF2F2 !important;
+  border: 1.5px solid #E6192B !important;
+  box-shadow: 2.5px 2.5px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+/* Founder's Note Zine Card: Refined and Minimal */
+html.light .founders-note-card {
+  background-color: #FAF8F3 !important;
+  border: 1px solid #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+}
+
+/* Sub-boxes within Founder's Note (Pull-quotes, Statistics, NCRB readouts) */
+html.light #mission .bg-\[\#080808\],
+html.light #mission .bg-\[\#090909\] {
+  background-color: #F4F1EA !important;
+  border-left: 3px solid #E6192B !important;
+  border-top: 1px solid #D1CDCD !important;
+  border-bottom: 1px solid #D1CDCD !important;
+  border-right: 1px solid #D1CDCD !important;
+  box-shadow: none !important;
+  color: #0A0A0A !important;
+}
+
+html.light #mission .bg-\[\#080808\] .text-white {
+  color: #0A0A0A !important;
+}
+
+/* Founder Note Controls: "Read All Chapters" & "PREV" */
+html.light #mission .bg-\[\#121212\] {
+  background-color: #FAF8F3 !important;
+  border: 1px solid #0A0A0A !important;
+  box-shadow: 1.5px 1.5px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light #mission .bg-\[\#121212\]:hover {
+  background-color: #E6192B !important;
+  color: #FFFFFF !important;
+}
+
+/* Transparency Sub-cards in Donation Section */
+html.light #donate .bg-\[\#121212\] {
+  background-color: #F4F1EA !important;
+  border: 1px solid #D1CDCD !important;
+  color: #0A0A0A !important;
+}
+
+html.light #donate .bg-\[\#141414\] {
+  background-color: #FAF8F3 !important;
+  border: 1px solid #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+/* Deep Printer's Ink Typography */
+html.light .text-white,
+html.light .text-\[\#FFFFFF\],
+html.light .text-\[\#EDEDED\],
+html.light .text-\[\#F4F1EA\] {
+  color: #0A0A0A !important;
+}
+
+html.light .text-\[\#D1D5DB\],
+html.light .text-\[\#A3A3A3\],
+html.light .text-neutral-200,
+html.light .text-neutral-300 {
+  color: #262626 !important;
+}
+
+html.light .text-neutral-400 {
+  color: #444444 !important;
+}
+
+html.light .text-neutral-500,
+html.light .text-\[\#555555\] {
+  color: #555555 !important;
+}
+
+html.light .text-neutral-600 {
+  color: #777777 !important;
+}
+
+/* Global Hard Borders */
+html.light .border-neutral-900,
+html.light .border-neutral-800,
+html.light .border-neutral-800\/80,
+html.light .border-neutral-800\/70,
+html.light .border-neutral-700,
+html.light .border-neutral-700\/80,
+html.light .border-\[\#222222\],
+html.light .border-\[\#262626\],
+html.light .border-\[\#333333\] {
+  border-color: #0A0A0A !important;
+}
+
+/* Floating Navbar in Punk Zine Light Mode */
+html.light .navbar-grunge-scrim {
+  display: none !important;
+}
+
+html.light header nav {
+  background-color: #FAF8F3 !important;
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 4px 4px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light header nav a {
+  color: #0A0A0A !important;
+}
+
+html.light header nav a:hover {
+  color: #E6192B !important;
+}
+
+html.light header nav span.text-\[\#D1D5DB\] {
+  color: #444444 !important;
+}
+
+html.light #navbar-user-profile button {
+  background-color: #FAF8F3 !important;
+  border: 1.5px solid #0A0A0A !important;
+  color: #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+html.light #navbar-user-profile button span {
+  color: #0A0A0A !important;
+}
+
+/* Mobile & Profile Menus in Punk Zine Light Mode */
+html.light header .bg-\[\#0E0E0E\] {
+  background-color: #FAF8F3 !important;
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 6px 6px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light header .bg-\[\#0E0E0E\] a,
+html.light header .bg-\[\#0E0E0E\] button {
+  color: #0A0A0A !important;
+}
+
+html.light header .bg-\[\#0E0E0E\] a:hover,
+html.light header .bg-\[\#0E0E0E\] button:hover {
+  background-color: #E6192B !important;
+  color: #FFFFFF !important;
+}
+
+/* Hero Section CTA Buttons in Punk Zine Light Mode */
+html.light a[href="/#donate"].bg-\[\#E6192B\] {
+  background-color: #E6192B !important;
+  color: #FFFFFF !important;
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+}
+
+html.light a[href="/#donate"].bg-\[\#E6192B\]:hover {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+  transform: translate(1px, 1px) !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+}
+
+html.light .hero-team-btn {
+  background-color: #0A0A0A !important;
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #E6192B !important;
+  color: #FFFFFF !important;
+}
+
+html.light .hero-team-btn:hover {
+  background-color: #E6192B !important;
+  border-color: #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+  color: #FFFFFF !important;
+}
+
+html.light .hero-pillars-btn {
+  background-color: #FAF8F3 !important;
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light .hero-pillars-btn:hover {
+  background-color: #E6192B !important;
+  color: #FFFFFF !important;
+}
+
+/* Secondary Action Buttons (e.g., "READ MORE STORIES", "VIEW ALL REVIEWS") */
+html.light a.bg-\[\#141414\],
+html.light button.bg-\[\#141414\] {
+  background-color: #FAF8F3 !important;
+  border: 1.5px solid #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light a.bg-\[\#141414\]:hover,
+html.light button.bg-\[\#141414\]:hover {
+  background-color: #E6192B !important;
+  border-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+}
+
+/* STRICT PRESERVATION: Red Badges, Active Buttons, & Marquee Ticker */
+html.light .bg-\[\#E6192B\],
+html.light .bg-\[\#E50914\],
+html.light .bg-\[\#C81E3A\] {
+  background-color: #C81E3A !important;
+  color: #FFFFFF !important;
+}
+
+html.light .bg-\[\#E6192B\] *,
+html.light .bg-\[\#E50914\] *,
+html.light .bg-\[\#C81E3A\] * {
+  color: #FFFFFF !important;
+}
+
+html.light .border-\[\#E6192B\],
+html.light .border-red-500\/30 {
+  border-color: #E6192B !important;
+}
+
+/* Red impact text in Founder's note & headlines */
+html.light .text-\[\#E6192B\],
+html.light .text-\[\#E50914\] {
+  color: #E6192B !important;
+}
+
+/* Footer in Punk Zine Light Mode */
+html.light footer {
+  background-color: #DDD8CE !important;
+  border-top: 3px solid #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light footer .bg-\[\#121212\] {
+  background-color: #FAF8F3 !important;
+  border: 1.5px solid #0A0A0A !important;
+  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+}
+
+html.light footer .text-transparent {
+  background-image: linear-gradient(to bottom, rgba(10, 10, 10, 0.14), rgba(10, 10, 10, 0.03), transparent) !important;
+}
+
+/* Modals & Inputs in Punk Zine Light Mode */
+html.light .fixed.inset-0.bg-black\/85,
+html.light .fixed.inset-0.bg-black\/80 {
+  background-color: rgba(10, 10, 10, 0.6) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+html.light input.bg-\[\#141414\],
+html.light textarea.bg-\[\#141414\] {
+  background-color: #FAF8F3 !important;
+  border: 1.5px solid #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+  color: #0A0A0A !important;
+}
+
+html.light input.bg-\[\#141414\]::placeholder,
+html.light textarea.bg-\[\#141414\]::placeholder {
+  color: #666666 !important;
+}

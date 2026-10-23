@@ -111,11 +111,37 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en" className="dark" data-scroll-behavior="smooth">
+    <html lang="en" className="dark" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@500;700;800&family=Syncopate:wght@700&display=swap"
+          rel="stylesheet"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('project-she-theme');
+                  if (saved === 'light') {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.classList.add('light');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  } else {
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
         />
       </head>
       <body className="antialiased min-h-screen flex flex-col relative bg-[#080808] text-[#EDEDED] overflow-x-hidden">

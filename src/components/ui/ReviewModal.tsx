@@ -26,6 +26,15 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
     setMounted(true);
   }, []);
 
+  // Auto-fill user display name when modal opens or user/profile hydrates
+  useEffect(() => {
+    if (isOpen) {
+      if (profile?.display_name || user?.displayName) {
+        setDisplayName(profile?.display_name || user?.displayName || '');
+      }
+    }
+  }, [isOpen, user, profile]);
+
   if (!isOpen || !mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,11 +90,11 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
       onClick={(e) => e.target === e.currentTarget && handleClose()}
       className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
     >
-      <div className="w-full max-w-lg bg-[#0E0E0E] text-[#F4F1EA] border-2 border-[#E50914] shadow-[8px_8px_0px_0px_#E50914] p-6 relative my-auto stencil-cut">
+      <div className="w-full max-w-lg bg-[#0E0E0E] text-[#F4F1EA] border border-white/20 rounded-sm shadow-2xl p-6 relative my-auto">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-4 right-4 p-1.5 border border-[#333333] hover:border-[#E50914] hover:bg-[#E50914] hover:text-white transition-all"
+          className="absolute top-4 right-4 p-1.5 border border-neutral-800 rounded-sm hover:border-[#E50914] hover:bg-[#E50914] hover:text-white transition-all"
         >
           <GrungeGlyph name="close" className="w-5 h-5" />
         </button>
@@ -103,7 +112,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
         </div>
 
         {success ? (
-          <div className="p-5 border-2 border-emerald-500 bg-emerald-950/40 text-emerald-200 space-y-3 text-center stencil-cut">
+          <div className="p-5 border border-emerald-500/50 bg-emerald-950/40 text-emerald-200 space-y-3 text-center rounded-sm">
             <GrungeGlyph name="check" className="w-10 h-10 text-emerald-400 mx-auto" />
             <h4 className="font-heading font-black text-lg">THANK YOU!</h4>
             <p className="text-xs font-sans text-emerald-300 leading-relaxed">
@@ -112,7 +121,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
             <button
               type="button"
               onClick={handleClose}
-              className="mt-3 px-5 py-2 bg-[#E50914] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-colors"
+              className="mt-3 px-5 py-2 bg-[#E50914] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-colors rounded-sm"
             >
               CLOSE
             </button>
@@ -120,7 +129,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">
             {error && (
-              <div className="p-3 border border-[#E50914] bg-red-950/50 text-[#FF6B6B] flex items-center gap-2">
+              <div className="p-3 border border-[#E50914] bg-red-950/50 text-[#FF6B6B] flex items-center gap-2 rounded-sm">
                 <GrungeGlyph name="alert" className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -136,7 +145,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="e.g. Priya K. or Anonymous Ally"
-                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none"
+                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none rounded-sm"
               />
             </div>
 
@@ -147,7 +156,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none"
+                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none rounded-sm"
               >
                 <option value="Survivor">Survivor</option>
                 <option value="Volunteer / Advocate">Volunteer / Advocate</option>
@@ -190,11 +199,11 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
                 placeholder="Share your experience with Project S.H.E. and how our community supported or inspired you..."
-                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none resize-none"
+                className="w-full p-2.5 bg-[#141414] border border-neutral-800 rounded-sm focus:border-[#E50914] text-white outline-none resize-none"
               />
             </div>
 
-            <div className="p-3 bg-[#141414] border border-[#222222] text-[10px] text-[#888888] leading-relaxed flex items-start gap-2">
+            <div className="p-3 bg-[#141414] border border-neutral-800/80 rounded-sm text-[10px] text-[#888888] leading-relaxed flex items-start gap-2">
               <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914] shrink-0 mt-0.5" />
               <span><strong>Safety Guarantee:</strong> Your email and private account credentials are never made public. Only your chosen display name and testimonial text will appear after administrator approval.</span>
             </div>
@@ -202,7 +211,7 @@ export default function ReviewModal({ isOpen, onClose, onSuccess }: ReviewModalP
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-sm uppercase tracking-wider transition-all border border-[#E50914] shadow-[4px_4px_0px_0px_#000000] disabled:opacity-50"
+              className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-sm uppercase tracking-wider transition-all border border-transparent rounded-sm disabled:opacity-50"
             >
               {submitting ? 'SUBMITTING...' : 'SUBMIT REVIEW'}
             </button>

@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import { BlogPost } from '@/lib/types';
+import { HiArrowRight, HiHeart } from 'react-icons/hi2';
 
 export default function BlogGlimpse() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -21,7 +21,6 @@ export default function BlogGlimpse() {
       const res = await fetch('/api/posts');
       const data = await res.json();
       if (data.success && Array.isArray(data.posts)) {
-        // Pinned posts first, then newest/most liked. Take top 3.
         const sorted = [...data.posts].sort((a, b) => {
           if (a.is_pinned && !b.is_pinned) return -1;
           if (!a.is_pinned && b.is_pinned) return 1;
@@ -59,43 +58,24 @@ export default function BlogGlimpse() {
 
   return (
     <section id="stories" className="scroll-mt-28 sm:scroll-mt-36 pt-24 sm:pt-32 pb-8 px-4 sm:px-6 max-w-7xl mx-auto select-none relative">
-      
-      {/* Immersive Dark-Punk Atmospheric Background */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-[0.06] mix-blend-screen"
-          style={{ backgroundImage: `url('/assets/punk-bg-abstract.jpg')` }}
-        />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[400px] bg-[radial-gradient(ellipse,rgba(229,9,20,0.12)_0%,transparent_70%)] blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,#080808_88%)]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-transparent to-[#080808]" />
-      </div>
 
-      {/* Subtle Corner Punk Seal */}
-      <div className="absolute -top-10 -right-10 w-48 h-48 opacity-[0.07] pointer-events-none select-none z-0 hidden sm:block">
-        <Image
-          src="/assets/punk-starburst.png"
-          alt="*"
-          fill
-          sizes="192px"
-          className="object-contain"
-        />
+      {/* Subtle Atmospheric Glow */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[400px] bg-[radial-gradient(ellipse,rgba(230,25,43,0.06)_0%,transparent_70%)] blur-3xl pointer-events-none" />
       </div>
 
       {/* Header Bar */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10 border-b border-neutral-900 pb-6">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10 border-b border-[#222222] pb-6">
         <div className="space-y-2 text-center md:text-left">
           <div className="flex items-center gap-2 justify-center md:justify-start">
-            <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
-            <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold flex items-center gap-1.5">
-              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" /> ADVOCACY &amp; DIALOGUE
+            <span className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+              // ADVOCACY &amp; DIALOGUE
             </span>
-            <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
           </div>
-          <h2 className="font-heading font-extrabold text-3xl sm:text-4xl uppercase tracking-tight text-white leading-none">
+          <h2 className="font-heading font-bold text-3xl sm:text-4xl uppercase tracking-tight text-white leading-none">
             STORIES &amp; ARTICLES
           </h2>
-          <p className="font-sans text-xs sm:text-sm text-neutral-400 max-w-xl leading-relaxed">
+          <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] max-w-xl leading-relaxed">
             Articles and case posts from our team of writers and designers turning community support into tangible change.
           </p>
         </div>
@@ -104,10 +84,10 @@ export default function BlogGlimpse() {
         <div className="flex items-center justify-center md:justify-end gap-3">
           <Link
             href="/blog"
-            className="group px-4 py-2.5 bg-[#141414] hover:bg-[#E50914] text-neutral-200 hover:text-white border border-neutral-800 hover:border-[#E50914] transition-all flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider min-h-[42px] hover-lift stencil-cut"
+            className="group px-5 py-2.5 bg-[#141414] hover:bg-[#E6192B] text-[#D1D5DB] hover:text-white border border-neutral-800 hover:border-[#E6192B] transition-all flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider min-h-[42px] rounded-md hover-lift"
           >
             <span>READ MORE STORIES</span>
-            <GrungeGlyph name="arrow-right" className="w-3.5 h-3.5 text-[#E50914] group-hover:text-white transition-colors" />
+            <HiArrowRight className="w-4 h-4 text-[#E6192B] group-hover:text-white transition-transform duration-200 group-hover:translate-x-1" />
           </Link>
         </div>
       </div>
@@ -117,18 +97,18 @@ export default function BlogGlimpse() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-5 bg-[#0E0E0E] border border-neutral-900 animate-pulse min-h-[300px] space-y-4 stencil-cut">
-                <div className="h-44 bg-neutral-900 w-full rounded" />
-                <div className="h-4 bg-neutral-800 w-1/3 rounded" />
-                <div className="h-5 bg-neutral-800 w-4/5 rounded" />
-                <div className="h-3 bg-neutral-800 w-full rounded" />
+              <div key={i} className="p-5 bg-[#0E0E0E] border border-neutral-800/80 animate-pulse min-h-[300px] space-y-4 rounded-md">
+                <div className="h-44 bg-neutral-900 w-full rounded-sm" />
+                <div className="h-4 bg-neutral-800 w-1/3 rounded-sm" />
+                <div className="h-5 bg-neutral-800 w-4/5 rounded-sm" />
+                <div className="h-3 bg-neutral-800 w-full rounded-sm" />
               </div>
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="p-8 bg-[#0E0E0E] border-2 border-dashed border-neutral-800 text-center space-y-3 max-w-lg mx-auto stencil-cut">
-            <p className="text-white font-bold text-sm uppercase">NO ARTICLES YET</p>
-            <p className="text-xs text-neutral-400 font-sans">
+          <div className="p-8 bg-[#0E0E0E] border border-neutral-800/80 text-center space-y-3 max-w-lg mx-auto rounded-md">
+            <p className="text-white font-mono font-bold text-sm uppercase">NO ARTICLES YET</p>
+            <p className="text-xs text-[#D1D5DB] font-sans">
               No articles have been published yet. Our team will post updates and stories soon.
             </p>
           </div>
@@ -140,28 +120,15 @@ export default function BlogGlimpse() {
               return (
                 <article
                   key={post.id}
-                  className={`bg-[#0E0E0E] text-[#F4F1EA] border-2 transition-all flex flex-col justify-between group relative stencil-cut overflow-hidden ${
+                  className={`bg-[#0E0E0E] text-[#EDEDED] border transition-all flex flex-col justify-between group relative overflow-hidden rounded-md ${
                     post.is_pinned
-                      ? 'border-[#E50914] shadow-[4px_4px_0px_0px_#E50914]'
-                      : 'border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#111111] hover:shadow-[4px_4px_0px_0px_#E50914]'
+                      ? 'border-[#E6192B]/60'
+                      : 'border-neutral-800/80 hover:border-[#E6192B]/50'
                   }`}
                 >
-                  {/* Push Pin on Pinned Posts */}
-                  {post.is_pinned && (
-                    <div className="absolute -top-1 -right-1 z-30 w-9 h-9 rotate-12 pointer-events-none drop-shadow-[0_2px_8px_rgba(229,9,20,0.8)]">
-                      <Image
-                        src="/assets/punk-red-pin.png"
-                        alt="Pinned Article"
-                        fill
-                        sizes="36px"
-                        className="object-contain"
-                      />
-                    </div>
-                  )}
-
                   <div className="relative">
                     {/* Cover Image */}
-                    <div className="relative w-full h-44 bg-neutral-900 overflow-hidden border-b-2 border-neutral-800">
+                    <div className="relative w-full h-44 bg-neutral-900 overflow-hidden border-b border-neutral-800/80">
                       <Image
                         src={post.cover_image_url || '/assets/logo.png'}
                         alt={post.title}
@@ -170,13 +137,12 @@ export default function BlogGlimpse() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                        <span className="bg-[#E50914] text-white text-[9px] font-black uppercase px-2 py-0.5 border border-black shadow-[2px_2px_0px_0px_#000000]">
+                        <span className="bg-[#E6192B] text-white text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded-sm">
                           {post.category}
                         </span>
                         {post.is_pinned && (
-                          <span className="bg-black/90 text-[#E50914] border border-[#E50914] text-[8px] font-black uppercase px-1.5 py-0.5 tracking-wider flex items-center gap-1">
-                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-[#E50914]" />
-                            <span>PINNED</span>
+                          <span className="bg-black/90 text-[#E6192B] border border-[#E6192B] text-[8px] font-mono font-bold uppercase px-1.5 py-0.5 tracking-wider rounded-sm">
+                            PINNED
                           </span>
                         )}
                       </div>
@@ -185,50 +151,44 @@ export default function BlogGlimpse() {
                     {/* Content */}
                     <div className="p-5 space-y-2.5">
                       <div className="flex items-center gap-2 text-[10px] text-neutral-400 font-mono">
-                        <span className="flex items-center gap-1">
-                          <GrungeGlyph name="calendar" className="w-3 h-3 text-[#E50914]" />
-                          {new Date(post.published_at || post.created_at).toLocaleDateString()}
-                        </span>
+                        <span>{new Date(post.published_at || post.created_at).toLocaleDateString()}</span>
                         <span>•</span>
                         <span className="truncate">{post.author_name}</span>
                       </div>
 
-                      <h3 className="font-heading font-black text-base uppercase tracking-tight text-white group-hover:text-[#E50914] transition-colors line-clamp-2 leading-tight">
+                      <h3 className="font-heading font-bold text-base uppercase tracking-tight text-white group-hover:text-[#E6192B] transition-colors line-clamp-2 leading-snug">
                         <Link href={`/blog/${post.slug}`}>
                           {post.title}
                         </Link>
                       </h3>
 
-                      <p className="text-xs text-neutral-400 line-clamp-3 leading-relaxed font-sans">
+                      <p className="text-xs text-[#D1D5DB] line-clamp-3 leading-relaxed font-sans">
                         {post.excerpt || post.body.substring(0, 140) + '...'}
                       </p>
                     </div>
                   </div>
 
-                  {/* Footer / CTA Bar */}
-                  <div className="p-4 pt-3 border-t border-neutral-900 flex items-center justify-between text-xs bg-[#090909]">
+                  {/* Footer Bar */}
+                  <div className="p-4 pt-3 border-t border-neutral-800/80 flex items-center justify-between text-xs bg-[#090909]">
                     <Link
                       href={`/blog/${post.slug}`}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#E50914] group-hover:text-white uppercase tracking-wider transition-colors"
+                      className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-[#E6192B] group-hover:text-white uppercase tracking-wider transition-colors group/read"
                     >
                       <span>READ ARTICLE</span>
-                      <GrungeGlyph name="arrow-right" className="w-3 h-3" />
+                      <HiArrowRight className="w-3.5 h-3.5 transition-transform duration-150 group-hover/read:translate-x-0.5" />
                     </Link>
 
                     <button
                       type="button"
                       onClick={(e) => handleLike(post.id, e)}
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 border transition-all text-[11px] font-mono font-bold shrink-0 ${
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 border transition-all text-[11px] font-mono font-bold shrink-0 rounded-md ${
                         hasLiked
-                          ? 'border-[#E50914] bg-[#220707] text-[#E50914]'
-                          : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-[#E50914] hover:text-white'
+                          ? 'border-[#E6192B] bg-[#220707] text-[#E6192B]'
+                          : 'border-neutral-800 bg-[#121212] text-[#D1D5DB] hover:border-[#E6192B] hover:text-white'
                       }`}
                       title="Like this story"
                     >
-                      <GrungeGlyph
-                        name="heart"
-                        className={`w-3 h-3 ${hasLiked ? 'text-[#E50914] fill-current' : 'text-neutral-500'}`}
-                      />
+                      <HiHeart className="w-3.5 h-3.5 text-[#E6192B]" />
                       <span>{post.likes || 0}</span>
                     </button>
                   </div>

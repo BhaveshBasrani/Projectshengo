@@ -36,42 +36,8 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
   const [newTopicAuthorName, setNewTopicAuthorName] = useState('');
   const [newTopicLoading, setNewTopicLoading] = useState(false);
 
-  // Default initial post if database is completely empty
-  const displayUpdates = useMemo(() => {
-    if (boardUpdates.length > 0) return boardUpdates;
-    return [
-      {
-        id: 'welcome-bulletin',
-        title: 'COMMUNITY BULLETIN & NOTICE BOARD',
-        content: JSON.stringify({
-          body: 'Welcome to the Project S.H.E. Community Bulletin. All urgent notices, upcoming workshops, survivor discussions, and announcements are pinned right here. Feel free to join the conversation and reply below.',
-          card_style: 'zine',
-          image_url: '/assets/headphones-sticker.png',
-          is_banner: true,
-          doodle_icon: 'star',
-          author_name: 'Project S.H.E.',
-          pinned: true,
-          locked: false,
-          likes: 4,
-          liked_by: [],
-          comments: [
-            {
-              id: 'cm-welcome',
-              author_id: 'admin',
-              author_name: 'Project S.H.E. Core',
-              content: 'Leave your thoughts, questions, or solidarity notes below!',
-              created_at: new Date().toISOString(),
-              likes: 2,
-              liked_by: [],
-            },
-          ],
-        }),
-        category: 'Announcement',
-        status: 'published' as const,
-        created_at: new Date().toISOString(),
-      },
-    ];
-  }, [boardUpdates]);
+  // Dynamic updates only - zero dummy data
+  const displayUpdates = boardUpdates;
 
   // Categories list
   const categories = ['All', 'Announcement', 'Discussion', 'Workshop', 'Event / Gig', 'Safehouse Aid', 'Volunteer Call', 'Creative & Art'];
@@ -325,22 +291,20 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
   };
 
   return (
-    <section id="bulletin-board" className="scroll-mt-24 py-16 px-3.5 sm:px-6 max-w-7xl mx-auto select-none relative">
+    <section id="bulletin-board" className="bulletin-board-section scroll-mt-24 py-16 px-3.5 sm:px-6 max-w-7xl mx-auto select-none relative">
       
       {/* Header Bar */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-2 border-neutral-800 pb-5">
+      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#262626] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" />
-            <span className="font-mono text-xs text-[#E50914] uppercase tracking-widest font-black">
-              COMMUNITY BULLETIN &amp; TOPICS
+            <span className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+              // COMMUNITY BULLETIN
             </span>
-            <GrungeGlyph name="star" className="w-3.5 h-3.5 text-[#E50914]" />
           </div>
-          <h2 className="font-heading font-black text-2xl sm:text-4xl uppercase tracking-tight text-white mt-1">
+          <h2 className="font-heading font-black text-2xl sm:text-4xl uppercase tracking-tight text-white mt-1 leading-none">
             COMMUNITY BULLETIN BOARD
           </h2>
-          <p className="font-mono text-xs text-neutral-400 mt-1 max-w-2xl">
+          <p className="font-mono text-xs text-neutral-400 mt-2 max-w-2xl leading-relaxed">
             Interactive community discussions, announcements, workshops, and survivor support topics. Read, reply, and connect.
           </p>
         </div>
@@ -350,33 +314,36 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
           <button
             type="button"
             onClick={() => setNewTopicModalOpen(true)}
-            className="px-4 py-2.5 bg-[#E50914] hover:bg-white text-white hover:text-black font-heading font-black text-xs uppercase tracking-wider transition-all border-2 border-white shadow-[3px_3px_0px_#000000] flex items-center gap-2"
+            className="px-4 py-2.5 bg-[#E6192B] hover:bg-white text-white hover:text-black font-mono text-xs font-bold uppercase tracking-wider transition-all border border-transparent rounded-none flex items-center gap-2 shadow-[2px_2px_0px_#000000]"
           >
-            <GrungeGlyph name="plus" className="w-4 h-4" />
+            <GrungeGlyph name="plus" className="w-3.5 h-3.5" />
             <span>START A TOPIC</span>
           </button>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter Tabs and Search Bar */}
       <div className="mb-6 space-y-3">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full custom-scrollbar">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-wider shrink-0 transition-all border ${
-                  selectedCategory.toLowerCase() === cat.toLowerCase()
-                    ? 'bg-[#E50914] text-white border-[#E50914] shadow-[2px_2px_0px_#000000]'
-                    : 'bg-[#121212] text-neutral-400 border-neutral-800 hover:border-neutral-600 hover:text-white'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          {/* Category Filter Text Links (Clean 11px uppercase links with red hover & active indicator) */}
+          <div className="flex items-center gap-6 overflow-x-auto pb-2 max-w-full custom-scrollbar border-b border-[#262626] sm:border-b-0">
+            {categories.map((cat) => {
+              const isActive = selectedCategory.toLowerCase() === cat.toLowerCase();
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`font-mono text-[11px] uppercase tracking-wider shrink-0 transition-colors duration-150 pb-1 relative ${
+                    isActive
+                      ? 'text-[#E6192B] font-bold border-b-2 border-[#E6192B]'
+                      : 'text-neutral-400 hover:text-[#E6192B] font-medium bulletin-tab-inactive'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Input */}
@@ -386,7 +353,7 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search topics..."
-              className="w-full pl-8 pr-3 py-1.5 bg-[#121212] border border-neutral-800 focus:border-[#E50914] text-white font-mono text-xs outline-none"
+              className="bulletin-search-input w-full pl-8 pr-3 py-2 bg-[#0E0E0E] border border-[#2E2E2E] focus:border-[#E6192B] text-white font-mono text-xs outline-none rounded-none placeholder:text-neutral-500"
             />
             <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-500">
               <GrungeGlyph name="search" className="w-3.5 h-3.5" />
@@ -405,271 +372,71 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
         </div>
       </div>
 
-      {/* The Rectangular Space with Star Grid Gridlines */}
-      <div className="relative border-4 border-neutral-800 bg-[#070707] shadow-[8px_8px_0px_0px_#E50914] overflow-hidden min-h-[400px]">
+      {/* Main Canvas: Flat Negative Space with Sharp 1px Border (No Sci-Fi Corners, No Dotted Grid) */}
+      <div className="bulletin-board-canvas relative border border-[#333333] bg-[#000000] overflow-hidden min-h-[400px] rounded-none">
         
-        {/* Star Grid Canvas Pattern */}
-        <div className="absolute inset-0 bg-star-gridlines opacity-90 pointer-events-none" />
-
-        {/* Ambient Crimson Vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.85)_95%)] pointer-events-none" />
-
-        {/* Framing Hazard Corner Accents */}
-        <div className="absolute top-0 left-0 w-16 h-4 bg-hazard-stripes opacity-90 z-20" />
-        <div className="absolute top-0 right-0 w-16 h-4 bg-hazard-stripes opacity-90 z-20" />
-        <div className="absolute bottom-0 left-0 w-16 h-4 bg-hazard-stripes opacity-90 z-20" />
-        <div className="absolute bottom-0 right-0 w-16 h-4 bg-hazard-stripes opacity-90 z-20" />
-
-        {/* Floating Punk Stickers / Doodles on Canvas Perimeter */}
-        <div className="hidden lg:block absolute top-4 right-10 w-28 h-28 opacity-30 pointer-events-none select-none z-10 rotate-12">
-          <Image
-            src="/assets/discoball-sticker.png"
-            alt="Disco Ball Sticker"
-            fill
-            sizes="112px"
-            className="object-contain drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"
-          />
-        </div>
-        <div className="hidden lg:block absolute bottom-6 left-8 w-24 h-24 opacity-25 pointer-events-none select-none z-10 -rotate-12">
-          <Image
-            src="/assets/headphones-sticker.png"
-            alt="Headphones Sticker"
-            fill
-            sizes="96px"
-            className="object-contain drop-shadow-[0_0_12px_rgba(229,9,20,0.5)]"
-          />
-        </div>
-
-        {/* If no topics match filter */}
-        {filteredUpdates.length === 0 && (
+        {/* Empty States and Content Grid */}
+        {displayUpdates.length === 0 ? (
+          <div className="relative z-10 p-12 sm:p-16 text-center max-w-xl mx-auto my-12 border border-[#333333] bg-[#0E0E0E] rounded-none space-y-4 bulletin-card">
+            <span className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+              // NOTICE BOARD
+            </span>
+            <h3 className="text-white font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight">
+              NO BULLETINS POSTED YET
+            </h3>
+            <p className="text-xs sm:text-sm text-[#A3A3A3] font-sans leading-relaxed">
+              No community bulletins or announcements have been published yet. Be the first to start a conversation or create a topic.
+            </p>
+            <button
+              type="button"
+              onClick={() => setNewTopicModalOpen(true)}
+              className="mt-2 px-6 py-3 bg-[#E6192B] hover:bg-white text-white hover:text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors rounded-none shadow-[2px_2px_0px_#000000]"
+            >
+              + CREATE FIRST TOPIC
+            </button>
+          </div>
+        ) : filteredUpdates.length === 0 ? (
           <div className="relative z-10 p-12 text-center text-neutral-400 font-mono text-xs space-y-3">
             <p className="text-sm text-neutral-300 font-bold">No bulletin topics match your current filter.</p>
             <p className="text-neutral-500">Be the first to start a discussion under this category!</p>
             <button
               type="button"
               onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
-              className="px-3 py-1.5 bg-neutral-900 border border-neutral-700 hover:border-white text-white text-[11px] uppercase tracking-wider"
+              className="px-3 py-1.5 bg-neutral-900 border border-neutral-700 hover:border-white text-white text-[11px] uppercase tracking-wider rounded-none"
             >
               Reset Filters
             </button>
           </div>
-        )}
+        ) : (
+          /* Inner Content Grid - Clean Strictly Typographic Editorial Cards */
+          <div className="relative z-10 p-5 sm:p-8 lg:p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
+            {filteredUpdates.map((update, idx) => {
+              const parsed: ParsedBulletin = parseBulletinPayload(update);
+              const commentCount = parsed.comments?.length || 0;
+              const likeCount = parsed.likes || 0;
+              const isLikedByMe = (parsed.liked_by || []).includes(currentUserId);
 
-        {/* Inner Content Grid */}
-        <div className="relative z-10 p-5 sm:p-8 lg:p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
-          {filteredUpdates.map((update, idx) => {
-            const parsed: ParsedBulletin = parseBulletinPayload(update);
-            const commentCount = parsed.comments?.length || 0;
-            const likeCount = parsed.likes || 0;
-            const isLikedByMe = (parsed.liked_by || []).includes(currentUserId);
-
-            return (
-              <div
-                key={update.id || idx}
-                onClick={() => setSelectedUpdate(update)}
-                className="cursor-pointer transition-all duration-300 hover:-translate-y-1.5 group select-text"
-              >
-                {/* 1. POLAROID STYLE */}
-                {parsed.card_style === 'polaroid' && (
-                  <div className="bg-[#EDEDED] text-black p-3.5 sm:p-4 shadow-[6px_6px_0px_#000000] rotate-[-1deg] group-hover:rotate-0 transition-transform relative">
-                    <div className="zine-tape absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-5 opacity-90 z-20 pointer-events-none" />
-
-                    {/* Image Area */}
-                    <div className="relative w-full h-44 sm:h-48 bg-[#181818] overflow-hidden border border-neutral-300 mb-3 flex items-center justify-center">
-                      {parsed.image_url ? (
-                        <Image
-                          src={parsed.image_url}
-                          alt={update.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-contain p-2 group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="flex flex-col items-center gap-2 text-neutral-400">
-                          <GrungeGlyph name="star" className="w-8 h-8 text-[#E50914]" />
-                          <span className="font-mono text-[10px] uppercase">PROJECT S.H.E.</span>
-                        </div>
-                      )}
-
-                      <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-[#E50914] text-white font-mono text-[9px] font-black uppercase">
-                        {update.category}
-                      </span>
-
-                      {parsed.pinned && (
-                        <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-black text-amber-300 font-mono text-[8px] font-bold uppercase tracking-wider border border-amber-400 flex items-center gap-1">
-                          <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
-                          <span>PINNED</span>
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Caption */}
-                    <div className="space-y-1.5 font-sans">
-                      <h3 className="font-heading font-black text-sm uppercase tracking-tight text-black line-clamp-1">
-                        {update.title}
-                      </h3>
-                      <p className="font-mono text-xs text-neutral-700 line-clamp-2 leading-relaxed">
-                        {parsed.body}
-                      </p>
-                      
-                      {/* Meta bar */}
-                      <div className="pt-2 border-t border-neutral-300 flex items-center justify-between font-mono text-[10px] text-neutral-600">
-                        <div className="flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={(e) => handleLikeBulletin(update.id, e)}
-                            className={`flex items-center gap-1 hover:text-[#E50914] ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
-                          >
-                            <GrungeGlyph name="star" className="w-3 h-3" />
-                            <span>{likeCount}</span>
-                          </button>
-                          <span className="flex items-center gap-1">
-                            <GrungeGlyph name="chat" className="w-3 h-3" />
-                            <span>{commentCount}</span>
-                          </span>
-                        </div>
-                        <span className="text-[#E50914] font-bold group-hover:underline">VIEW &amp; DISCUSS →</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. BRUTALIST STAMP ANNOUNCEMENT STYLE */}
-                {parsed.card_style === 'stamp' && (
-                  <div className="bg-[#120606] border-2 border-[#E50914] p-5 shadow-[6px_6px_0px_#E50914] relative text-white space-y-3">
-                    <div className="flex items-center justify-between">
+              return (
+                <div
+                  key={update.id || idx}
+                  onClick={() => setSelectedUpdate(update)}
+                  className="bulletin-card bg-[#0E0E0E] text-white border border-[#262626] hover:border-[#E6192B] p-5 sm:p-6 flex flex-col justify-between space-y-4 rounded-none transition-all duration-200 cursor-pointer group select-text"
+                >
+                  <div className="space-y-3">
+                    {/* Top Row: Category + Pinned Tag + Date */}
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[9px] font-bold uppercase">
+                        <span className="px-2 py-0.5 bg-[#E6192B] text-white font-mono text-[9px] font-bold uppercase tracking-wider">
                           {update.category}
                         </span>
                         {parsed.pinned && (
-                          <span className="text-amber-400 font-mono text-[9px] font-bold flex items-center gap-1">
-                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
-                            <span>PINNED</span>
+                          <span className="border border-[#E6192B] text-[#E6192B] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider">
+                            PINNED
                           </span>
                         )}
-                      </div>
-                      <span className="border border-[#E50914] text-[#E50914] px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
-                        <GrungeGlyph name="bolt" className="w-2.5 h-2.5" />
-                        <span>OFFICIAL</span>
-                      </span>
-                    </div>
-
-                    <h3 className="font-heading font-black text-base uppercase text-white tracking-tight leading-snug">
-                      {update.title}
-                    </h3>
-
-                    {parsed.image_url && (
-                      <div className="relative w-full h-32 bg-black border border-neutral-800 overflow-hidden">
-                        <Image
-                          src={parsed.image_url}
-                          alt={update.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-contain p-2"
-                        />
-                      </div>
-                    )}
-
-                    <p className="font-sans text-xs text-neutral-300 leading-relaxed line-clamp-3">
-                      {parsed.body}
-                    </p>
-
-                    <div className="pt-2 border-t border-red-950 flex items-center justify-between font-mono text-xs">
-                      <div className="flex items-center gap-3 text-neutral-400 text-[10px]">
-                        <button
-                          type="button"
-                          onClick={(e) => handleLikeBulletin(update.id, e)}
-                          className={`flex items-center gap-1 hover:text-white ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
-                        >
-                          <GrungeGlyph name="star" className="w-3 h-3" />
-                          <span>{likeCount}</span>
-                        </button>
-                        <span className="flex items-center gap-1">
-                          <GrungeGlyph name="chat" className="w-3 h-3" />
-                          <span>{commentCount}</span>
-                        </span>
-                      </div>
-                      <span className="text-[#E50914] font-bold group-hover:underline text-[10px]">READ &amp; DISCUSS →</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. PUNK DOODLE STYLE */}
-                {parsed.card_style === 'doodle' && (
-                  <div className="bg-[#0D0D0D] border-2 border-dashed border-neutral-700 p-5 relative text-white space-y-3 rotate-[1deg] group-hover:rotate-0 transition-transform shadow-[4px_4px_0px_#222222]">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 bg-neutral-800 text-white font-mono text-[9px] uppercase">
-                          {update.category}
-                        </span>
-                        {parsed.pinned && (
-                          <span className="text-amber-400 font-mono text-[9px] flex items-center gap-1">
-                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
-                            <span>PINNED</span>
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[#E50914] text-xs font-bold flex items-center gap-1">
-                        <GrungeGlyph name="edit" className="w-3 h-3" />
-                        <span>DOODLE</span>
-                      </span>
-                    </div>
-
-                    <h3 className="font-heading font-black text-base uppercase tracking-tight text-white leading-tight">
-                      {update.title}
-                    </h3>
-
-                    {parsed.image_url && (
-                      <div className="relative w-full h-32 bg-black border border-dashed border-neutral-700 overflow-hidden">
-                        <Image
-                          src={parsed.image_url}
-                          alt={update.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-contain p-2"
-                        />
-                      </div>
-                    )}
-
-                    <p className="font-mono text-xs text-neutral-300 leading-relaxed line-clamp-3">
-                      {parsed.body}
-                    </p>
-
-                    <div className="pt-2 border-t border-neutral-800 flex items-center justify-between font-mono text-[10px]">
-                      <div className="flex items-center gap-3 text-neutral-400">
-                        <button
-                          type="button"
-                          onClick={(e) => handleLikeBulletin(update.id, e)}
-                          className={`flex items-center gap-1 hover:text-white ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
-                        >
-                          <GrungeGlyph name="star" className="w-3 h-3" />
-                          <span>{likeCount}</span>
-                        </button>
-                        <span className="flex items-center gap-1">
-                          <GrungeGlyph name="chat" className="w-3 h-3" />
-                          <span>{commentCount}</span>
-                        </span>
-                      </div>
-                      <span className="text-[#E50914] font-bold group-hover:underline">VIEW &amp; REPLY →</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. ZINE NOTE STYLE (DEFAULT) */}
-                {(!parsed.card_style || parsed.card_style === 'zine') && (
-                  <div className="bg-[#121212] border-2 border-neutral-800 p-5 relative text-white space-y-3 shadow-[6px_6px_0px_#000000]">
-                    <div className="zine-tape absolute -top-2 left-6 w-16 h-4 opacity-80 pointer-events-none" />
-
-                    <div className="flex items-center justify-between pt-1">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[9px] font-bold uppercase">
-                          {update.category}
-                        </span>
-                        {parsed.pinned && (
-                          <span className="text-amber-400 font-mono text-[9px] font-bold flex items-center gap-1">
-                            <GrungeGlyph name="pin" className="w-2.5 h-2.5 text-amber-400" />
-                            <span>PINNED</span>
+                        {parsed.locked && (
+                          <span className="border border-neutral-700 text-neutral-400 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider">
+                            LOCKED
                           </span>
                         )}
                       </div>
@@ -678,53 +445,59 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                       </span>
                     </div>
 
-                    <h3 className="font-heading font-black text-base uppercase tracking-tight text-white leading-tight">
+                    {/* Title */}
+                    <h3 className="font-heading font-bold text-base sm:text-lg uppercase tracking-tight text-white line-clamp-2 leading-snug group-hover:text-[#E6192B] transition-colors">
                       {update.title}
                     </h3>
 
+                    {/* Image (strictly if real image provided, otherwise omit completely) */}
                     {parsed.image_url && (
-                      <div className="relative w-full h-36 bg-black border border-neutral-800 overflow-hidden">
+                      <div className="relative w-full h-40 bg-black overflow-hidden border border-[#262626]">
                         <Image
                           src={parsed.image_url}
                           alt={update.title}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                     )}
 
-                    <p className="font-sans text-xs text-neutral-300 leading-relaxed line-clamp-3">
+                    {/* Body text */}
+                    <p className="font-sans text-xs sm:text-[13px] text-neutral-300 line-clamp-3 leading-relaxed">
                       {parsed.body}
                     </p>
+                  </div>
 
-                    <div className="pt-3 border-t border-neutral-800 flex items-center justify-between font-mono text-xs">
-                      <div className="flex items-center gap-3 text-neutral-400 text-[10px]">
-                        <button
-                          type="button"
-                          onClick={(e) => handleLikeBulletin(update.id, e)}
-                          className={`flex items-center gap-1 hover:text-white ${isLikedByMe ? 'text-[#E50914] font-bold' : ''}`}
-                        >
-                          <GrungeGlyph name="star" className="w-3 h-3" />
-                          <span>{likeCount}</span>
-                        </button>
-                        <span className="flex items-center gap-1">
-                          <GrungeGlyph name="chat" className="w-3 h-3" />
-                          <span>{commentCount}</span>
-                        </span>
-                      </div>
-                      <span className="text-[#E50914] font-bold flex items-center gap-1 group-hover:underline text-[10px]">
-                        <span>READ &amp; DISCUSS</span>
-                        <GrungeGlyph name="arrow-right" className="w-3 h-3" />
+                  {/* Bottom Meta Row */}
+                  <div className="pt-3 border-t border-[#262626] bulletin-card-meta flex items-center justify-between font-mono text-[10px] text-neutral-400">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={(e) => handleLikeBulletin(update.id, e)}
+                        className={`flex items-center gap-1.5 hover:text-[#E6192B] transition-colors ${
+                          isLikedByMe ? 'text-[#E6192B] font-bold' : ''
+                        }`}
+                      >
+                        <GrungeGlyph name="star" className="w-3 h-3" />
+                        <span>{likeCount}</span>
+                      </button>
+                      <span className="flex items-center gap-1.5">
+                        <GrungeGlyph name="chat" className="w-3 h-3" />
+                        <span>{commentCount}</span>
                       </span>
                     </div>
-                  </div>
-                )}
 
-              </div>
-            );
-          })}
-        </div>
+                    <span className="text-[#E6192B] font-bold flex items-center gap-1.5 group-hover:underline">
+                      <span>READ &amp; DISCUSS</span>
+                      <GrungeGlyph name="arrow-right" className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
       </div>
 
@@ -742,11 +515,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
             onClick={() => setSelectedUpdate(null)}
           >
             <div
-              className="w-full max-w-3xl my-auto bg-[#0E0E0E] border-2 border-[#E50914] shadow-[8px_8px_0px_0px_#000000] text-white flex flex-col max-h-[88vh] relative overflow-hidden"
+              className="bulletin-modal w-full max-w-3xl my-auto bg-[#0E0E0E] border border-[#333333] shadow-[4px_4px_0px_#000000] text-white flex flex-col max-h-[88vh] relative overflow-hidden rounded-none"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Sticky Header */}
-              <div className="p-4 sm:p-5 border-b border-neutral-800 bg-[#121212] flex items-center justify-between shrink-0">
+              <div className="modal-header p-4 sm:p-5 border-b border-[#262626] bg-[#121212] flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 bg-[#E50914] text-white font-mono text-[10px] font-bold uppercase tracking-wider">
                     {selectedUpdate.category}
@@ -1084,11 +857,11 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
           onClick={() => setNewTopicModalOpen(false)}
         >
           <div
-            className="w-full max-w-xl my-auto bg-[#0E0E0E] border-2 border-[#E50914] shadow-[8px_8px_0px_0px_#000000] text-white flex flex-col max-h-[90vh] overflow-hidden"
+            className="bulletin-modal w-full max-w-xl my-auto bg-[#0E0E0E] border border-[#333333] shadow-[4px_4px_0px_#000000] text-white flex flex-col max-h-[90vh] overflow-hidden rounded-none"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-4 sm:p-5 border-b border-neutral-800 bg-[#121212] flex items-center justify-between shrink-0">
+            <div className="modal-header p-4 sm:p-5 border-b border-[#262626] bg-[#121212] flex items-center justify-between shrink-0">
               <div>
                 <span className="text-[10px] text-[#E50914] uppercase font-mono font-bold tracking-wider block">
                   COMMUNITY DISCUSSION FORUM
@@ -1189,39 +962,17 @@ export default function BulletinBoard({ updates: initialUpdates }: BulletinBoard
                 />
               </div>
 
-              {/* Attach Sticker or Picture */}
+              {/* Optional Image Attachment */}
               <div>
-                <label className="block uppercase text-[11px] text-neutral-400 mb-1 font-bold">
-                  Attach Sticker or Image URL (Optional)
+                <label className="block uppercase text-[11px] text-neutral-400 mb-1 font-bold font-mono">
+                  Image Attachment URL (Optional)
                 </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {[
-                    { label: 'None', val: '', glyph: null },
-                    { label: 'HEADPHONES', val: '/assets/headphones-sticker.png', glyph: 'headphones' as const },
-                    { label: 'DISCO BALL', val: '/assets/discoball-sticker.png', glyph: 'disc' as const },
-                    { label: 'SPIRAL STAR', val: '/assets/punk-red-spiral-star-clean.png', glyph: 'sparkle' as const },
-                  ].map((stk) => (
-                    <button
-                      key={stk.val}
-                      type="button"
-                      onClick={() => setNewTopicImageUrl(stk.val)}
-                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors flex items-center gap-1.5 ${
-                        newTopicImageUrl === stk.val
-                          ? 'border-[#E50914] bg-[#E50914] text-white font-bold'
-                          : 'border-neutral-800 bg-[#161616] text-neutral-400 hover:border-neutral-600'
-                      }`}
-                    >
-                      {stk.glyph && <GrungeGlyph name={stk.glyph} className="w-3 h-3 text-[#E50914]" />}
-                      <span>{stk.label}</span>
-                    </button>
-                  ))}
-                </div>
                 <input
-                  type="text"
+                  type="url"
                   value={newTopicImageUrl}
                   onChange={(e) => setNewTopicImageUrl(e.target.value)}
-                  placeholder="Or paste external image URL (https://...)"
-                  className="w-full p-2 bg-[#141414] border border-neutral-700 text-white text-[11px] outline-none focus:border-[#E50914]"
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white font-mono text-xs outline-none focus:border-[#E50914] rounded-none"
                 />
               </div>
 

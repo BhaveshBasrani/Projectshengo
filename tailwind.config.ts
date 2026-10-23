@@ -47,11 +47,13 @@ const config: Config = {
         'brutal-white-lg': '8px 8px 0px 0px #EDEDED',
       },
       fontFamily: {
-        heading: ['Plus Jakarta Sans', 'Inter', '-apple-system', 'sans-serif'],
-        sans: ['Plus Jakarta Sans', 'Inter', '-apple-system', 'sans-serif'],
-        body: ['Inter', 'Plus Jakarta Sans', '-apple-system', 'sans-serif'],
+        heading: ['Oswald', 'Syncopate', 'Plus Jakarta Sans', 'sans-serif'],
+        oswald: ['Oswald', 'sans-serif'],
+        syncopate: ['Syncopate', 'sans-serif'],
+        space: ['Space Grotesk', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'sans-serif'],
+        body: ['Inter', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
-        glitch: ['Rubik Glitch', 'Impact', 'cursive'],
       },
       animation: {
         'marquee': 'marquee 24s linear infinite',

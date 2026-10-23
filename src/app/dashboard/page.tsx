@@ -78,7 +78,7 @@ export default function UserDashboard() {
 
   if (loading || (!user && loading)) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center font-mono">
+      <div className="min-h-screen punk-loader-screen bg-[#080808] flex items-center justify-center font-mono">
         <PunkLoader
           label="LOADING DASHBOARD"
           sublabel="PLEASE WAIT A MOMENT"
@@ -94,31 +94,30 @@ export default function UserDashboard() {
     <div className="pt-28 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono">
       
       {/* Top Banner Header */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b-2 border-neutral-800 relative">
-        <div className="zine-tape absolute -top-4 left-6 z-10 hidden sm:block" />
+      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-neutral-300 dark:border-neutral-800 relative">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#E50914] uppercase tracking-widest font-black">
+            <span className="text-xs text-[#E6192B] uppercase tracking-widest font-bold">
               [MEMBER DASHBOARD]
             </span>
-            <span className="px-2 py-0.5 bg-neutral-900 text-[10px] text-emerald-400 border border-emerald-900 font-bold stencil-cut">
+            <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-900 text-[10px] text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-900 font-bold rounded-sm">
               AUTHENTICATED
             </span>
           </div>
-          <h1 className="font-heading font-black text-3xl sm:text-5xl uppercase tracking-tight text-white flex items-center gap-3">
+          <h1 className="font-heading font-black text-3xl sm:text-5xl uppercase tracking-tight text-[#0A0A0A] dark:text-white flex items-center gap-3">
             <span>WELCOME, {profile?.display_name || user.displayName || user.email?.split('@')[0]}</span>
-            <GrungeGlyph name="star" className="w-5 h-5 text-[#E50914] shrink-0 inline-block" />
+            <GrungeGlyph name="star" className="w-5 h-5 text-[#E6192B] shrink-0 inline-block" />
           </h1>
-          <p className="text-xs text-neutral-400">
-            Account ID: <span className="font-mono text-neutral-300 bg-neutral-900 px-1.5 py-0.5 border border-neutral-800">{user.uid}</span>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400">
+            Account ID: <span className="font-mono text-neutral-800 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-900 px-2 py-0.5 border border-neutral-300 dark:border-neutral-800 rounded-sm">{user.uid}</span>
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <button
             type="button"
             onClick={() => setReviewModalOpen(true)}
-            className="px-4 py-2.5 bg-[#E50914] text-white hover:bg-white hover:text-black text-xs font-bold uppercase transition-all shadow-[3px_3px_0px_0px_#000000] flex items-center gap-1.5 stencil-cut border border-[#E50914]"
+            className="px-4 py-2 bg-[#E6192B] text-white hover:bg-[#d01424] text-xs font-bold uppercase transition-all shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 rounded-sm border border-[#E6192B] hover-lift"
           >
             <GrungeGlyph name="star" className="w-3.5 h-3.5" />
             <span>SUBMIT REVIEW</span>
@@ -126,15 +125,15 @@ export default function UserDashboard() {
           <button
             type="button"
             onClick={() => setFeedbackModalOpen(true)}
-            className="px-4 py-2.5 bg-[#141414] border border-neutral-700 hover:border-[#E50914] text-white text-xs font-bold uppercase transition-all flex items-center gap-1.5 stencil-cut"
+            className="px-4 py-2 bg-[#FAF8F3] dark:bg-[#141414] border border-[#0A0A0A] dark:border-neutral-700 hover:border-[#E6192B] text-[#0A0A0A] dark:text-white text-xs font-bold uppercase transition-all flex items-center gap-1.5 rounded-sm shadow-[2px_2px_0px_0px_#0A0A0A] dark:shadow-[2px_2px_0px_0px_#000000] hover-lift"
           >
-            <GrungeGlyph name="message" className="w-3.5 h-3.5 text-[#E50914]" />
+            <GrungeGlyph name="message" className="w-3.5 h-3.5 text-[#E6192B]" />
             <span>SEND SUGGESTION</span>
           </button>
           <button
             type="button"
             onClick={() => logout()}
-            className="p-2.5 border border-neutral-700 hover:bg-[#E50914] hover:border-[#E50914] hover:text-white transition-all text-xs stencil-cut text-neutral-400 hover:text-white"
+            className="p-2 border border-neutral-300 dark:border-neutral-700 hover:bg-[#E6192B] hover:border-[#E6192B] hover:text-white transition-all text-xs rounded-sm text-neutral-500 dark:text-neutral-400 hover:text-white"
             title="Sign Out"
           >
             <GrungeGlyph name="logout" className="w-4 h-4" />
@@ -148,32 +147,10 @@ export default function UserDashboard() {
         <div className="lg:col-span-5 space-y-6">
           
           {/* Profile Card */}
-          <div className="p-6 bg-[#0E0E0E] border-2 border-neutral-800 text-[#F4F1EA] shadow-[6px_6px_0px_0px_#000000] space-y-4 relative overflow-hidden stencil-cut">
-            {/* Real Extracted Tribal Lily Watermark */}
-            <div className="absolute -top-10 -right-10 w-36 h-56 opacity-15 pointer-events-none z-0 rotate-12">
-              <Image
-                src="/assets/punk-lily-clean.png"
-                alt="Tribal Lily"
-                fill
-                sizes="144px"
-                className="object-contain"
-              />
-            </div>
-
-            {/* Permitted Polly Stars Watermark */}
-            <div className="absolute -bottom-8 -right-8 w-44 h-44 opacity-10 pointer-events-none z-0">
-              <Image
-                src="/assets/punk-polly-stars-clean.png"
-                alt="Polly Stars Watermark"
-                fill
-                sizes="176px"
-                className="object-contain"
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-3 relative z-10">
-              <span className="font-heading font-black text-sm uppercase text-[#E50914] tracking-wider flex items-center gap-2">
-                <GrungeGlyph name="user" className="w-4 h-4 text-[#E50914]" />
+          <div className="p-6 bg-[#FAF8F3] dark:bg-[#0E0E0E] border border-[#0A0A0A] dark:border-neutral-800 text-[#0A0A0A] dark:text-[#F4F1EA] shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_#000000] space-y-4 relative overflow-hidden rounded-sm">
+            <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3 relative z-10">
+              <span className="font-heading font-black text-sm uppercase text-[#E6192B] tracking-wider flex items-center gap-2">
+                <GrungeGlyph name="user" className="w-4 h-4 text-[#E6192B]" />
                 <span>MY PROFILE</span>
               </span>
               <span className="text-[10px] text-neutral-500 uppercase font-mono">
@@ -192,32 +169,32 @@ export default function UserDashboard() {
                       type="text"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="p-2 bg-[#141414] border border-[#E50914] text-white outline-none flex-1 text-xs font-mono"
+                      className="p-2 bg-white dark:bg-[#141414] border border-[#E6192B] text-[#0A0A0A] dark:text-white outline-none flex-1 text-xs font-mono rounded-sm"
                     />
                     <button
                       type="button"
                       onClick={handleSaveName}
-                      className="px-3 py-2 bg-[#E50914] text-white font-bold text-xs stencil-cut"
+                      className="px-3 py-2 bg-[#E6192B] text-white font-bold text-xs rounded-sm"
                     >
                       SAVE
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingName(false)}
-                      className="px-2 py-2 border border-neutral-700 text-neutral-400 text-xs"
+                      className="px-2 py-2 border border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 text-xs rounded-sm"
                     >
                       CANCEL
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between mt-1 bg-[#141414] p-2 border border-neutral-800">
-                    <span className="text-white font-bold text-sm">
+                  <div className="flex items-center justify-between mt-1 bg-white dark:bg-[#141414] p-2.5 border border-neutral-300 dark:border-neutral-800 rounded-sm">
+                    <span className="text-[#0A0A0A] dark:text-white font-bold text-sm">
                       {profile?.display_name || user.displayName || 'No display name'}
                     </span>
                     <button
                       type="button"
                       onClick={() => setEditingName(true)}
-                      className="text-neutral-400 hover:text-[#E50914] p-1 transition-colors"
+                      className="text-neutral-400 hover:text-[#E6192B] p-1 transition-colors"
                       title="Edit Display Name"
                     >
                       <GrungeGlyph name="edit" className="w-3.5 h-3.5" />
@@ -230,8 +207,8 @@ export default function UserDashboard() {
                 <label className="text-[10px] text-neutral-500 uppercase block font-bold">
                   Email Address
                 </label>
-                <div className="flex items-center gap-2 mt-1 text-neutral-300 bg-[#141414] p-2 border border-neutral-800">
-                  <GrungeGlyph name="mail" className="w-3.5 h-3.5 text-[#E50914]" />
+                <div className="flex items-center gap-2 mt-1 text-neutral-800 dark:text-neutral-300 bg-white dark:bg-[#141414] p-2.5 border border-neutral-300 dark:border-neutral-800 rounded-sm">
+                  <GrungeGlyph name="mail" className="w-3.5 h-3.5 text-[#E6192B]" />
                   <span>{user.email}</span>
                 </div>
               </div>
@@ -240,8 +217,8 @@ export default function UserDashboard() {
                 <label className="text-[10px] text-neutral-500 uppercase block font-bold">
                   Member Since
                 </label>
-                <div className="flex items-center gap-2 mt-1 text-neutral-400 text-[11px] bg-[#141414] p-2 border border-neutral-800">
-                  <GrungeGlyph name="calendar" className="w-3.5 h-3.5 text-[#E50914]" />
+                <div className="flex items-center gap-2 mt-1 text-neutral-600 dark:text-neutral-400 text-[11px] bg-white dark:bg-[#141414] p-2.5 border border-neutral-300 dark:border-neutral-800 rounded-sm">
+                  <GrungeGlyph name="calendar" className="w-3.5 h-3.5 text-[#E6192B]" />
                   <span>
                     {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Active'}
                   </span>
@@ -250,9 +227,9 @@ export default function UserDashboard() {
             </div>
 
             {/* Newsletter Subscription Toggle */}
-            <div className="pt-4 border-t border-neutral-800 flex items-center justify-between relative z-10">
+            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between relative z-10">
               <div>
-                <span className="text-xs font-bold text-white block">Email Newsletter</span>
+                <span className="text-xs font-bold text-[#0A0A0A] dark:text-white block">Email Newsletter</span>
                 <span className="text-[10px] text-neutral-500">
                   {profile?.email_subscribed ? 'Subscribed to NGO news' : 'Unsubscribed'}
                 </span>
@@ -260,42 +237,30 @@ export default function UserDashboard() {
               <button
                 type="button"
                 onClick={handleToggleSubscription}
-                className="text-[#E50914] hover:scale-105 transition-transform"
+                className="text-[#E6192B] hover:scale-105 transition-transform"
                 title="Toggle subscription"
               >
                 {profile?.email_subscribed ? (
-                  <GrungeGlyph name="toggle-right" className="w-8 h-8 text-[#E50914]" />
+                  <GrungeGlyph name="toggle-right" className="w-8 h-8 text-[#E6192B]" />
                 ) : (
-                  <GrungeGlyph name="toggle-left" className="w-8 h-8 text-neutral-600" />
+                  <GrungeGlyph name="toggle-left" className="w-8 h-8 text-neutral-400 dark:text-neutral-600" />
                 )}
               </button>
             </div>
           </div>
 
           {/* External Google Forms Access Hub */}
-          <div className="p-6 bg-[#0E0E0E] border-2 border-neutral-800 text-[#F4F1EA] shadow-[6px_6px_0px_0px_#000000] space-y-4 relative stencil-cut">
-            {/* Pinned Polly Barbed Star Sticker */}
-            <div className="absolute -top-3 -right-3 w-14 h-20 pointer-events-none z-20">
-              <div className="zine-tape absolute -top-2 left-1 z-10 scale-50" />
-              <Image
-                src="/assets/punk-polly-stars-clean.png"
-                alt="Polly Star"
-                fill
-                sizes="56px"
-                className="object-contain drop-shadow-[0_0_6px_rgba(229,9,20,0.5)] rotate-6"
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <span className="font-heading font-black text-sm uppercase text-[#E50914] tracking-wider flex items-center gap-2">
-                <GrungeGlyph name="file" className="w-4 h-4 text-[#E50914]" />
+          <div className="p-6 bg-[#FAF8F3] dark:bg-[#0E0E0E] border border-[#0A0A0A] dark:border-neutral-800 text-[#0A0A0A] dark:text-[#F4F1EA] shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_#000000] space-y-4 relative rounded-sm">
+            <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
+              <span className="font-heading font-black text-sm uppercase text-[#E6192B] tracking-wider flex items-center gap-2">
+                <GrungeGlyph name="file" className="w-4 h-4 text-[#E6192B]" />
                 <span>EXTERNAL FORMS</span>
               </span>
-              <span className="text-[10px] text-neutral-400 font-mono">GOOGLE FORMS</span>
+              <span className="text-[10px] text-neutral-500 uppercase font-mono">GOOGLE FORMS</span>
             </div>
 
-            <div className="p-3 bg-[#141414] border border-neutral-800 text-[10px] text-neutral-400 leading-relaxed font-sans">
-              <strong className="text-white">Note:</strong> Team applications, art submissions, and personal stories open directly in Google Forms.
+            <div className="p-3 bg-white dark:bg-[#141414] border border-neutral-200 dark:border-neutral-800 text-[10px] text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans rounded-sm">
+              <strong className="text-[#0A0A0A] dark:text-white">Note:</strong> Team applications, art submissions, and personal stories open directly in Google Forms.
             </div>
 
             <div className="space-y-2.5">
@@ -303,7 +268,7 @@ export default function UserDashboard() {
                 href={config?.google_form_team_app || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 bg-[#141414] hover:bg-[#1A1A1A] border border-neutral-700 hover:border-[#E50914] flex items-center justify-between text-xs transition-colors group stencil-cut relative overflow-hidden"
+                className="p-3 bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1A1A1A] border border-neutral-200 dark:border-neutral-700 hover:border-[#E6192B] flex items-center justify-between text-xs transition-colors group rounded-sm relative overflow-hidden"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-10 relative shrink-0">
@@ -316,20 +281,20 @@ export default function UserDashboard() {
                     />
                   </div>
                   <div>
-                    <span className="font-bold text-white block group-hover:text-[#E50914]">
+                    <span className="font-bold text-[#0A0A0A] dark:text-white block group-hover:text-[#E6192B]">
                       Main Team Application
                     </span>
                     <span className="text-[10px] text-neutral-500 font-sans">Volunteer &amp; Core Staff</span>
                   </div>
                 </div>
-                <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E50914]" />
+                <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E6192B]" />
               </a>
 
               <a
                 href={config?.google_form_artwork_poetry || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 bg-[#141414] hover:bg-[#1A1A1A] border border-neutral-700 hover:border-[#E50914] flex items-center justify-between text-xs transition-colors group stencil-cut relative overflow-hidden"
+                className="p-3 bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1A1A1A] border border-neutral-200 dark:border-neutral-700 hover:border-[#E6192B] flex items-center justify-between text-xs transition-colors group rounded-sm relative overflow-hidden"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 relative shrink-0">
@@ -342,20 +307,20 @@ export default function UserDashboard() {
                     />
                   </div>
                   <div>
-                    <span className="font-bold text-white block group-hover:text-[#E50914]">
+                    <span className="font-bold text-[#0A0A0A] dark:text-white block group-hover:text-[#E6192B]">
                       Artwork &amp; Poetry Submissions
                     </span>
                     <span className="text-[10px] text-neutral-500 font-sans">Writing, poems, and creative artwork</span>
                   </div>
                 </div>
-                <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E50914]" />
+                <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E6192B]" />
               </a>
 
               <a
                 href={config?.google_form_anonymous_confessions || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-3 bg-[#141414] hover:bg-[#1A1A1A] border border-neutral-700 hover:border-[#E50914] flex items-center justify-between text-xs transition-colors group stencil-cut relative overflow-hidden"
+                className="p-3 bg-white dark:bg-[#141414] hover:bg-neutral-50 dark:hover:bg-[#1A1A1A] border border-neutral-200 dark:border-neutral-700 hover:border-[#E6192B] flex items-center justify-between text-xs transition-colors group rounded-sm relative overflow-hidden"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 relative shrink-0">
@@ -368,13 +333,13 @@ export default function UserDashboard() {
                     />
                   </div>
                   <div>
-                    <span className="font-bold text-white block group-hover:text-[#E50914]">
+                    <span className="font-bold text-[#0A0A0A] dark:text-white block group-hover:text-[#E6192B]">
                       Anonymous Confessions
                     </span>
                     <span className="text-[10px] text-neutral-500 font-sans">Safe &amp; Confidential Submissions</span>
                   </div>
                 </div>
-                <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E50914]" />
+                <GrungeGlyph name="external" className="w-4 h-4 text-neutral-400 group-hover:text-[#E6192B]" />
               </a>
             </div>
           </div>

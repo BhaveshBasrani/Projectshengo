@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/firebase/auth-context';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import { isAuthorizedAdminEmail } from '@/lib/admin/auth';
 import { auth } from '@/lib/firebase/config';
+import { HiCheck, HiArrowLeft } from 'react-icons/hi2';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -170,20 +171,25 @@ export default function LoginPage() {
         {authMode === 'magic-link' && (
           <div>
             {magicLinkSent ? (
-              <div className="p-4 border border-emerald-500 bg-emerald-950/40 text-emerald-200 text-xs space-y-3 text-center stencil-cut">
-                <GrungeGlyph name="check" className="w-8 h-8 text-emerald-400 mx-auto animate-bounce" />
-                <div className="space-y-1">
-                  <h3 className="font-heading font-black text-sm uppercase">Sign-in Link Sent!</h3>
-                  <p className="text-[11px] text-emerald-300 font-sans leading-relaxed">
-                    We sent a login link to <strong>{email}</strong>. Open your email and click the link to log in directly without a password.
+              <div className="p-6 border border-[#0A0A0A] dark:border-neutral-800 bg-[#FAF8F3] dark:bg-[#111111] text-[#0A0A0A] dark:text-white text-xs space-y-4 text-center rounded-sm shadow-[3px_3px_0px_0px_#0A0A0A] dark:shadow-[3px_3px_0px_0px_#000000]">
+                <div className="w-10 h-10 mx-auto rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-600/30 dark:border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                  <HiCheck className="w-5 h-5" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-heading font-black text-sm uppercase tracking-tight text-[#0A0A0A] dark:text-white">
+                    Sign-in Link Sent!
+                  </h3>
+                  <p className="text-[11px] text-neutral-600 dark:text-neutral-300 font-sans leading-relaxed">
+                    We sent a login link to <strong className="font-mono text-[#0A0A0A] dark:text-white bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded-sm">{email}</strong>. Open your email and click the link to log in directly without a password.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMagicLinkSent(false)}
-                  className="text-[10px] text-neutral-400 hover:text-white underline"
+                  className="text-[11px] text-[#E6192B] hover:underline font-mono font-bold inline-flex items-center gap-1 pt-1"
                 >
-                  Send to a different email
+                  <HiArrowLeft className="w-3 h-3" />
+                  <span>Send to a different email</span>
                 </button>
               </div>
             ) : (

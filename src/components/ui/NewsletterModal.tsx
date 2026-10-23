@@ -74,24 +74,20 @@ export default function NewsletterModal() {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg bg-[#0E0E0E] text-[#F4F1EA] border-2 border-[#E50914] shadow-[10px_10px_0px_0px_#E50914] p-8 md:p-10 font-mono transition-all duration-300 animate-in zoom-in-95 stencil-cut"
+        className="relative w-full max-w-lg bg-[#0E0E0E] text-[#F4F1EA] border border-neutral-800 rounded-md shadow-2xl p-8 md:p-10 font-mono transition-all duration-300 animate-in zoom-in-95"
       >
-        {/* Decorative corner accents */}
-        <div className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-[#E50914]" />
-        <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-[#E50914]" />
-
         {/* Close button */}
         <button
           onClick={handleClose}
           aria-label="Close dialog"
-          className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white hover:bg-neutral-900 border border-transparent hover:border-neutral-800 transition-colors"
+          className="absolute top-4 right-4 p-2 text-neutral-400 hover:text-white hover:bg-neutral-900 border border-transparent hover:border-neutral-800 rounded-md transition-colors"
         >
           <GrungeGlyph name="close" className="w-5 h-5" />
         </button>
 
         {success ? (
           <div className="py-8 text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-red-950/60 border border-[#E50914] text-[#E50914] mx-auto animate-bounce">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-red-950/60 border border-[#E50914] text-[#E50914] mx-auto rounded-md animate-bounce">
               <GrungeGlyph name="check" className="w-7 h-7" />
             </div>
             <div className="space-y-1">
@@ -124,7 +120,7 @@ export default function NewsletterModal() {
             </div>
 
             {error && (
-              <div className="p-2.5 bg-red-950/40 border border-[#E50914] text-[#FF6B6B] text-[11px] flex items-center gap-2">
+              <div className="p-2.5 bg-red-950/40 border border-[#E50914] text-[#FF6B6B] text-[11px] flex items-center gap-2 rounded-md">
                 <GrungeGlyph name="alert" className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -142,14 +138,14 @@ export default function NewsletterModal() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="w-full pl-10 pr-4 py-3.5 bg-[#141414] border border-neutral-700 focus:border-[#E50914] text-white text-xs placeholder:text-neutral-600 outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-3.5 bg-[#141414] border border-neutral-800 rounded-md focus:border-[#E50914] text-white text-xs placeholder:text-neutral-600 outline-none transition-all"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-xs uppercase tracking-widest transition-all border border-[#E50914] shadow-[4px_4px_0px_0px_#000000] disabled:opacity-50 flex items-center justify-center gap-2 group"
+                className="w-full py-3.5 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-xs uppercase tracking-widest transition-all border border-transparent rounded-md disabled:opacity-50 flex items-center justify-center gap-2 group"
               >
                 <span>{loading ? 'SUBSCRIBING...' : 'SUBSCRIBE TO NEWSLETTER'}</span>
                 <GrungeGlyph name="arrow-right" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

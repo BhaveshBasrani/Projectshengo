@@ -56,7 +56,7 @@ export default function FloatingNavbar() {
             setLatestReview(null);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     } else {
       setLatestReview(null);
     }
@@ -83,6 +83,7 @@ export default function FloatingNavbar() {
 
   const navLinks = [
     { label: 'ABOUT', href: '/#mission' },
+    { label: 'GALLERY', href: '/gallery' },
     { label: 'BULLETIN', href: '/bulletin' },
     { label: 'GET INVOLVED', href: '/#external-forms' },
     { label: 'DONATE', href: '/#donate' },
@@ -107,21 +108,19 @@ export default function FloatingNavbar() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 z-50 select-none transition-all duration-300 ease-out ${
-          isDocked
-            ? 'top-[44px] sm:top-[48px] w-full px-0 max-w-none bg-[#0A0A0A]/95 backdrop-blur-md border-b-2 border-[#E50914] shadow-[0_8px_24px_rgba(0,0,0,0.85)]'
+        className={`fixed left-0 right-0 z-50 select-none transition-all duration-300 ease-out ${isDocked
+            ? 'top-[44px] sm:top-[48px] w-full px-0 max-w-none bg-[#0A0A0A]/95 backdrop-blur-md border-b border-neutral-800/80 shadow-md'
             : 'top-3 sm:top-4 px-3 sm:px-6 max-w-7xl mx-auto bg-transparent border-none shadow-none'
-        }`}
+          }`}
       >
         <nav
-          className={`w-full transition-all duration-300 flex items-center justify-between relative ${
-            isDocked
+          className={`w-full transition-all duration-300 flex items-center justify-between relative ${isDocked
               ? 'max-w-7xl mx-auto px-3.5 sm:px-6 py-2 text-[#EDEDED] bg-transparent border-0 shadow-none'
-              : 'border-2 bg-[#0A0A0A]/95 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md'
-          }`}
+              : 'rounded-sm border border-white/25 sm:border-white/30 bg-[#0A0A0A]/95 text-[#EDEDED] px-3.5 sm:px-4 py-2.5 backdrop-blur-md shadow-lg shadow-black/40'
+            }`}
         >
           {/* Grunge background textures - clipped to nav bounds */}
-          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="navbar-grunge-scrim absolute inset-0 z-0 overflow-hidden pointer-events-none rounded-sm">
             {/* Authentic Crimson Grunge Background Texture */}
             <div
               className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-screen"
@@ -133,31 +132,22 @@ export default function FloatingNavbar() {
 
           {/* Brand Logo & Tag */}
           <Link href="/" className="flex items-center gap-2.5 group min-h-[44px] relative z-10">
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 border-2 border-current overflow-hidden shrink-0 bg-black">
+            <div className="relative w-9 h-9 sm:w-10 sm:h-10 border border-neutral-700 rounded-sm overflow-hidden shrink-0 bg-black">
               <Image
                 src="/assets/logo.png"
                 alt="Project S.H.E. Logo"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform"
                 priority
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="font-heading font-black text-sm sm:text-lg tracking-tight leading-none text-[#E50914]">
+                <span className="font-heading font-black text-sm sm:text-lg tracking-tight leading-none text-[#E6192B]">
                   PROJECT S.H.E.
                 </span>
-                <span className="w-3 h-3 sm:w-3.5 sm:h-3.5 relative inline-block animate-spin [animation-duration:16s] pointer-events-none">
-                  <Image
-                    src="/assets/punk-red-spiral-star-clean.png"
-                    alt="*"
-                    fill
-                    sizes="14px"
-                    className="object-contain"
-                  />
-                </span>
               </div>
-              <span className="hidden sm:block font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-neutral-400 group-hover:text-current transition-colors">
+              <span className="hidden sm:block font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-[#D1D5DB] group-hover:text-current transition-colors">
                 SUPPORT • HELP • EMPOWER
               </span>
             </div>
@@ -176,164 +166,191 @@ export default function FloatingNavbar() {
             ))}
           </div>
 
-          {/* Right Action Icons & Auth */}
+          {/* Right Action Buttons & Auth */}
           <div className="flex items-center gap-2 sm:gap-2.5 relative z-10">
-            {/* Quick Action: Suggestion / Feedback */}
-            {/* Quick Action: Suggestion / Feedback */}
-            <button
-              type="button"
-              onClick={() => setFeedbackModalOpen(true)}
-              className="group hidden sm:inline-flex items-center gap-1.5 px-3 py-2 border border-current text-[11px] font-mono font-bold hover:bg-[#E50914] hover:text-white hover:border-[#E50914] transition-all min-h-[40px] hover-lift"
-              title="Send Suggestion or Feedback"
-            >
-              <GrungeGlyph name="message" className="w-3.5 h-3.5 text-[#E50914] group-hover:text-white transition-colors" />
-              <span className="hidden xl:inline">FEEDBACK</span>
-            </button>
-
-            {/* Quick Action: Submit Review */}
-            <button
-              type="button"
-              onClick={() => setReviewModalOpen(true)}
-              className="group hidden md:inline-flex items-center gap-1.5 px-3 py-2 border border-current text-[11px] font-mono font-bold hover:bg-[#E50914] hover:text-white hover:border-[#E50914] transition-all min-h-[40px] hover-lift"
-              title="Submit a Public Review"
-            >
-              <GrungeGlyph name="star" className="w-3.5 h-3.5 text-amber-400 group-hover:text-white transition-colors" />
-              <span className="hidden xl:inline">REVIEW</span>
-            </button>
-
-            {/* Authentication Gateway with Hydration Safety */}
+            {/* When user is authenticated: show text-only buttons & user profile with dropdown */}
             {mounted && user ? (
-              <div id="navbar-user-profile" className="relative">
-                {/* Profile Trigger Button */}
+              <>
+                {/* Quick Action: Suggestion / Feedback (Text only, no icon, signed-in only) */}
                 <button
                   type="button"
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-1.5 p-1 border-2 border-[#222222] hover:border-[#E50914] transition-all bg-[#141414] min-h-[44px] hover-lift"
-                  title={user.displayName || user.email || 'User Account'}
-                  aria-expanded={profileDropdownOpen}
+                  onClick={() => setFeedbackModalOpen(true)}
+                  className="hidden sm:inline-flex items-center px-3 py-2 border border-neutral-800 rounded-sm text-[11px] font-mono font-bold hover:bg-[#E50914] hover:text-white hover:border-[#E50914] transition-all min-h-[40px] hover-lift text-neutral-300"
+                  title="Send Suggestion or Feedback"
                 >
-                  {user.photoURL && !imageError ? (
-                    <div className="relative w-8 h-8 overflow-hidden bg-black shrink-0 border border-neutral-700">
-                      <Image
-                        src={user.photoURL}
-                        alt={user.displayName || 'User Profile'}
-                        fill
-                        className="object-cover"
-                        onError={() => setImageError(true)}
-                        sizes="32px"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 bg-[#E50914] text-white font-mono text-xs font-black flex items-center justify-center border border-black shadow-[1px_1px_0px_0px_#000000] shrink-0 select-none">
-                      {getInitials()}
-                    </div>
-                  )}
-
-                  <span className="hidden md:inline font-mono text-[11px] font-bold text-white max-w-[90px] truncate px-1">
-                    {user.displayName?.split(' ')[0] || 'ACCOUNT'}
-                  </span>
-                  <GrungeGlyph name="chevron-down" className="w-3 h-3 text-[#888888]" />
+                  FEEDBACK
                 </button>
 
-                {/* Dropdown Menu */}
-                {profileDropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] p-3 font-mono text-xs z-50 animate-fadeIn">
-                    <div className="pb-2 mb-2 border-b border-neutral-800">
-                      <p className="font-bold text-white truncate">
-                        {user.displayName || 'Community Member'}
-                      </p>
-                      <p className="text-[10px] text-neutral-400 truncate">{user.email}</p>
-                    </div>
+                {/* Quick Action: Submit Review (Text only, no icon, signed-in only) */}
+                <button
+                  type="button"
+                  onClick={() => setReviewModalOpen(true)}
+                  className="hidden md:inline-flex items-center px-3 py-2 border border-neutral-800 rounded-sm text-[11px] font-mono font-bold hover:bg-[#E50914] hover:text-white hover:border-[#E50914] transition-all min-h-[40px] hover-lift text-neutral-300"
+                  title="Submit a Public Review"
+                >
+                  REVIEW
+                </button>
 
-                    {/* Live Review Status Tracker */}
-                    {latestReview && (
-                      <div className="p-2 bg-[#141414] border border-neutral-800 space-y-1 mb-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] text-neutral-400 font-bold uppercase">REVIEW STATUS</span>
-                          <span
-                            className={`px-1.5 py-0.2 text-[8px] font-black uppercase ${
-                              latestReview.status === 'approved'
-                                ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                                : latestReview.status === 'pending'
-                                ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                                : latestReview.status === 'archived'
-                                ? 'bg-neutral-800 text-neutral-300 border border-neutral-600'
-                                : 'bg-red-950 text-red-400 border border-red-800'
-                            }`}
-                          >
-                            {latestReview.status === 'approved' && 'APPROVED'}
-                            {latestReview.status === 'pending' && 'IN REVIEW'}
-                            {latestReview.status === 'archived' && 'ARCHIVED'}
-                            {latestReview.status === 'rejected' && 'REJECTED'}
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-neutral-300 italic truncate">
-                          &ldquo;{latestReview.review_text}&rdquo;
-                        </p>
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="text-[9px] text-[#E50914] hover:underline font-bold block pt-0.5"
-                        >
-                          View in Dashboard →
-                        </Link>
+                {/* Profile Trigger Button */}
+                <div id="navbar-user-profile" className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center gap-1.5 p-1 border border-neutral-800 rounded-sm hover:border-white/40 transition-all bg-[#141414] min-h-[40px] hover-lift"
+                    title={user.displayName || user.email || 'User Account'}
+                    aria-expanded={profileDropdownOpen}
+                  >
+                    {user.photoURL && !imageError ? (
+                      <div className="relative w-7 h-7 overflow-hidden bg-black shrink-0 border border-neutral-700 rounded-sm">
+                        <Image
+                          src={user.photoURL}
+                          alt={user.displayName || 'User Profile'}
+                          fill
+                          className="object-cover"
+                          onError={() => setImageError(true)}
+                          sizes="28px"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-7 h-7 bg-[#E50914] text-white font-mono text-xs font-black flex items-center justify-center rounded-sm shrink-0 select-none">
+                        {getInitials()}
                       </div>
                     )}
 
-                    <div className="space-y-1">
-                      {isAdmin && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setProfileDropdownOpen(false)}
-                          className="group flex items-center gap-2 p-2 hover:bg-[#E50914] hover:text-white transition-colors text-white font-bold"
+                    <span className="hidden md:inline font-mono text-[11px] font-bold text-white max-w-[100px] truncate px-1">
+                      {user.displayName?.split(' ')[0] || 'ACCOUNT'}
+                    </span>
+                    <GrungeGlyph name="chevron-down" className="w-3 h-3 text-[#888888]" />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-64 bg-[#0E0E0E] border border-white/20 rounded-sm shadow-2xl p-3 font-mono text-xs z-50 animate-fadeIn">
+                      {/* User Info Header with Name & Email */}
+                      <div className="pb-2.5 mb-2.5 border-b border-neutral-800">
+                        <div className="text-[9px] text-[#E6192B] font-bold uppercase tracking-widest mb-0.5">SIGNED IN AS</div>
+                        <p className="font-bold text-white truncate text-sm">
+                          {user.displayName || 'Community Member'}
+                        </p>
+                        <p className="text-[10px] text-neutral-400 truncate">{user.email}</p>
+                      </div>
+
+                      {/* Quick Actions in Dropdown: Write a review & send feedback */}
+                      <div className="space-y-1 pb-2 mb-2 border-b border-neutral-800">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileDropdownOpen(false);
+                            setReviewModalOpen(true);
+                          }}
+                          className="w-full flex items-center justify-between p-2 rounded-sm hover:bg-[#E50914] hover:text-white transition-colors text-neutral-200 text-left font-bold"
                         >
-                          <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914] group-hover:text-white transition-colors" />
-                          <span>ADMIN PANEL</span>
-                        </Link>
+                          <span>WRITE A REVIEW</span>
+                          <span className="text-[10px] text-[#E50914] group-hover:text-white">★</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileDropdownOpen(false);
+                            setFeedbackModalOpen(true);
+                          }}
+                          className="w-full flex items-center justify-between p-2 rounded-sm hover:bg-[#E50914] hover:text-white transition-colors text-neutral-200 text-left font-bold"
+                        >
+                          <span>SEND FEEDBACK</span>
+                          <span className="text-[10px] text-neutral-400">DIRECT</span>
+                        </button>
+                      </div>
+
+                      {/* Live Review Status Tracker */}
+                      {latestReview && (
+                        <div className="p-2 bg-[#141414] border border-neutral-800 rounded-sm space-y-1 mb-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-neutral-400 font-bold uppercase">REVIEW STATUS</span>
+                            <span
+                              className={`px-1.5 py-0.5 text-[8px] font-black uppercase rounded-sm ${latestReview.status === 'approved'
+                                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                                  : latestReview.status === 'pending'
+                                    ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                                    : latestReview.status === 'archived'
+                                      ? 'bg-neutral-800 text-neutral-300 border border-neutral-600'
+                                      : 'bg-red-950 text-red-400 border border-red-800'
+                                }`}
+                            >
+                              {latestReview.status === 'approved' && 'APPROVED'}
+                              {latestReview.status === 'pending' && 'IN REVIEW'}
+                              {latestReview.status === 'archived' && 'ARCHIVED'}
+                              {latestReview.status === 'rejected' && 'REJECTED'}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-neutral-300 italic truncate">
+                            &ldquo;{latestReview.review_text}&rdquo;
+                          </p>
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className="text-[9px] text-[#E50914] hover:underline font-bold block pt-0.5"
+                          >
+                            View in Dashboard →
+                          </Link>
+                        </div>
                       )}
 
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="group flex items-center gap-2 p-2 hover:bg-[#E50914] hover:text-white transition-colors text-neutral-200 hover:text-white"
-                      >
-                        <GrungeGlyph name="user" className="w-4 h-4 text-[#E50914] group-hover:text-white transition-colors" />
-                        <span>MY DASHBOARD</span>
-                      </Link>
+                      <div className="space-y-1">
+                        {isAdmin && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setProfileDropdownOpen(false)}
+                            className="flex items-center justify-between p-2 rounded-sm hover:bg-[#E50914] hover:text-white transition-colors text-white font-bold"
+                          >
+                            <span>ADMIN PANEL</span>
+                            <span className="text-[9px] text-red-400">SECURE</span>
+                          </Link>
+                        )}
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setProfileDropdownOpen(false);
-                          logout();
-                        }}
-                        className="group w-full flex items-center gap-2 p-2 hover:bg-[#E50914] hover:text-white transition-colors text-neutral-400 hover:text-white text-left"
-                      >
-                        <GrungeGlyph name="logout" className="w-4 h-4 group-hover:text-white transition-colors" />
-                        <span>LOGOUT</span>
-                      </button>
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center justify-between p-2 rounded-sm hover:bg-[#E50914] hover:text-white transition-colors text-neutral-200 hover:text-white font-bold"
+                        >
+                          <span>MY DASHBOARD</span>
+                          <span>→</span>
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileDropdownOpen(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center justify-between p-2 rounded-sm hover:bg-[#E50914] hover:text-white transition-colors text-neutral-400 hover:text-white text-left font-bold"
+                        >
+                          <span>LOGOUT</span>
+                          <span>⎋</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </>
             ) : mounted ? (
               <div className="flex items-center gap-1.5">
                 <Link
                   href="/auth/login"
-                  className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-[#E50914] text-white border-2 border-white shadow-[2px_2px_0px_0px_#000000] font-mono text-[10px] sm:text-xs font-black uppercase tracking-wider hover:bg-white hover:text-black hover:border-black transition-all min-h-[36px] sm:min-h-[44px] flex items-center hover-lift"
+                  className="px-3.5 py-2 bg-[#E6192B] text-white border border-transparent font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-[#121212] hover:text-white transition-all min-h-[40px] flex items-center hover-lift rounded-sm"
                 >
                   SIGN IN
                 </Link>
               </div>
             ) : (
-              <div className="w-20 h-10 bg-[#141414] border border-neutral-800" />
+              <div className="w-20 h-10 bg-[#141414] border border-neutral-800 rounded-sm" />
             )}
 
             {/* Mobile Menu Toggle Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 border-2 border-current hover:bg-[#E50914] hover:text-white transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="lg:hidden p-2.5 border border-neutral-800 rounded-sm hover:bg-[#E6192B] hover:text-white transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"
               aria-label="Toggle Mobile Navigation"
             >
               {mobileMenuOpen ? <GrungeGlyph name="close" className="w-5 h-5" /> : <GrungeGlyph name="menu" className="w-5 h-5" />}
@@ -344,9 +361,8 @@ export default function FloatingNavbar() {
         {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
           <div
-            className={`lg:hidden mt-2 p-4 border-2 bg-[#0E0E0E] border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] text-white font-mono text-xs space-y-3 animate-fadeIn ${
-              isDocked ? 'mx-3 sm:mx-6 mb-3' : ''
-            }`}
+            className={`lg:hidden mt-2 p-4 border border-white/20 rounded-sm bg-[#0E0E0E] shadow-2xl text-white font-mono text-xs space-y-3 animate-fadeIn ${isDocked ? 'mx-3 sm:mx-6 mb-3' : ''
+              }`}
           >
             <div className="flex flex-col space-y-1 border-b border-neutral-800 pb-3">
               {navLinks.map((link) => (
@@ -354,72 +370,75 @@ export default function FloatingNavbar() {
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2 px-2 hover:bg-[#E50914] hover:text-white font-bold transition-colors min-h-[44px] flex items-center"
+                  className="py-2 px-2 hover:bg-[#E6192B] hover:text-white font-bold transition-colors min-h-[44px] flex items-center rounded-sm"
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setFeedbackModalOpen(true);
-                }}
-                className="group p-2.5 border border-current flex items-center justify-center gap-1.5 font-bold hover:bg-[#E50914] hover:text-white min-h-[44px] transition-all"
-              >
-                <GrungeGlyph name="message" className="w-3.5 h-3.5 text-[#E50914] group-hover:text-white transition-colors" />
-                <span>FEEDBACK</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setReviewModalOpen(true);
-                }}
-                className="group p-2.5 border border-current flex items-center justify-center gap-1.5 font-bold hover:bg-[#E50914] hover:text-white min-h-[44px] transition-all"
-              >
-                <GrungeGlyph name="star" className="w-3.5 h-3.5 text-amber-400 group-hover:text-white transition-colors" />
-                <span>REVIEW</span>
-              </button>
-            </div>
-
             {mounted && user ? (
-              <div className="pt-2 border-t border-neutral-800 flex flex-col gap-2">
-                <Link
-                  href={isAdmin ? '/admin' : '/dashboard'}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 bg-[#E50914] text-white text-center font-bold min-h-[44px] flex items-center justify-center"
-                >
-                  {isAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="w-full py-2 border border-current text-center font-bold min-h-[44px] flex items-center justify-center"
-                >
-                  LOGOUT
-                </button>
-              </div>
+              <>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setFeedbackModalOpen(true);
+                    }}
+                    className="p-2.5 border border-neutral-800 rounded-sm flex items-center justify-center font-bold hover:bg-[#E6192B] hover:text-white min-h-[44px] transition-all text-neutral-300"
+                  >
+                    FEEDBACK
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setReviewModalOpen(true);
+                    }}
+                    className="p-2.5 border border-neutral-800 rounded-sm flex items-center justify-center font-bold hover:bg-[#E6192B] hover:text-white min-h-[44px] transition-all text-neutral-300"
+                  >
+                    REVIEW
+                  </button>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-800 flex flex-col gap-2">
+                  <div className="px-2 py-1 text-[10px] text-neutral-400 truncate">
+                    Signed in as: <span className="text-white font-bold">{user.displayName || user.email}</span>
+                  </div>
+                  <Link
+                    href={isAdmin ? '/admin' : '/dashboard'}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full py-2.5 bg-[#E6192B] text-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm"
+                  >
+                    {isAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 border border-neutral-800 hover:bg-[#E6192B] hover:text-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm transition-colors"
+                  >
+                    LOGOUT
+                  </button>
+                </div>
+              </>
             ) : mounted ? (
               <div className="pt-2 border-t border-neutral-800 grid grid-cols-2 gap-2">
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 bg-[#E50914] text-white text-center font-bold min-h-[44px] flex items-center justify-center"
+                  className="py-2.5 bg-[#E6192B] text-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm"
                 >
                   LOGIN
                 </Link>
                 <Link
                   href="/auth/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 border border-current text-center font-bold min-h-[44px] flex items-center justify-center"
+                  className="py-2.5 border border-neutral-800 hover:border-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm transition-colors"
                 >
                   REGISTER
                 </Link>

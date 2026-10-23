@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import { SiteConfig } from '@/lib/types';
+import { HiCheck, HiSquare2Stack } from 'react-icons/hi2';
 
 interface DonationSectionProps {
   config: SiteConfig;
@@ -11,9 +11,10 @@ interface DonationSectionProps {
 
 export default function DonationSection({ config }: DonationSectionProps) {
   const [copied, setCopied] = useState(false);
+  const upiId = config.donation_upi_id || 'shailajalakshmisarao1974-2@okicici';
 
   const handleCopyUpi = () => {
-    navigator.clipboard.writeText(config.donation_upi_id || 'shailajalakshmisarao1974-2@okicici');
+    navigator.clipboard.writeText(upiId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };
@@ -24,183 +25,139 @@ export default function DonationSection({ config }: DonationSectionProps) {
       {/* Header */}
       <div className="mb-14 space-y-2 text-center sm:text-left">
         <div className="flex items-center gap-2 justify-center sm:justify-start">
-          <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
-          <span className="text-xs text-[#E50914] uppercase tracking-widest font-bold flex items-center gap-1.5">
-            <GrungeGlyph name="heart" className="w-3.5 h-3.5 text-[#E50914]" /> SUPPORT SURVIVORS DIRECTLY
+          <span className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+            // DIRECT SURVIVOR AID
           </span>
-          <GrungeGlyph name="barbed-wire" className="w-6 h-3 text-[#E50914]" />
         </div>
-        <h2 className="font-heading font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-[#EDEDED] leading-none">
+        <h2 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white leading-none">
           DONATE THROUGH UPI
         </h2>
-        <p className="text-sm sm:text-base text-neutral-400 max-w-2xl leading-relaxed">
+        <p className="font-sans text-sm sm:text-base text-[#A3A3A3] max-w-2xl leading-relaxed">
           Convenient, safe, and designed to ensure your contribution reaches those who need it most.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-        {/* Left QR Card - Styled as a Classified Punk Zine Document with Masking Tape */}
-        <div className="lg:col-span-6 flex justify-center">
-          <div className="w-full max-w-md p-6 sm:p-8 bg-[#0E0E0E] text-[#EDEDED] border-4 border-dashed border-[#E50914] shadow-[8px_8px_0px_0px_#E50914] flex flex-col items-center text-center relative group overflow-hidden stencil-cut">
+        {/* Left QR Terminal - Pristine Solid White Square framed by 1px #333333 Border */}
+        <div className="lg:col-span-5 flex justify-center">
+          <div className="w-full max-w-md p-6 sm:p-8 bg-[#0E0E0E] text-[#EDEDED] border border-[#333333] rounded-sm flex flex-col items-center text-center relative group">
 
-            {/* Authentic Zine Masking Tape on Corners */}
-            <div className="zine-tape absolute -top-3 -left-3 w-24 -rotate-12 z-20" />
-            <div className="zine-tape absolute -bottom-3 -right-3 w-24 rotate-12 z-20" />
-
-            {/* Extracted Punk Tribal Lily Vine Watermark */}
-            <div className="absolute -right-2 -bottom-4 w-48 h-72 opacity-20 pointer-events-none select-none">
-              <Image
-                src="/assets/punk-lily-clean.png"
-                alt="Punk Tribal Lily"
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-            </div>
-
-            {/* Extracted Red Spiral Seal in Corner */}
-            <div className="absolute top-3 right-3 w-16 h-16 opacity-30 animate-spin [animation-duration:20s] pointer-events-none select-none">
-              <Image
-                src="/assets/punk-red-spiral-star-clean.png"
-                alt="Red Spiral Seal"
-                fill
-                sizes="64px"
-                className="object-contain"
-              />
-            </div>
-
-            <div className="flex items-center gap-2 mb-4 mt-1 relative z-10">
-              <GrungeGlyph name="lock" className="w-5 h-5 text-[#E50914]" />
-              <span className="font-heading font-black text-lg tracking-tight uppercase text-white">
-                OFFICIAL DONATION QR
+            <div className="flex items-center justify-between w-full mb-6">
+              <span className="font-mono text-[10px] text-[#E6192B] uppercase tracking-widest font-bold">
+                OFFICIAL UPI TERMINAL
               </span>
             </div>
 
-            {/* QR Sticker Container */}
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-[#F4F1EA] p-3 shadow-[4px_4px_0px_0px_rgba(229,9,20,0.6)] transform -rotate-2 hover:rotate-0 transition-transform duration-300 z-10 rounded-sm">
-              <div className="absolute inset-0 z-0 opacity-40 mix-blend-multiply pointer-events-none" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }} />
-              <Image
-                src="/assets/qr-code.svg"
-                alt="Project S.H.E. Official Donation QR Code"
-                fill
-                className="object-contain p-2 relative z-10"
-                priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-
-              {/* Authentic Comic Starburst Action Badge */}
-              <div className="absolute -top-6 -right-6 w-20 h-20 sm:w-24 sm:h-24 rotate-12 pointer-events-none select-none z-30 drop-shadow-[0_0_15px_rgba(229,9,20,0.6)]">
+            {/* Pristine Solid White Perfect Square framed by Minimalist 1px #333333 Border */}
+            <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-white border border-[#333333] p-4 flex items-center justify-center rounded-sm">
+              <div className="relative w-full h-full">
                 <Image
-                  src="/assets/punk-starburst.png"
-                  alt="100% Direct Aid Starburst"
+                  src="/assets/qr-code.svg"
+                  alt="Project S.H.E. Official Donation QR Code"
                   fill
-                  sizes="96px"
                   className="object-contain"
+                  priority
+                  sizes="(max-width: 768px) 256px, 288px"
                 />
               </div>
             </div>
 
-            <div className="mt-5 w-full pt-4 border-t-2 border-[#222222] space-y-3 font-mono relative z-10">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-[#141414] p-3 border-2 border-[#222222]">
-                <div className="flex items-center gap-2 overflow-hidden w-full sm:w-auto">
-                  <span className="text-[#888888] text-[11px] shrink-0">UPI ID:</span>
-                  <span className="font-bold text-white text-[11px] sm:text-xs select-all truncate">shailajalakshmisarao1974-2@okicici</span>
+            <div className="mt-6 w-full pt-4 border-t border-[#333333] space-y-3 font-mono">
+              <div className="bg-[#141414] p-3.5 sm:p-4 border border-[#333333] rounded-sm space-y-2.5 text-left">
+                <div className="flex items-center justify-between text-[10px] text-[#888888] font-mono uppercase tracking-widest font-bold">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-[#E6192B] rounded-full inline-block"></span>
+                    <span>UPI ID</span>
+                  </span>
+                  {copied && (
+                    <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-wider font-semibold flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
+                      <HiCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>COPIED</span>
+                    </span>
+                  )}
                 </div>
+
+                <div
+                  onClick={handleCopyUpi}
+                  className="bg-[#121212] border border-[#262626] hover:border-[#E6192B]/50 p-2.5 sm:p-3 rounded-sm cursor-pointer transition-colors group/box flex items-center justify-between gap-2"
+                  title="Click to copy UPI ID"
+                >
+                  <span className="font-mono text-xs sm:text-[13px] text-white font-bold select-all tracking-tight break-all block text-left">
+                    {upiId}
+                  </span>
+                  <HiSquare2Stack className="w-3.5 h-3.5 text-neutral-500 group-hover/box:text-[#E6192B] shrink-0 transition-colors hidden sm:block" />
+                </div>
+
                 <button
                   type="button"
                   onClick={handleCopyUpi}
-                  className="group px-3 py-2 bg-[#E50914] text-white hover:bg-white hover:text-black font-bold text-xs uppercase flex items-center gap-1.5 transition-all border border-black shadow-[2px_2px_0px_0px_#000000] min-h-[40px] hover-lift"
+                  className={`relative overflow-hidden group/btn w-full py-2.5 px-4 font-mono text-xs font-bold uppercase tracking-wider rounded-sm flex items-center justify-center gap-2 transition-all duration-200 ease-out active:scale-[0.98] active:translate-y-0.5 ${
+                    copied
+                      ? 'bg-white text-black border border-white shadow-[0_0_20px_rgba(255,255,255,0.4)]'
+                      : 'bg-[#E6192B] hover:bg-white text-white hover:text-black border border-[#E6192B] hover:border-white shadow-[0_2px_12px_rgba(230,25,43,0.3)] hover:shadow-[0_4px_24px_rgba(255,255,255,0.25)]'
+                  }`}
                 >
+                  {/* Subtle glass sheen sweep on hover */}
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
+
                   {copied ? (
-                    <GrungeGlyph name="check" className="w-3.5 h-3.5 text-white group-hover:text-black transition-colors" />
+                    <span className="relative z-10 inline-flex items-center gap-1.5 transform transition-all duration-200 scale-100 animate-in zoom-in-95 font-bold">
+                      <HiCheck className="w-4 h-4 text-black" />
+                      <span className="tracking-widest">COPIED TO CLIPBOARD!</span>
+                    </span>
                   ) : (
-                    <GrungeGlyph name="copy" className="w-3.5 h-3.5 text-white group-hover:text-black transition-colors" />
+                    <span className="relative z-10 inline-flex items-center gap-1.5 font-bold">
+                      <HiSquare2Stack className="w-3.5 h-3.5 shrink-0 transition-transform duration-200 group-hover/btn:scale-110" />
+                      <span>COPY UPI ID</span>
+                    </span>
                   )}
-                  <span>{copied ? 'COPIED' : 'COPY'}</span>
                 </button>
               </div>
 
-              <span className="text-[11px] text-[#888888] block font-sans">
-                Scan with Google Pay, PhonePe, Paytm, BHIM, or any UPI banking app.
+              <span className="text-[11px] text-[#A3A3A3] block font-mono text-center">
+                Works with Google Pay, PhonePe, Paytm, BHIM, or any UPI banking app.
               </span>
             </div>
 
           </div>
         </div>
 
-        {/* Right Transparency Information - Monospace Raw Data Readout */}
-        <div className="lg:col-span-6 space-y-6">
+        {/* Right Transparency & Trust Information - Editorial Readout */}
+        <div className="lg:col-span-7 space-y-10 sm:space-y-12">
 
-          <div className="p-6 sm:p-8 bg-[#0E0E0E] border-2 border-[#222222] shadow-[6px_6px_0px_0px_#E50914] fluid-card glow-on-hover space-y-5 stencil-cut relative overflow-hidden">
-            {/* Permitted Cyber Lily Watermark */}
-            <div className="absolute -right-4 -bottom-8 w-64 h-80 opacity-15 pointer-events-none select-none rotate-12">
-              <Image
-                src="/assets/punk-lily-clean.png"
-                alt="Punk Cyber Lily"
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
-            </div>
+          {/* Section 1: Where does your money go? */}
+          <div className="p-6 sm:p-8 bg-[#0E0E0E] border border-[#333333] rounded-sm space-y-4 relative">
+            <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white">
+              WHERE DOES YOUR MONEY GO?
+            </h3>
 
-            <div className="flex items-center justify-between border-b-2 border-[#222222] pb-3 relative z-10">
-              <h3 className="font-heading font-black text-xl sm:text-2xl uppercase tracking-tight text-[#E50914]">
-                WHERE DOES YOUR MONEY GO?
-              </h3>
-            </div>
-
-            <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-sans relative z-10">
-              Our partnerships with organisations like Sayodhya help ensure that every contribution goes towards making someone’s life safer. A small portion of your contribution is set aside to support future events and outreach campaigns. We then donate the funds raised through these initiatives to organisations working within Project S.H.E.’s areas of focus.
-            </p>
-
-            {/* Monospace Raw Data Readouts */}
-            <div className="space-y-3 pt-1 relative z-10">
-              <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
-                <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[01] DIRECT SUPPORT FOR SURVIVORS</span>
-                  <span className="text-[#E50914]">SAFE HOUSES</span>
-                </div>
-                <p className="text-xs text-[#888888] font-sans mt-1">
-                  Partnerships with organisations like Sayodhya help ensure that every contribution goes towards making someone’s life safer.
-                </p>
-              </div>
-
-              <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
-                <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[02] FUTURE EVENTS &amp; OUTREACH</span>
-                  <span className="text-[#E50914]">CAMPAIGNS</span>
-                </div>
-                <p className="text-xs text-[#888888] font-sans mt-1">
-                  A small portion of your contribution is set aside to support future events and outreach campaigns.
-                </p>
-              </div>
-
-              <div className="p-3 bg-[#121212] border-l-4 border-[#E50914] border-y border-r border-[#222222]">
-                <div className="flex items-center justify-between font-mono text-[11px] text-[#EDEDED] font-bold">
-                  <span>[03] COMMUNITY IMPACT</span>
-                  <span className="text-[#E50914]">FOCUS AREAS</span>
-                </div>
-                <p className="text-xs text-[#888888] font-sans mt-1">
-                  We donate the funds raised through these initiatives to organisations working within Project S.H.E.’s areas of focus.
-                </p>
-              </div>
+            <div className="space-y-4 pt-1">
+              <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
+                Our partnerships with organisations like Sayodhya help ensure that every contribution goes towards making someone’s life safer.
+              </p>
+              <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
+                A small portion of your contribution is set aside to support future events and outreach campaigns. We then donate the funds raised through these initiatives to organisations working within Project S.H.E.’s areas of focus.
+              </p>
             </div>
           </div>
 
-          {/* Official Registration Status Card */}
-          <div className="p-5 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] font-mono text-xs space-y-2 relative stencil-cut">
-            <div className="flex items-center gap-2 text-[#E50914] font-black uppercase tracking-wider text-[11px]">
-              <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914]" />
-              <span>OUR REGISTRATION STATUS</span>
+          {/* Section 2: Our registration Status */}
+          <div className="p-6 sm:p-8 bg-[#0E0E0E] border border-[#333333] rounded-sm space-y-4 relative">
+            <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white">
+              OUR REGISTRATION STATUS.
+            </h3>
+
+            <div className="pt-1">
+              <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
+                We are formally registered as Sarva Nirbhaya Foundation, a Section 8 company under the Companies Act, 2013. We were incorporated on 19 May 2026 under the Ministry of Corporate Affairs, Government of India.
+              </p>
             </div>
-            <p className="text-neutral-200 text-xs font-sans leading-relaxed">
-              We are formally registered as <strong className="text-white font-mono">Sarva Nirbhaya Foundation</strong>, a Section 8 company under the Companies Act, 2013. We were incorporated on <strong className="text-white">19 May 2026</strong> under the Ministry of Corporate Affairs, Government of India.
-            </p>
           </div>
 
         </div>
 
       </div>
-
     </section>
   );
 }
-

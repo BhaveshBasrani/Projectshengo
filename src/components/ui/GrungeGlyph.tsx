@@ -7,11 +7,6 @@ import {
   RiStarLine,
   RiHeartFill,
   RiHeartLine,
-  RiArrowRightLine,
-  RiArrowLeftLine,
-  RiArrowDownLine,
-  RiArrowUpLine,
-  RiExternalLinkLine,
   RiMenuLine,
   RiCloseLine,
   RiCheckLine,
@@ -21,9 +16,6 @@ import {
   RiMessage3Line,
   RiCalendarLine,
   RiNotification3Line,
-  RiArrowLeftSLine,
-  RiArrowRightSLine,
-  RiArrowDownSLine,
   RiFileCopyLine,
   RiLockFill,
   RiDoubleQuotesL,
@@ -63,6 +55,16 @@ import {
   RiSparklingFill,
   RiChat3Fill,
 } from 'react-icons/ri';
+import {
+  HiArrowRight,
+  HiArrowLeft,
+  HiArrowDown,
+  HiArrowUp,
+  HiArrowTopRightOnSquare,
+  HiChevronLeft,
+  HiChevronRight,
+  HiChevronDown,
+} from 'react-icons/hi2';
 import { FaSkull, FaFire, FaBolt, FaThumbtack, FaLock, FaBullhorn } from 'react-icons/fa6';
 
 export type GlyphName =
@@ -158,15 +160,15 @@ export default function GrungeGlyph({ name, className = 'w-4 h-4', size }: Grung
     case 'heart-outline':
       return <RiHeartLine className={className} style={sizeStyle} />;
     case 'arrow-right':
-      return <RiArrowRightLine className={className} style={sizeStyle} />;
+      return <HiArrowRight className={className} style={sizeStyle} />;
     case 'arrow-left':
-      return <RiArrowLeftLine className={className} style={sizeStyle} />;
+      return <HiArrowLeft className={className} style={sizeStyle} />;
     case 'arrow-down':
-      return <RiArrowDownLine className={className} style={sizeStyle} />;
+      return <HiArrowDown className={className} style={sizeStyle} />;
     case 'arrow-up':
-      return <RiArrowUpLine className={className} style={sizeStyle} />;
+      return <HiArrowUp className={className} style={sizeStyle} />;
     case 'external':
-      return <RiExternalLinkLine className={className} style={sizeStyle} />;
+      return <HiArrowTopRightOnSquare className={className} style={sizeStyle} />;
     case 'menu':
       return <RiMenuLine className={className} style={sizeStyle} />;
     case 'close':
@@ -187,11 +189,11 @@ export default function GrungeGlyph({ name, className = 'w-4 h-4', size }: Grung
     case 'bell':
       return <RiNotification3Line className={className} style={sizeStyle} />;
     case 'chevron-left':
-      return <RiArrowLeftSLine className={className} style={sizeStyle} />;
+      return <HiChevronLeft className={className} style={sizeStyle} />;
     case 'chevron-right':
-      return <RiArrowRightSLine className={className} style={sizeStyle} />;
+      return <HiChevronRight className={className} style={sizeStyle} />;
     case 'chevron-down':
-      return <RiArrowDownSLine className={className} style={sizeStyle} />;
+      return <HiChevronDown className={className} style={sizeStyle} />;
     case 'copy':
       return <RiFileCopyLine className={className} style={sizeStyle} />;
     case 'lock':

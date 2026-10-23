@@ -27,6 +27,18 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
     setMounted(true);
   }, []);
 
+  // Auto-fill user details when modal opens or user/profile hydrates
+  useEffect(() => {
+    if (isOpen) {
+      if (profile?.display_name || user?.displayName) {
+        setName(profile?.display_name || user?.displayName || '');
+      }
+      if (profile?.email || user?.email) {
+        setEmail(profile?.email || user?.email || '');
+      }
+    }
+  }, [isOpen, user, profile]);
+
   if (!isOpen || !mounted) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,11 +91,11 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
       onClick={(e) => e.target === e.currentTarget && handleClose()}
       className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn overflow-y-auto"
     >
-      <div className="w-full max-w-lg bg-[#0E0E0E] text-[#F4F1EA] border-2 border-[#E50914] shadow-[8px_8px_0px_0px_#E50914] p-6 relative my-auto stencil-cut">
+      <div className="w-full max-w-lg bg-[#0E0E0E] text-[#F4F1EA] border border-white/20 rounded-sm shadow-2xl p-6 relative my-auto">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-4 right-4 p-1.5 border border-[#333333] hover:border-[#E50914] hover:bg-[#E50914] hover:text-white transition-all"
+          className="absolute top-4 right-4 p-1.5 border border-neutral-800 rounded-sm hover:border-[#E50914] hover:bg-[#E50914] hover:text-white transition-all"
         >
           <GrungeGlyph name="close" className="w-5 h-5" />
         </button>
@@ -107,10 +119,10 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
           <button
             type="button"
             onClick={() => setType('suggestion')}
-            className={`py-2 px-3 border-2 transition-all font-mono font-bold ${
+            className={`py-2 px-3 border transition-all font-mono font-bold rounded-sm ${
               type === 'suggestion'
-                ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
-                : 'border-[#333333] bg-[#141414] text-[#888888] hover:border-white'
+                ? 'border-[#E50914] bg-[#E50914] text-white'
+                : 'border-neutral-800 bg-[#141414] text-[#888888] hover:border-white'
             }`}
           >
             [+] SUGGESTION
@@ -118,10 +130,10 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
           <button
             type="button"
             onClick={() => setType('feedback')}
-            className={`py-2 px-3 border-2 transition-all font-mono font-bold ${
+            className={`py-2 px-3 border transition-all font-mono font-bold rounded-sm ${
               type === 'feedback'
-                ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
-                : 'border-[#333333] bg-[#141414] text-[#888888] hover:border-white'
+                ? 'border-[#E50914] bg-[#E50914] text-white'
+                : 'border-neutral-800 bg-[#141414] text-[#888888] hover:border-white'
             }`}
           >
             [!] FEEDBACK
@@ -129,7 +141,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
         </div>
 
         {success ? (
-          <div className="p-5 border-2 border-emerald-500 bg-emerald-950/40 text-emerald-200 space-y-3 text-center stencil-cut">
+          <div className="p-5 border border-emerald-500/50 bg-emerald-950/40 text-emerald-200 space-y-3 text-center rounded-sm">
             <GrungeGlyph name="check" className="w-10 h-10 text-emerald-400 mx-auto" />
             <h4 className="font-heading font-black text-lg">MESSAGE SENT</h4>
             <p className="text-xs font-sans text-emerald-300 leading-relaxed">
@@ -138,7 +150,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
             <button
               type="button"
               onClick={handleClose}
-              className="mt-3 px-5 py-2 bg-[#E50914] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-colors"
+              className="mt-3 px-5 py-2 bg-[#E50914] text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-white hover:text-black transition-colors rounded-sm"
             >
               CLOSE
             </button>
@@ -146,7 +158,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 text-xs font-mono">
             {error && (
-              <div className="p-3 border border-[#E50914] bg-red-950/50 text-[#FF6B6B] flex items-center gap-2">
+              <div className="p-3 border border-[#E50914] bg-red-950/50 text-[#FF6B6B] flex items-center gap-2 rounded-sm">
                 <GrungeGlyph name="alert" className="w-4 h-4 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -163,7 +175,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full Name / Alias"
-                  className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none"
+                  className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none rounded-sm"
                 />
               </div>
 
@@ -177,7 +189,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="contact@example.com"
-                  className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none"
+                  className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none rounded-sm"
                 />
               </div>
             </div>
@@ -192,7 +204,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder={`Brief summary of your ${type}`}
-                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none"
+                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none rounded-sm"
               />
             </div>
 
@@ -206,11 +218,11 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={`Provide specific context, suggestions, ideas, or observations...`}
-                className="w-full p-2.5 bg-[#141414] border border-[#333333] focus:border-[#E50914] text-white outline-none resize-none"
+                className="w-full p-2.5 bg-[#141414] border border-neutral-800 rounded-sm focus:border-[#E50914] text-white outline-none resize-none"
               />
             </div>
 
-            <div className="p-3 bg-[#141414] border border-[#222222] text-[10px] text-[#888888] leading-relaxed flex items-start gap-2">
+            <div className="p-3 bg-[#141414] border border-neutral-800/80 rounded-sm text-[10px] text-[#888888] leading-relaxed flex items-start gap-2">
               <GrungeGlyph name="shield" className="w-4 h-4 text-[#E50914] shrink-0 mt-0.5" />
               <span><strong>Strict Privacy:</strong> Suggestions and feedback are strictly private administrative records. They will NEVER be publicly displayed on the website.</span>
             </div>
@@ -218,7 +230,7 @@ export default function FeedbackModal({ isOpen, onClose, defaultType = 'suggesti
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-sm uppercase tracking-wider transition-all border border-[#E50914] shadow-[4px_4px_0px_0px_#000000] disabled:opacity-50"
+              className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-sm uppercase tracking-wider transition-all border border-transparent rounded-sm disabled:opacity-50"
             >
               {submitting ? 'SENDING...' : `SEND ${type.toUpperCase()}`}
             </button>

@@ -221,9 +221,9 @@ function ReviewsArchiveContent() {
                     <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-sans italic line-clamp-4">
                       &ldquo;{rev.review_text}&rdquo;
                     </p>
-                    <div className="text-[11px] text-[#E50914] font-bold group-hover:underline flex items-center gap-1 pt-1.5">
+                    <div className="text-[11px] text-[#E50914] font-bold group-hover:underline flex items-center gap-1.5 pt-1.5">
                       <span>READ FULL REVIEW</span>
-                      <span>→</span>
+                      <GrungeGlyph name="arrow-right" className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                   </div>
                 </div>

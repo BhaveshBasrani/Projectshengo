@@ -60,12 +60,19 @@ export default function HalftoneFlow({
       }
     `;
 
-    // Fragment Shader: Custom Punk Red Halftone Fluid Flow
+    // Fragment Shader: Authentic Mechanical Rotary Press Halftone & Film Grain Screen (Non-AI)
     const fsSource = `
       precision highp float;
       uniform vec2 u_resolution;
       uniform float u_time;
       uniform float u_grid;
+
+      // Analog high-frequency grain hash for authentic physical printing press texture
+      float hash(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
 
       mat2 rot(float a) {
         float s = sin(a), c = cos(a);
@@ -74,44 +81,37 @@ export default function HalftoneFlow({
 
       void main() {
         vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-        vec2 p = uv * 2.0 - 1.0;
-        p.x *= u_resolution.x / u_resolution.y;
 
-        vec2 flow_uv = p;
-        float time = u_time * ${speed.toFixed(2)};
+        // Mechanical 45-degree angle standard offset litho screen
+        vec2 screen_p = rot(0.785398) * gl_FragCoord.xy; // 45 deg
 
-        // Fluid distortion waves
-        for(float i = 1.0; i < 4.0; i++) {
-          flow_uv *= rot(time * 0.06);
-          flow_uv.x += sin(flow_uv.y * 1.8 * i + time) * 0.45;
-          flow_uv.y += cos(flow_uv.x * 1.4 * i - time * 0.75) * 0.45;
-        }
+        // Physical film grain & ink texture
+        float grain = hash(gl_FragCoord.xy + fract(u_time * 0.05) * 100.0) * 0.18;
 
-        float intensity = sin(flow_uv.x * 2.2 + flow_uv.y * 3.0) * 0.5 + 0.5;
+        // Slow subtle analog exposure drift (non-AI, purely photographic/mechanical)
+        float t = u_time * ${speed.toFixed(2)} * 0.4;
+        float exposure = sin(uv.x * 1.5 + t * 0.4) * cos(uv.y * 1.2 - t * 0.3) * 0.25 + 0.5;
+        exposure += grain * 0.35;
 
-        // Project S.H.E. Dark Punk Blood Palette
-        vec3 col_abyss = vec3(0.005, 0.0, 0.002);
-        vec3 col_deep_red = vec3(0.55, 0.02, 0.04);
-        vec3 col_punk_red = vec3(0.92, 0.035, 0.08); // #E50914 Crimson
+        // Radial focus keeping text area clean and right-side emblem balanced
+        float vignette = 1.0 - smoothstep(0.4, 1.4, length(uv - vec2(0.7, 0.4)));
+        exposure *= vignette;
 
-        // Rich dark-to-blood red fluid gradients
-        vec3 fluid_color = mix(col_abyss, col_deep_red, smoothstep(0.15, 0.55, intensity));
-        fluid_color = mix(fluid_color, col_punk_red, smoothstep(0.55, 0.95, intensity));
-
-        // Zine Screen Halftone Dot Raster
+        // Offset printing halftone dot screen
         float grid = u_grid;
-        vec2 grid_uv = gl_FragCoord.xy / grid;
-        vec2 cell_uv = fract(grid_uv) - 0.5;
+        vec2 cell = fract(screen_p / grid) - 0.5;
+        float dist = length(cell);
 
-        float dist = length(cell_uv);
-        float radius = intensity * 0.44;
-        float dot_mask = smoothstep(radius, radius - 0.12, dist);
+        // Dot size derived from analog ink exposure
+        float dot_radius = clamp(exposure * 0.48, 0.04, 0.46);
+        float dot = smoothstep(dot_radius, dot_radius - 0.1, dist);
 
-        // Halftone dots with subtle ambient back-glow
-        vec3 final_color = mix(col_abyss, fluid_color, dot_mask);
-        final_color += fluid_color * 0.14;
+        // Authentic Project S.H.E. Industrial Crimson Ink
+        vec3 ink_color = vec3(0.9, 0.1, 0.17); // #E6192B
 
-        gl_FragColor = vec4(final_color, 1.0);
+        // Output with organic alpha so background UK broadsheet is visible
+        float alpha = dot * (0.35 + exposure * 0.45);
+        gl_FragColor = vec4(ink_color * dot, alpha * 0.7);
       }
     `;
 
@@ -194,11 +194,11 @@ export default function HalftoneFlow({
       <canvas
         ref={canvasRef}
         className="w-full h-full block"
-        style={{ background: '#000000' }}
+        style={{ background: 'transparent' }}
       />
       {/* Top and bottom subtle dark gradient masks to blend seamlessly with the section */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-transparent to-[#080808] opacity-80 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/70 via-transparent to-[#080808]/50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-transparent to-[#080808] opacity-60 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/60 via-transparent to-[#080808]/40 pointer-events-none" />
     </div>
   );
 }
