@@ -80,6 +80,7 @@ const useMorphingText = (
     }
 
     const animate = () => {
+      if (texts.length <= 1) return;
       animationFrameId = requestAnimationFrame(animate);
 
       const newTime = new Date();

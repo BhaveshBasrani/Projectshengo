@@ -4,9 +4,9 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { HiHeart } from 'react-icons/hi2';
-import { motion, AnimatePresence } from 'framer-motion';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import HalftoneFlow from '@/components/ui/HalftoneFlow';
+import { MorphingText } from '@/components/ui/MorphingText';
 
 interface HeroSectionProps {
   teamFormUrl: string;
@@ -54,16 +54,6 @@ export default function HeroSection({
       'STAND WITH THOSE WHO SURVIVED.',
     ];
   }, [headlineText, headlineText2, headlineText3]);
-
-  const [phraseIndex, setPhraseIndex] = React.useState(0);
-
-  React.useEffect(() => {
-    if (phrases.length <= 1) return;
-    const interval = setInterval(() => {
-      setPhraseIndex((prev) => (prev + 1) % phrases.length);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [phrases.length]);
 
   const longestPhrase = phrases.reduce(
     (max, cur) => (cur.length > max.length ? cur : max),
@@ -173,33 +163,24 @@ export default function HeroSection({
               {phrases.join(' ')}
             </h1>
 
-            {/* Smooth Non-Blinking Editorial Headline Switcher */}
-            <div className="relative w-full overflow-hidden">
-              {/* Invisible layout spacer to reserve full height and prevent jumps */}
+            {/* Morphing Headline with Natural Dynamic Spacer */}
+            <div className="relative w-full">
+              {/* Invisible flow spacer */}
               <div
-                className="invisible pointer-events-none select-none font-heading font-black text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight leading-[1.08] uppercase pb-1 sm:pb-2"
+                className="invisible pointer-events-none select-none font-heading font-black text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight leading-[1.1] uppercase pb-1 sm:pb-2"
                 aria-hidden="true"
               >
                 {longestPhrase}
               </div>
 
-              {/* Absolute active transitioning headline */}
-              <div className="absolute inset-0 top-0 left-0 w-full h-full flex items-start">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={phraseIndex}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{
-                      duration: 0.45,
-                      ease: [0.16, 1, 0.3, 1],
-                    }}
-                    className="font-heading font-black text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight text-white dark:text-white leading-[1.08] uppercase select-text"
-                  >
-                    {phrases[phraseIndex]}
-                  </motion.div>
-                </AnimatePresence>
+              {/* Absolute active morphing container fitting exactly into spacer */}
+              <div className="absolute inset-0 top-0 left-0 w-full h-full">
+                <MorphingText
+                  texts={phrases}
+                  className="font-heading font-black text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight text-white dark:text-white leading-[1.1] uppercase"
+                  cooldown={2.8}
+                  morph={1.2}
+                />
               </div>
             </div>
 
