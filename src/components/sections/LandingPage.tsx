@@ -50,6 +50,8 @@ export default function LandingPage({ config, settings: initialSettings }: Landi
             teamFormUrl={settings?.google_form_team_app || config.google_form_team_app}
             marqueeText={settings?.marquee_text}
             headlineText={settings?.hero_headline}
+            headlineText2={settings?.hero_headline_2}
+            headlineText3={settings?.hero_headline_3}
             heroBadge={settings?.hero_badge}
             heroSubbadge={settings?.hero_subbadge}
             heroDescription={settings?.hero_description}

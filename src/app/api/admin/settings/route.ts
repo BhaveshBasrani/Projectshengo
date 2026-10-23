@@ -55,6 +55,8 @@ export async function PATCH(req: NextRequest) {
     const textKeys: (keyof SiteSettings)[] = [
       'marquee_text',
       'hero_headline',
+      'hero_headline_2',
+      'hero_headline_3',
       'hero_badge',
       'hero_subbadge',
       'hero_description',

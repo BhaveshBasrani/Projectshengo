@@ -385,7 +385,7 @@ export default function FloatingNavbar() {
                   href="/auth/login"
                   className={`navbar-signin-btn px-4 py-2 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all min-h-[40px] flex items-center select-none ${
                     isLight
-                      ? 'bg-[#E6192B] text-white border-2 border-[#0A0A0A] shadow-[2px_2px_0px_0px_#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] hover:shadow-[3px_3px_0px_0px_#E6192B]'
+                      ? 'bg-[#FAF8F3] text-[#0A0A0A] border-2 border-[#0A0A0A] shadow-[2px_2px_0px_0px_#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A]'
                       : 'bg-[#E6192B] text-white border border-[#E6192B] hover:bg-white hover:text-black hover:border-white shadow-[2px_2px_0px_0px_#E6192B]'
                   }`}
                   style={{ borderRadius: '0px' }}

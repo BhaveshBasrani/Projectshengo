@@ -181,6 +181,8 @@ export interface SiteSettings {
   hero_badge?: string;
   hero_subbadge?: string;
   hero_headline: string;
+  hero_headline_2?: string;
+  hero_headline_3?: string;
   hero_description?: string;
   about_statement?: string;
   pillar_1_title?: string;
@@ -237,7 +239,9 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   marquee_text: '₹2,00,000+ RAISED & DELIVERED ✦ BATTLE OF THE BANDS (BOTB 1.0 & 2.0) ✦ SARVA NIRBHAYA FOUNDATION ✦ HYDERABAD, INDIA ✦ DISMANTLING GENDER-BASED VIOLENCE ✦ SUPPORT. HELP. EMPOWER. ✦ REGISTERED SECTION 8 NON-PROFIT ✦ SAHODAYA WOMEN\'S HELP HOME',
   hero_badge: 'HYDERABAD\'S LEADING STUDENT NGO',
   hero_subbadge: 'SARVA NIRBHAYA FOUNDATION • HYDERABAD, INDIA',
-  hero_headline: 'RAISE YOUR VOICE WHERE THEIRS WAS SILENCED. STAND WITH THOSE WHO SURVIVED.',
+  hero_headline: 'RAISE YOUR VOICE WHERE THEIRS WAS SILENCED.',
+  hero_headline_2: 'STAND WITH THOSE WHO SURVIVED.',
+  hero_headline_3: '',
   hero_description: 'Violence injects itself into the lives of survivors even after the incident itself has long passed, impacting their very ability to rebuild their lives. Project S.H.E., Hyderabad\'s leading student NGO, works to dismantle this systemic gender-based violence as well as extend support to survivor safe houses.',
   about_statement: 'Hi, I’m Sanskriti Mohan, founder of Project S.H.E. We are a youth-led organisation based in Hyderabad, India, and this is how our movement began.',
   pillar_1_title: '1. Fundraising',

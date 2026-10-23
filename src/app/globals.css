@@ -1011,10 +1011,11 @@ html[data-theme='light'] footer.brutal-footer .footer-btn {
 
 html.light footer.brutal-footer .footer-btn:hover,
 html[data-theme='light'] footer.brutal-footer .footer-btn:hover {
-  background-color: #E6192B !important;
-  border-color: #E6192B !important;
+  background-color: #0A0A0A !important;
+  border-color: #0A0A0A !important;
   color: #FFFFFF !important;
 }
+
 
 /* Theme Toggle Component Styling in Light Mode */
 html.light footer.brutal-footer .theme-toggle-container,
@@ -1218,8 +1219,8 @@ html[data-theme='light'] header nav button:not(.navbar-keep-style):hover {
 /* The Sign In CTA Button in Light Mode */
 html.light .navbar-signin-btn,
 html[data-theme='light'] .navbar-signin-btn {
-  background-color: #E6192B !important;
-  color: #FFFFFF !important;
+  background-color: #FAF8F3 !important;
+  color: #0A0A0A !important;
   border: 1.5px solid #0A0A0A !important;
   box-shadow: 2px 2px 0px 0px #0A0A0A !important;
 }
@@ -1229,8 +1230,8 @@ html[data-theme='light'] .navbar-signin-btn:hover {
   background-color: #0A0A0A !important;
   color: #FFFFFF !important;
   border-color: #0A0A0A !important;
-  box-shadow: 3px 3px 0px 0px #E6192B !important;
-  transform: translate(-1px, -1px) !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
+  transform: translate(1px, 1px) !important;
 }
 
 /* Punk Loader Light Theme Details */
@@ -1372,6 +1373,8 @@ html.light .navbar-grunge-scrim {
 
 html.light header nav {
   background-color: #FAF8F3 !important;
+}
+
 html.light header nav span.text-\[\#D1D5DB\] {
   color: #444444 !important;
 }
@@ -1436,9 +1439,9 @@ html.light .hero-team-btn {
 }
 
 html.light .hero-team-btn:hover {
-  background-color: #E6192B !important;
+  background-color: #222222 !important;
   border-color: #0A0A0A !important;
-  box-shadow: 3px 3px 0px 0px #0A0A0A !important;
+  box-shadow: 2px 2px 0px 0px #0A0A0A !important;
   color: #FFFFFF !important;
 }
 
@@ -1450,7 +1453,8 @@ html.light .hero-pillars-btn {
 }
 
 html.light .hero-pillars-btn:hover {
-  background-color: #E6192B !important;
+  background-color: #0A0A0A !important;
+  border-color: #0A0A0A !important;
   color: #FFFFFF !important;
 }
 
@@ -1465,7 +1469,7 @@ html.light button.bg-\[\#141414\] {
 
 html.light a.bg-\[\#141414\]:hover,
 html.light button.bg-\[\#141414\]:hover {
-  background-color: #E6192B !important;
+  background-color: #0A0A0A !important;
   border-color: #0A0A0A !important;
   color: #FFFFFF !important;
 }

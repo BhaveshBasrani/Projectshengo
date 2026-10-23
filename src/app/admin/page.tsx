@@ -1319,30 +1319,110 @@ export default function TeamHubPage() {
                   </div>
                 </div>
 
-                {/* Hero Headline */}
-                <div className="space-y-2">
-                  <label
-                    className={`block font-mono text-xs uppercase tracking-wider font-bold ${
-                      isLight ? 'text-[#111111]' : 'text-neutral-300'
-                    }`}
-                  >
-                    Hero Primary Headline
-                  </label>
-                  <input
-                    type="text"
-                    value={siteSettings.hero_headline}
-                    onChange={(e) =>
-                      setSiteSettings((prev) => ({ ...prev, hero_headline: e.target.value }))
-                    }
-                    placeholder="e.g. RAISE YOUR VOICE WHERE THEIRS WAS SILENCED. STAND WITH THOSE WHO SURVIVED."
-                    className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
-                      isLight
-                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
-                        : 'bg-[#090909] border-neutral-700 text-white'
-                    }`}
-                    style={{ borderRadius: '0px' }}
-                    required
-                  />
+                {/* Hero Rotating Headline Phrases */}
+                <div className="space-y-3 p-3.5 bg-black/20 dark:bg-black/40 border border-[#E6192B]/30 rounded-none">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <label
+                      className={`block font-mono text-xs uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-200'
+                      }`}
+                    >
+                      Hero Switching Headline (Alternating Phrases)
+                    </label>
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-[#E6192B]/15 text-[#E6192B] border border-[#E6192B]/30 uppercase tracking-widest font-bold">
+                      Smooth Transition • No Blink
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-neutral-400 font-sans leading-relaxed">
+                    The hero headline smoothly switches between these phrases every few seconds without blinking. Enter different phrases in the boxes below:
+                  </p>
+
+                  {/* Phrase 1 */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-mono">
+                      <span className="font-bold text-[#E6192B]">PHRASE 1 (PRIMARY)</span>
+                      <span className="text-neutral-500 text-[10px]">REQUIRED</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={siteSettings.hero_headline || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, hero_headline: e.target.value }))
+                      }
+                      placeholder="e.g. RAISE YOUR VOICE WHERE THEIRS WAS SILENCED."
+                      className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                      required
+                    />
+                  </div>
+
+                  {/* Phrase 2 */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-mono">
+                      <span className="font-bold text-[#E6192B]">PHRASE 2 (SWITCHES WITH PHRASE 1)</span>
+                      <span className="text-neutral-500 text-[10px]">RECOMMENDED</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={siteSettings.hero_headline_2 || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, hero_headline_2: e.target.value }))
+                      }
+                      placeholder="e.g. STAND WITH THOSE WHO SURVIVED."
+                      className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+
+                  {/* Phrase 3 */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-mono">
+                      <span className="font-bold text-neutral-400">PHRASE 3 (OPTIONAL EXTRA ROTATION)</span>
+                      <span className="text-neutral-500 text-[10px]">OPTIONAL</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={siteSettings.hero_headline_3 || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, hero_headline_3: e.target.value }))
+                      }
+                      placeholder="e.g. SUPPORT. HELP. EMPOWER."
+                      className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+
+                  {/* Visual Preview Flow */}
+                  <div className="pt-1.5 flex items-center gap-2 text-[10px] font-mono text-neutral-400 overflow-x-auto">
+                    <span className="text-[#E6192B] font-bold">CYCLE:</span>
+                    <span className="px-1.5 py-0.5 bg-black/30 border border-neutral-800 text-neutral-300 truncate max-w-[160px]">
+                      {siteSettings.hero_headline || 'Phrase 1'}
+                    </span>
+                    <span>⇄</span>
+                    <span className="px-1.5 py-0.5 bg-black/30 border border-neutral-800 text-neutral-300 truncate max-w-[160px]">
+                      {siteSettings.hero_headline_2 || 'Phrase 2'}
+                    </span>
+                    {siteSettings.hero_headline_3 && (
+                      <>
+                        <span>⇄</span>
+                        <span className="px-1.5 py-0.5 bg-black/30 border border-neutral-800 text-neutral-300 truncate max-w-[160px]">
+                          {siteSettings.hero_headline_3}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
 
                 {/* Hero Mission Description */}

@@ -4,14 +4,16 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { HiHeart } from 'react-icons/hi2';
+import { motion, AnimatePresence } from 'framer-motion';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import HalftoneFlow from '@/components/ui/HalftoneFlow';
-import { MorphingText } from '@/components/ui/MorphingText';
 
 interface HeroSectionProps {
   teamFormUrl: string;
   marqueeText?: string;
   headlineText?: string;
+  headlineText2?: string;
+  headlineText3?: string;
   heroBadge?: string;
   heroSubbadge?: string;
   heroDescription?: string;
@@ -21,10 +23,53 @@ export default function HeroSection({
   teamFormUrl,
   marqueeText,
   headlineText,
+  headlineText2,
+  headlineText3,
   heroBadge,
   heroSubbadge,
   heroDescription,
 }: HeroSectionProps) {
+  // Collect headline phrases cleanly for smooth switching
+  const phrases = React.useMemo(() => {
+    const list: string[] = [];
+    if (headlineText && headlineText.trim()) list.push(headlineText.trim());
+    if (headlineText2 && headlineText2.trim()) list.push(headlineText2.trim());
+    if (headlineText3 && headlineText3.trim()) list.push(headlineText3.trim());
+
+    // Fallback/Migration: If only one phrase was entered but it contains full sentences separated by periods
+    if (list.length === 1 && list[0].includes('.')) {
+      const parts = list[0]
+        .split(/(?<=\.)\s+/)
+        .map((p) => p.trim())
+        .filter((p) => p.length > 3);
+      if (parts.length > 1) {
+        return parts;
+      }
+    }
+
+    if (list.length > 0) return list;
+
+    return [
+      'RAISE YOUR VOICE WHERE THEIRS WAS SILENCED.',
+      'STAND WITH THOSE WHO SURVIVED.',
+    ];
+  }, [headlineText, headlineText2, headlineText3]);
+
+  const [phraseIndex, setPhraseIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    if (phrases.length <= 1) return;
+    const interval = setInterval(() => {
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [phrases.length]);
+
+  const longestPhrase = phrases.reduce(
+    (max, cur) => (cur.length > max.length ? cur : max),
+    phrases[0]
+  );
+
   const customSegments = marqueeText
     ? marqueeText
         .split('✦')
@@ -125,34 +170,36 @@ export default function HeroSection({
           {/* Main Typography & CTAs */}
           <div className="lg:col-span-7 space-y-5 sm:space-y-6">
             <h1 className="sr-only">
-              {headlineText || "Raise your voice where theirs was silenced. Stand with those who survived."}
+              {phrases.join(' ')}
             </h1>
 
-            {/* Morphing Headline with Natural Dynamic Spacer */}
-            <div className="relative w-full">
-              {/* Invisible flow spacer */}
+            {/* Smooth Non-Blinking Editorial Headline Switcher */}
+            <div className="relative w-full overflow-hidden">
+              {/* Invisible layout spacer to reserve full height and prevent jumps */}
               <div
-                className="invisible pointer-events-none select-none font-heading font-bold text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight leading-[1.1] uppercase pb-1 sm:pb-2"
+                className="invisible pointer-events-none select-none font-heading font-black text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight leading-[1.08] uppercase pb-1 sm:pb-2"
                 aria-hidden="true"
               >
-                {headlineText || "Raise your voice where theirs was silenced."}
+                {longestPhrase}
               </div>
 
-              {/* Absolute active morphing container fitting exactly into spacer */}
-              <div className="absolute inset-0 top-0 left-0 w-full h-full">
-                <MorphingText
-                  texts={
-                    headlineText
-                      ? [headlineText]
-                      : [
-                          "Raise your voice where theirs was silenced.",
-                          "Stand with those who survived.",
-                        ]
-                  }
-                  className="font-heading font-bold text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight text-white leading-[1.1] uppercase"
-                  cooldown={2.8}
-                  morph={1.2}
-                />
+              {/* Absolute active transitioning headline */}
+              <div className="absolute inset-0 top-0 left-0 w-full h-full flex items-start">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={phraseIndex}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -16 }}
+                    transition={{
+                      duration: 0.45,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="font-heading font-black text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight text-white dark:text-white leading-[1.08] uppercase select-text"
+                  >
+                    {phrases[phraseIndex]}
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
 
