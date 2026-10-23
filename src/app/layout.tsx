@@ -9,6 +9,7 @@ import TextureBackground from '@/components/ui/TextureBackground';
 import NewsletterModal from '@/components/ui/NewsletterModal';
 import ClientSecurityShield from '@/components/security/ClientSecurityShield';
 import CookieConsentBanner from '@/components/ui/CookieConsentBanner';
+import ThemeInitializer from '@/components/ui/ThemeInitializer';
 
 export const metadata: Metadata = {
   title: {
@@ -169,6 +170,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased min-h-screen flex flex-col relative bg-[#080808] text-[#EDEDED] overflow-x-hidden">
+        <ThemeInitializer defaultTheme={defaultTheme} />
         {/* Procedural WebGL Paper Grain Shader */}
         <TextureBackground mode="dark" opacity={0.85} />
 

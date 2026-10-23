@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSiteSettings, updateSiteSettings } from '@/lib/data/store';
 import { getValidAdminSecrets } from '@/lib/admin/auth';
 import { SiteSettings } from '@/lib/types';
@@ -87,6 +88,9 @@ export async function PATCH(req: NextRequest) {
     }
 
     const updated = await updateSiteSettings(updates);
+    try {
+      revalidatePath('/', 'layout');
+    } catch {}
 
     return NextResponse.json(
       {

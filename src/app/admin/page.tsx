@@ -283,6 +283,29 @@ export default function TeamHubPage() {
     }
   };
 
+  // --- ACTIONS: IMMEDIATE DEFAULT THEME (SALUS PATTERN) ---
+  const handleSetDefaultTheme = async (theme: 'dark' | 'light') => {
+    setSiteSettings((prev) => ({ ...prev, default_theme: theme }));
+    togglePreviewTheme(theme);
+
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify({ default_theme: theme }),
+      });
+      if (res.ok) {
+        localStorage.setItem('project-she-server-default', theme);
+        localStorage.setItem('project-she-theme', theme);
+        showNotice(`System default theme set to: "${theme.toUpperCase()}" (Live across all devices)`);
+      } else {
+        showNotice('Theme preview updated. Click "Save Live Changes" to sync.');
+      }
+    } catch {
+      showNotice('Theme preview updated. Click "Save Live Changes" to sync.');
+    }
+  };
+
   // --- ACTIONS: SITE TEXT & LINKS ---
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1133,10 +1156,7 @@ export default function TeamHubPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <button
                     type="button"
-                    onClick={() => {
-                      setSiteSettings((prev) => ({ ...prev, default_theme: 'dark' }));
-                      togglePreviewTheme('dark');
-                    }}
+                    onClick={() => handleSetDefaultTheme('dark')}
                     className={`p-4 border text-left font-mono transition-all flex items-center justify-between ${
                       (siteSettings.default_theme || 'dark') === 'dark'
                         ? isLight
@@ -1174,10 +1194,7 @@ export default function TeamHubPage() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setSiteSettings((prev) => ({ ...prev, default_theme: 'light' }));
-                      togglePreviewTheme('light');
-                    }}
+                    onClick={() => handleSetDefaultTheme('light')}
                     className={`p-4 border text-left font-mono transition-all flex items-center justify-between ${
                       siteSettings.default_theme === 'light'
                         ? 'border-[#E6192B] bg-[#E6192B]/10 text-[#111111]'
