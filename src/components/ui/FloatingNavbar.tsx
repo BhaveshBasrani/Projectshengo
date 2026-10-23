@@ -186,7 +186,11 @@ export default function FloatingNavbar() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="hover:text-[#E50914] hover:drop-shadow-[0_0_8px_rgba(229,9,20,0.6)] transition-all relative py-1 hover:underline underline-offset-4 decoration-2 decoration-[#E50914] min-h-[44px] flex items-center hover-lift"
+                className={`nav-anchor-link transition-all relative py-1 hover:underline underline-offset-4 decoration-2 decoration-[#E6192B] min-h-[44px] flex items-center hover-lift ${
+                  isLight
+                    ? 'text-[#0A0A0A] hover:text-[#E6192B]'
+                    : 'text-[#EDEDED] hover:text-[#E50914] hover:drop-shadow-[0_0_8px_rgba(229,9,20,0.6)]'
+                }`}
               >
                 {link.label}
               </Link>
@@ -202,7 +206,12 @@ export default function FloatingNavbar() {
                 <button
                   type="button"
                   onClick={() => setFeedbackModalOpen(true)}
-                  className="hidden sm:inline-flex items-center px-3 py-2 border border-neutral-800 rounded-sm text-[11px] font-mono font-bold hover:bg-[#E50914] hover:text-white hover:border-[#E50914] transition-all min-h-[40px] hover-lift text-neutral-300"
+                  className={`hidden sm:inline-flex items-center px-3 py-2 border text-[11px] font-mono font-bold transition-all min-h-[40px] hover-lift ${
+                    isLight
+                      ? 'border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] shadow-[1.5px_1.5px_0px_0px_#0A0A0A]'
+                      : 'border-neutral-800 bg-transparent text-neutral-300 hover:bg-[#E50914] hover:text-white hover:border-[#E50914] rounded-sm'
+                  }`}
+                  style={{ borderRadius: isLight ? '0px' : undefined }}
                   title="Send Suggestion or Feedback"
                 >
                   FEEDBACK
@@ -212,7 +221,12 @@ export default function FloatingNavbar() {
                 <button
                   type="button"
                   onClick={() => setReviewModalOpen(true)}
-                  className="hidden md:inline-flex items-center px-3 py-2 border border-neutral-800 rounded-sm text-[11px] font-mono font-bold hover:bg-[#E50914] hover:text-white hover:border-[#E50914] transition-all min-h-[40px] hover-lift text-neutral-300"
+                  className={`hidden md:inline-flex items-center px-3 py-2 border text-[11px] font-mono font-bold transition-all min-h-[40px] hover-lift ${
+                    isLight
+                      ? 'border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] shadow-[1.5px_1.5px_0px_0px_#0A0A0A]'
+                      : 'border-neutral-800 bg-transparent text-neutral-300 hover:bg-[#E50914] hover:text-white hover:border-[#E50914] rounded-sm'
+                  }`}
+                  style={{ borderRadius: isLight ? '0px' : undefined }}
                   title="Submit a Public Review"
                 >
                   REVIEW
@@ -223,7 +237,12 @@ export default function FloatingNavbar() {
                   <button
                     type="button"
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-1.5 p-1 border border-neutral-800 rounded-sm hover:border-white/40 transition-all bg-[#141414] min-h-[40px] hover-lift"
+                    className={`flex items-center gap-1.5 p-1 border transition-all min-h-[40px] hover-lift ${
+                      isLight
+                        ? 'border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] shadow-[1.5px_1.5px_0px_0px_#0A0A0A]'
+                        : 'border-neutral-800 bg-[#141414] hover:border-white/40 rounded-sm'
+                    }`}
+                    style={{ borderRadius: isLight ? '0px' : undefined }}
                     title={user.displayName || user.email || 'User Account'}
                     aria-expanded={profileDropdownOpen}
                   >
@@ -364,20 +383,35 @@ export default function FloatingNavbar() {
               <div className="flex items-center gap-1.5">
                 <Link
                   href="/auth/login"
-                  className="px-3.5 py-2 bg-[#E6192B] text-white border border-transparent font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider hover:bg-[#121212] hover:text-white transition-all min-h-[40px] flex items-center hover-lift rounded-sm"
+                  className={`navbar-signin-btn px-4 py-2 font-mono text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all min-h-[40px] flex items-center select-none ${
+                    isLight
+                      ? 'bg-[#E6192B] text-white border-2 border-[#0A0A0A] shadow-[2px_2px_0px_0px_#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] hover:shadow-[3px_3px_0px_0px_#E6192B]'
+                      : 'bg-[#E6192B] text-white border border-[#E6192B] hover:bg-white hover:text-black hover:border-white shadow-[2px_2px_0px_0px_#E6192B]'
+                  }`}
+                  style={{ borderRadius: '0px' }}
                 >
                   SIGN IN
                 </Link>
               </div>
             ) : (
-              <div className="w-20 h-10 bg-[#141414] border border-neutral-800 rounded-sm" />
+              <div
+                className={`w-20 h-10 border ${
+                  isLight ? 'bg-[#FAF8F3] border-[#0A0A0A]' : 'bg-[#141414] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              />
             )}
 
             {/* Mobile Menu Toggle Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 border border-neutral-800 rounded-sm hover:bg-[#E6192B] hover:text-white transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"
+              className={`lg:hidden p-2.5 border transition-all min-w-[40px] min-h-[40px] flex items-center justify-center ${
+                isLight
+                  ? 'border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white hover:border-[#0A0A0A] shadow-[1.5px_1.5px_0px_0px_#0A0A0A]'
+                  : 'border-neutral-800 rounded-sm hover:bg-[#E6192B] hover:text-white text-white'
+              }`}
+              style={{ borderRadius: isLight ? '0px' : undefined }}
               aria-label="Toggle Mobile Navigation"
             >
               {mobileMenuOpen ? <GrungeGlyph name="close" className="w-5 h-5" /> : <GrungeGlyph name="menu" className="w-5 h-5" />}
@@ -388,16 +422,24 @@ export default function FloatingNavbar() {
         {/* Mobile Drawer Menu */}
         {mobileMenuOpen && (
           <div
-            className={`lg:hidden mt-2 p-4 border border-white/20 rounded-sm bg-[#0E0E0E] shadow-2xl text-white font-mono text-xs space-y-3 animate-fadeIn ${isDocked ? 'mx-3 sm:mx-6 mb-3' : ''
-              }`}
+            className={`lg:hidden mt-2 p-4 border font-mono text-xs space-y-3 animate-fadeIn ${
+              isLight
+                ? 'bg-[#FAF8F3] border-2 border-[#0A0A0A] text-[#0A0A0A] shadow-[6px_6px_0px_0px_#0A0A0A]'
+                : 'border border-white/20 rounded-sm bg-[#0E0E0E] shadow-2xl text-white'
+            } ${isDocked ? 'mx-3 sm:mx-6 mb-3' : ''}`}
+            style={{ borderRadius: isLight ? '0px' : undefined }}
           >
-            <div className="flex flex-col space-y-1 border-b border-neutral-800 pb-3">
+            <div className={`flex flex-col space-y-1 border-b pb-3 ${isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'}`}>
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2 px-2 hover:bg-[#E6192B] hover:text-white font-bold transition-colors min-h-[44px] flex items-center rounded-sm"
+                  className={`py-2 px-2 font-bold transition-colors min-h-[44px] flex items-center ${
+                    isLight
+                      ? 'text-[#0A0A0A] hover:bg-[#EAE5DB] hover:text-[#E6192B]'
+                      : 'hover:bg-[#E6192B] hover:text-white text-white rounded-sm'
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -413,7 +455,11 @@ export default function FloatingNavbar() {
                       setMobileMenuOpen(false);
                       setFeedbackModalOpen(true);
                     }}
-                    className="p-2.5 border border-neutral-800 rounded-sm flex items-center justify-center font-bold hover:bg-[#E6192B] hover:text-white min-h-[44px] transition-all text-neutral-300"
+                    className={`p-2.5 border flex items-center justify-center font-bold min-h-[44px] transition-all ${
+                      isLight
+                        ? 'border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
+                        : 'border-neutral-800 rounded-sm text-neutral-300 hover:bg-[#E6192B] hover:text-white'
+                    }`}
                   >
                     FEEDBACK
                   </button>
@@ -424,20 +470,28 @@ export default function FloatingNavbar() {
                       setMobileMenuOpen(false);
                       setReviewModalOpen(true);
                     }}
-                    className="p-2.5 border border-neutral-800 rounded-sm flex items-center justify-center font-bold hover:bg-[#E6192B] hover:text-white min-h-[44px] transition-all text-neutral-300"
+                    className={`p-2.5 border flex items-center justify-center font-bold min-h-[44px] transition-all ${
+                      isLight
+                        ? 'border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
+                        : 'border-neutral-800 rounded-sm text-neutral-300 hover:bg-[#E6192B] hover:text-white'
+                    }`}
                   >
                     REVIEW
                   </button>
                 </div>
 
-                <div className="pt-2 border-t border-neutral-800 flex flex-col gap-2">
-                  <div className="px-2 py-1 text-[10px] text-neutral-400 truncate">
-                    Signed in as: <span className="text-white font-bold">{user.displayName || user.email}</span>
+                <div className={`pt-2 border-t flex flex-col gap-2 ${isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'}`}>
+                  <div className={`px-2 py-1 text-[10px] truncate ${isLight ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                    Signed in as: <span className={`font-bold ${isLight ? 'text-[#0A0A0A]' : 'text-white'}`}>{user.displayName || user.email}</span>
                   </div>
                   <Link
                     href={isAdmin ? '/admin' : '/dashboard'}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 bg-[#E6192B] text-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm"
+                    className={`w-full py-2.5 text-center font-bold min-h-[44px] flex items-center justify-center ${
+                      isLight
+                        ? 'bg-[#E6192B] text-white border-2 border-[#0A0A0A] hover:bg-[#0A0A0A]'
+                        : 'bg-[#E6192B] text-white rounded-sm hover:bg-white hover:text-black'
+                    }`}
                   >
                     {isAdmin ? 'ADMIN PANEL' : 'MY DASHBOARD'}
                   </Link>
@@ -447,25 +501,37 @@ export default function FloatingNavbar() {
                       logout();
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full py-2 border border-neutral-800 hover:bg-[#E6192B] hover:text-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm transition-colors"
+                    className={`w-full py-2 border text-center font-bold min-h-[44px] flex items-center justify-center transition-colors ${
+                      isLight
+                        ? 'border-[#0A0A0A] bg-transparent text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
+                        : 'border-neutral-800 rounded-sm hover:bg-[#E6192B] hover:text-white'
+                    }`}
                   >
                     LOGOUT
                   </button>
                 </div>
               </>
             ) : mounted ? (
-              <div className="pt-2 border-t border-neutral-800 grid grid-cols-2 gap-2">
+              <div className={`pt-2 border-t grid grid-cols-2 gap-2 ${isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'}`}>
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 bg-[#E6192B] text-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm"
+                  className={`py-2.5 text-center font-bold min-h-[44px] flex items-center justify-center font-mono text-xs uppercase ${
+                    isLight
+                      ? 'bg-[#E6192B] text-white border-2 border-[#0A0A0A] hover:bg-[#0A0A0A]'
+                      : 'bg-[#E6192B] text-white rounded-sm hover:bg-white hover:text-black'
+                  }`}
                 >
                   LOGIN
                 </Link>
                 <Link
                   href="/auth/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 border border-neutral-800 hover:border-white text-center font-bold min-h-[44px] flex items-center justify-center rounded-sm transition-colors"
+                  className={`py-2.5 border text-center font-bold min-h-[44px] flex items-center justify-center font-mono text-xs uppercase transition-colors ${
+                    isLight
+                      ? 'border-2 border-[#0A0A0A] bg-[#FAF8F3] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
+                      : 'border-neutral-800 hover:border-white rounded-sm text-white'
+                  }`}
                 >
                   REGISTER
                 </Link>

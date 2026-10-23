@@ -12,6 +12,30 @@ interface DonationSectionProps {
 
 export default function DonationSection({ config, settings }: DonationSectionProps) {
   const [copied, setCopied] = useState(false);
+  const [isLight, setIsLight] = useState(false);
+
+  React.useEffect(() => {
+    const checkTheme = () => {
+      if (typeof document !== 'undefined') {
+        const isL =
+          document.documentElement.getAttribute('data-theme') === 'light' ||
+          document.documentElement.classList.contains('light');
+        setIsLight(isL);
+      }
+    };
+    checkTheme();
+    window.addEventListener('theme-changed', checkTheme);
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme'],
+    });
+    return () => {
+      window.removeEventListener('theme-changed', checkTheme);
+      observer.disconnect();
+    };
+  }, []);
+
   const upiId = settings?.donation_upi_id || config.donation_upi_id || 'shailajalakshmisarao1974-2@okicici';
   const qrUrl = settings?.donation_qr_url || config.donation_qr_url || '/assets/qr-code.svg';
   const headline = settings?.donation_headline || 'DONATE THROUGH UPI';
@@ -33,19 +57,27 @@ export default function DonationSection({ config, settings }: DonationSectionPro
             // DIRECT SURVIVOR AID
           </span>
         </div>
-        <h2 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white leading-none">
+        <h2 className={`font-heading font-bold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight leading-none ${
+          isLight ? 'text-[#0A0A0A]' : 'text-white'
+        }`}>
           {headline}
         </h2>
-        <p className="font-sans text-sm sm:text-base text-[#A3A3A3] max-w-2xl leading-relaxed">
+        <p className={`font-sans text-sm sm:text-base max-w-2xl leading-relaxed ${
+          isLight ? 'text-neutral-700' : 'text-[#A3A3A3]'
+        }`}>
           {subtext}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-        {/* Left QR Terminal - Pristine Solid White Square framed by 1px #333333 Border */}
+        {/* Left QR Terminal - Pristine Solid White Square framed by Border */}
         <div className="lg:col-span-5 flex justify-center">
-          <div className="w-full max-w-md p-6 sm:p-8 bg-[#0E0E0E] text-[#EDEDED] border border-[#333333] rounded-sm flex flex-col items-center text-center relative group">
+          <div className={`w-full max-w-md p-6 sm:p-8 rounded-sm flex flex-col items-center text-center relative group transition-colors ${
+            isLight
+              ? 'bg-[#FAF8F3] text-[#0A0A0A] border-2 border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A]'
+              : 'bg-[#0E0E0E] text-[#EDEDED] border border-[#333333]'
+          }`}>
 
             <div className="flex items-center justify-between w-full mb-6">
               <span className="font-mono text-[10px] text-[#E6192B] uppercase tracking-widest font-bold">
@@ -53,8 +85,10 @@ export default function DonationSection({ config, settings }: DonationSectionPro
               </span>
             </div>
 
-            {/* Pristine Solid White Perfect Square framed by Minimalist 1px #333333 Border */}
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-white border border-[#333333] p-4 flex items-center justify-center rounded-sm">
+            {/* Pristine Solid White Perfect Square framed by Minimalist Border */}
+            <div className={`relative w-64 h-64 sm:w-72 sm:h-72 bg-white p-4 flex items-center justify-center rounded-sm ${
+              isLight ? 'border-2 border-[#0A0A0A]' : 'border border-[#333333]'
+            }`}>
               <div className="relative w-full h-full flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -66,16 +100,24 @@ export default function DonationSection({ config, settings }: DonationSectionPro
               </div>
             </div>
 
-            <div className="mt-6 w-full pt-4 border-t border-[#333333] space-y-3 font-mono">
-              <div className="bg-[#141414] p-3.5 sm:p-4 border border-[#333333] rounded-sm space-y-2.5 text-left">
-                <div className="flex items-center justify-between text-[10px] text-[#888888] font-mono uppercase tracking-widest font-bold">
+            <div className={`mt-6 w-full pt-4 border-t space-y-3 font-mono ${
+              isLight ? 'border-[#0A0A0A]' : 'border-[#333333]'
+            }`}>
+              <div className={`p-3.5 sm:p-4 rounded-sm space-y-2.5 text-left border ${
+                isLight
+                  ? 'bg-white border-[#0A0A0A]'
+                  : 'bg-[#141414] border-[#333333]'
+              }`}>
+                <div className={`flex items-center justify-between text-[10px] font-mono uppercase tracking-widest font-bold ${
+                  isLight ? 'text-neutral-600' : 'text-[#888888]'
+                }`}>
                   <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-[#E6192B] rounded-full inline-block"></span>
                     <span>UPI ID</span>
                   </span>
                   {copied && (
-                    <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-wider font-semibold flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
-                      <HiCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono uppercase tracking-wider font-semibold flex items-center gap-1 animate-in fade-in zoom-in-95 duration-200">
+                      <HiCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>COPIED</span>
                     </span>
                   )}
@@ -83,10 +125,16 @@ export default function DonationSection({ config, settings }: DonationSectionPro
 
                 <div
                   onClick={handleCopyUpi}
-                  className="bg-[#121212] border border-[#262626] hover:border-[#E6192B]/50 p-2.5 sm:p-3 rounded-sm cursor-pointer transition-colors group/box flex items-center justify-between gap-2"
+                  className={`p-2.5 sm:p-3 rounded-sm cursor-pointer transition-colors group/box flex items-center justify-between gap-2 border ${
+                    isLight
+                      ? 'bg-[#FAF8F3] border-[#0A0A0A] hover:border-[#E6192B]'
+                      : 'bg-[#121212] border-[#262626] hover:border-[#E6192B]/50'
+                  }`}
                   title="Click to copy UPI ID"
                 >
-                  <span className="font-mono text-xs sm:text-[13px] text-white font-bold select-all tracking-tight break-all block text-left">
+                  <span className={`font-mono text-xs sm:text-[13px] font-bold select-all tracking-tight break-all block text-left ${
+                    isLight ? 'text-[#0A0A0A]' : 'text-white'
+                  }`}>
                     {upiId}
                   </span>
                   <HiSquare2Stack className="w-3.5 h-3.5 text-neutral-500 group-hover/box:text-[#E6192B] shrink-0 transition-colors hidden sm:block" />
@@ -97,16 +145,15 @@ export default function DonationSection({ config, settings }: DonationSectionPro
                   onClick={handleCopyUpi}
                   className={`relative overflow-hidden group/btn w-full py-2.5 px-4 font-mono text-xs font-bold uppercase tracking-wider rounded-sm flex items-center justify-center gap-2 transition-all duration-200 ease-out active:scale-[0.98] active:translate-y-0.5 ${
                     copied
-                      ? 'bg-white text-black border border-white shadow-[0_0_20px_rgba(255,255,255,0.4)]'
-                      : 'bg-[#E6192B] hover:bg-white text-white hover:text-black border border-[#E6192B] hover:border-white shadow-[0_2px_12px_rgba(230,25,43,0.3)] hover:shadow-[0_4px_24px_rgba(255,255,255,0.25)]'
+                      ? 'bg-emerald-600 text-white border border-emerald-600'
+                      : isLight
+                      ? 'bg-[#0A0A0A] text-white hover:bg-[#E6192B] border-2 border-[#0A0A0A]'
+                      : 'bg-[#E6192B] hover:bg-white text-white hover:text-black border border-[#E6192B] hover:border-white'
                   }`}
                 >
-                  {/* Subtle glass sheen sweep on hover */}
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
-
                   {copied ? (
-                    <span className="relative z-10 inline-flex items-center gap-1.5 transform transition-all duration-200 scale-100 animate-in zoom-in-95 font-bold">
-                      <HiCheck className="w-4 h-4 text-black" />
+                    <span className="relative z-10 inline-flex items-center gap-1.5 font-bold">
+                      <HiCheck className="w-4 h-4 text-white" />
                       <span className="tracking-widest">COPIED TO CLIPBOARD!</span>
                     </span>
                   ) : (
@@ -118,7 +165,9 @@ export default function DonationSection({ config, settings }: DonationSectionPro
                 </button>
               </div>
 
-              <span className="text-[11px] text-[#A3A3A3] block font-mono text-center">
+              <span className={`text-[11px] block font-mono text-center ${
+                isLight ? 'text-neutral-600' : 'text-[#A3A3A3]'
+              }`}>
                 Works with Google Pay, PhonePe, Paytm, BHIM, or any UPI banking app.
               </span>
             </div>
@@ -130,29 +179,47 @@ export default function DonationSection({ config, settings }: DonationSectionPro
         <div className="lg:col-span-7 space-y-10 sm:space-y-12">
 
           {/* Section 1: Where does your money go? */}
-          <div className="p-6 sm:p-8 bg-[#0E0E0E] border border-[#333333] rounded-sm space-y-4 relative">
-            <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white">
+          <div className={`p-6 sm:p-8 rounded-sm space-y-4 relative ${
+            isLight
+              ? 'bg-[#FAF8F3] border-2 border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A]'
+              : 'bg-[#0E0E0E] border border-[#333333]'
+          }`}>
+            <h3 className={`font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight ${
+              isLight ? 'text-[#0A0A0A]' : 'text-white'
+            }`}>
               WHERE DOES YOUR MONEY GO?
             </h3>
 
             <div className="space-y-4 pt-1">
-              <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
+              <p className={`font-sans text-sm sm:text-[15px] leading-[1.75] font-normal ${
+                isLight ? 'text-neutral-800' : 'text-[#A3A3A3]'
+              }`}>
                 Our partnerships with organisations like Sayodhya help ensure that every contribution goes towards making someone’s life safer.
               </p>
-              <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
+              <p className={`font-sans text-sm sm:text-[15px] leading-[1.75] font-normal ${
+                isLight ? 'text-neutral-800' : 'text-[#A3A3A3]'
+              }`}>
                 A small portion of your contribution is set aside to support future events and outreach campaigns. We then donate the funds raised through these initiatives to organisations working within Project S.H.E.’s areas of focus.
               </p>
             </div>
           </div>
 
           {/* Section 2: Our registration Status */}
-          <div className="p-6 sm:p-8 bg-[#0E0E0E] border border-[#333333] rounded-sm space-y-4 relative">
-            <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white">
+          <div className={`p-6 sm:p-8 rounded-sm space-y-4 relative ${
+            isLight
+              ? 'bg-[#FAF8F3] border-2 border-[#0A0A0A] shadow-[4px_4px_0px_0px_#0A0A0A]'
+              : 'bg-[#0E0E0E] border border-[#333333]'
+          }`}>
+            <h3 className={`font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight ${
+              isLight ? 'text-[#0A0A0A]' : 'text-white'
+            }`}>
               OUR REGISTRATION STATUS.
             </h3>
 
             <div className="pt-1">
-              <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
+              <p className={`font-sans text-sm sm:text-[15px] leading-[1.75] font-normal ${
+                isLight ? 'text-neutral-800' : 'text-[#A3A3A3]'
+              }`}>
                 We are formally registered as Sarva Nirbhaya Foundation, a Section 8 company under the Companies Act, 2013. We were incorporated on 19 May 2026 under the Ministry of Corporate Affairs, Government of India.
               </p>
             </div>
