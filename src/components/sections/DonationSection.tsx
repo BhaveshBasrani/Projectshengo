@@ -2,16 +2,20 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { SiteConfig } from '@/lib/types';
+import { SiteConfig, SiteSettings } from '@/lib/types';
 import { HiCheck, HiSquare2Stack } from 'react-icons/hi2';
 
 interface DonationSectionProps {
   config: SiteConfig;
+  settings?: SiteSettings;
 }
 
-export default function DonationSection({ config }: DonationSectionProps) {
+export default function DonationSection({ config, settings }: DonationSectionProps) {
   const [copied, setCopied] = useState(false);
-  const upiId = config.donation_upi_id || 'shailajalakshmisarao1974-2@okicici';
+  const upiId = settings?.donation_upi_id || config.donation_upi_id || 'shailajalakshmisarao1974-2@okicici';
+  const qrUrl = settings?.donation_qr_url || config.donation_qr_url || '/assets/qr-code.svg';
+  const headline = settings?.donation_headline || 'DONATE THROUGH UPI';
+  const subtext = settings?.donation_subtext || 'Convenient, safe, and designed to ensure your contribution reaches those who need it most.';
 
   const handleCopyUpi = () => {
     navigator.clipboard.writeText(upiId);
@@ -30,10 +34,10 @@ export default function DonationSection({ config }: DonationSectionProps) {
           </span>
         </div>
         <h2 className="font-heading font-bold text-3xl sm:text-4xl md:text-5xl uppercase tracking-tight text-white leading-none">
-          DONATE THROUGH UPI
+          {headline}
         </h2>
         <p className="font-sans text-sm sm:text-base text-[#A3A3A3] max-w-2xl leading-relaxed">
-          Convenient, safe, and designed to ensure your contribution reaches those who need it most.
+          {subtext}
         </p>
       </div>
 
@@ -53,7 +57,7 @@ export default function DonationSection({ config }: DonationSectionProps) {
             <div className="relative w-64 h-64 sm:w-72 sm:h-72 bg-white border border-[#333333] p-4 flex items-center justify-center rounded-sm">
               <div className="relative w-full h-full">
                 <Image
-                  src="/assets/qr-code.svg"
+                  src={qrUrl}
                   alt="Project S.H.E. Official Donation QR Code"
                   fill
                   className="object-contain"

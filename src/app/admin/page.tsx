@@ -1,2630 +1,3211 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/firebase/auth-context';
-import Image from 'next/image';
-import GrungeGlyph from '@/components/ui/GrungeGlyph';
-import PunkLoader from '@/components/ui/PunkLoader';
 import {
   PublicReview,
   SuggestionFeedback,
-  BlogPost,
   SiteUpdate,
-  SiteConfig,
-  AdminStats,
-  UserProfile,
-  BulletinCardStyle,
-  BulletinDoodleIcon,
-  parseBulletinPayload,
+  SiteSettings,
+  GalleryItem,
+  VisitorLog,
+  TeamAccessLog,
+  DEFAULT_SITE_SETTINGS,
 } from '@/lib/types';
-import { isAuthorizedAdminEmail } from '@/lib/admin/auth';
+import {
+  HiCheck,
+  HiXMark,
+  HiTrash,
+  HiPlus,
+  HiArrowTopRightOnSquare,
+  HiArrowRightOnRectangle,
+  HiEye,
+  HiEyeSlash,
+  HiPencilSquare,
+  HiShieldExclamation,
+  HiUserGroup,
+  HiBars3,
+  HiChevronLeft,
+  HiChevronRight,
+  HiMagnifyingGlass,
+  HiArrowPath,
+  HiChatBubbleBottomCenterText,
+  HiMegaphone,
+  HiInbox,
+  HiPhoto,
+  HiSun,
+  HiMoon,
+  HiQrCode,
+} from 'react-icons/hi2';
 
-export default function AdminDashboardPage() {
+export default function TeamHubPage() {
   const router = useRouter();
-  const { user, profile, loading, logout, isAdmin } = useAuth();
+  const { user, logout } = useAuth();
 
-  // Navigation tabs
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'reviews' | 'feedback' | 'posts' | 'updates' | 'email' | 'config'>('overview');
+  // Navigation tab state
+  const [activeTab, setActiveTab] = useState<
+    'site_text' | 'gallery' | 'insights' | 'reviews' | 'notices' | 'messages'
+  >('site_text');
+
+  // Theme detection & preview
+  const [isLight, setIsLight] = useState(false);
+
+  useEffect(() => {
+    const checkTheme = () => {
+      const isL =
+        document.documentElement.getAttribute('data-theme') === 'light' ||
+        document.documentElement.classList.contains('light');
+      setIsLight(isL);
+    };
+    checkTheme();
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class'],
+    });
+    window.addEventListener('theme-changed', checkTheme);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('theme-changed', checkTheme);
+    };
+  }, []);
+
+  const togglePreviewTheme = (newTheme: 'dark' | 'light') => {
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    try {
+      localStorage.setItem('project-she-theme', newTheme);
+    } catch (e) {}
+    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: newTheme } }));
+    setIsLight(newTheme === 'light');
+  };
+
+  // Mobile sidebar toggle
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Authentication states
   const [adminSecret, setAdminSecret] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authChecking, setAuthChecking] = useState(true);
+  const [keyInput, setKeyInput] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
+  const [showKeyText, setShowKeyText] = useState(false);
 
-  // Password change states
-  const [newMasterPassword, setNewMasterPassword] = useState('');
-  const [confirmMasterPassword, setConfirmMasterPassword] = useState('');
-  const [showPasswordText, setShowPasswordText] = useState(false);
-  const [passwordChangeStatus, setPasswordChangeStatus] = useState<{ type: 'idle' | 'loading' | 'success' | 'error'; message: string }>({ type: 'idle', message: '' });
-
-  // Live telemetry states (100% Real & Verified)
-  const [liveLatency, setLiveLatency] = useState<number | null>(null);
-  const [lastSyncTime, setLastSyncTime] = useState<string>('');
-  const [dbStatus, setDbStatus] = useState<'connected' | 'checking' | 'error'>('checking');
-
-  // Data states
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [users, setUsers] = useState<UserProfile[]>([]);
+  // Data states - populated with safe defaults
   const [reviews, setReviews] = useState<PublicReview[]>([]);
   const [feedback, setFeedback] = useState<SuggestionFeedback[]>([]);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [updates, setUpdates] = useState<SiteUpdate[]>([]);
-  const [config, setConfig] = useState<SiteConfig | null>(null);
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [visitorLogs, setVisitorLogs] = useState<VisitorLog[]>([]);
+  const [teamAccessLogs, setTeamAccessLogs] = useState<TeamAccessLog[]>([]);
+  const [registeredUsersCount, setRegisteredUsersCount] = useState<number>(0);
 
-  const [actionLoading, setActionLoading] = useState(false);
-  const [feedbackMsg, setFeedbackMsg] = useState('');
+  // Site Text & Links state (initialized directly with DEFAULT_SITE_SETTINGS)
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ ...DEFAULT_SITE_SETTINGS });
+  const [savingSettings, setSavingSettings] = useState(false);
 
-  // Modals & Form states
-  const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
-  const [newUpdateTitle, setNewUpdateTitle] = useState('');
-  const [newUpdateContent, setNewUpdateContent] = useState('');
-  const [newUpdateCategory, setNewUpdateCategory] = useState('Announcement');
-  const [newUpdateCardStyle, setNewUpdateCardStyle] = useState<BulletinCardStyle>('zine');
-  const [newUpdateImageUrl, setNewUpdateImageUrl] = useState('');
-  const [newUpdateIsBanner, setNewUpdateIsBanner] = useState(true);
-  const [newUpdateLinkUrl, setNewUpdateLinkUrl] = useState('');
-  const [newUpdateLinkText, setNewUpdateLinkText] = useState('READ MORE');
-  const [newUpdateDoodleIcon, setNewUpdateDoodleIcon] = useState<BulletinDoodleIcon>('star');
+  // Gallery state
+  const [galleryCategoryFilter, setGalleryCategoryFilter] = useState<'ALL' | 'BOTB 2.0' | 'PROJECT SHE 1.0'>('ALL');
+  const [gallerySearchQuery, setGallerySearchQuery] = useState('');
+  const [galleryPage, setGalleryPage] = useState(1);
+  const photosPerPage = 36;
 
-  const [emailSubject, setEmailSubject] = useState('');
-  const [emailHeadline, setEmailHeadline] = useState('');
-  const [emailSubtitle, setEmailSubtitle] = useState('');
-  const [emailContent, setEmailContent] = useState('');
-  const [emailCtaText, setEmailCtaText] = useState('VISIT OUR WEBSITE');
-  const [emailCtaUrl, setEmailCtaUrl] = useState('https://projectshe.org');
-  const [emailTarget, setEmailTarget] = useState<'subscribed_only' | 'all' | 'test_admin'>('subscribed_only');
+  // Add Photo form state
+  const [showAddPhoto, setShowAddPhoto] = useState(false);
+  const [newPhotoSrc, setNewPhotoSrc] = useState('');
+  const [newPhotoTitle, setNewPhotoTitle] = useState('');
+  const [newPhotoCategory, setNewPhotoCategory] = useState<'BOTB 2.0' | 'PROJECT SHE 1.0'>('BOTB 2.0');
+  const [isAddingPhoto, setIsAddingPhoto] = useState(false);
 
-  // Search & Filters
-  const [userSearch, setUserSearch] = useState('');
-  const [userSubscriptionFilter, setUserSubscriptionFilter] = useState<'all' | 'subscribed' | 'unsubscribed'>('all');
-  const [reviewFilter, setReviewFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'archived'>('pending');
-  const [feedbackTypeFilter, setFeedbackTypeFilter] = useState<'all' | 'suggestion' | 'feedback'>('all');
+  // General loading & notice
+  const [loadingData, setLoadingData] = useState(false);
+  const [clearingWaste, setClearingWaste] = useState(false);
+  const [statusNotice, setStatusNotice] = useState('');
 
-  const getHeaders = (keyToUse?: string) => {
-    const key = keyToUse || adminSecret || (typeof window !== 'undefined' ? sessionStorage.getItem('project_she_admin_key') || localStorage.getItem('project_she_admin_key') || '' : '');
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'x-admin-secret': key,
-    };
-    if (user?.email) {
-      headers['x-admin-email'] = user.email;
-    }
-    return headers;
+  // Review tab filter
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'pending' | 'approved'>('pending');
+
+  // New Notice form states
+  const [newNoticeTitle, setNewNoticeTitle] = useState('');
+  const [newNoticeCategory, setNewNoticeCategory] = useState('Announcement');
+  const [newNoticeContent, setNewNoticeContent] = useState('');
+  const [newNoticeLinkUrl, setNewNoticeLinkUrl] = useState('');
+  const [newNoticeLinkText, setNewNoticeLinkText] = useState('Read Details');
+  const [isSubmittingNotice, setIsSubmittingNotice] = useState(false);
+
+  const showNotice = (msg: string) => {
+    setStatusNotice(msg);
+    setTimeout(() => setStatusNotice(''), 4000);
   };
 
-  const showToast = (msg: string) => {
-    setFeedbackMsg(msg);
-    setTimeout(() => setFeedbackMsg(''), 4000);
-  };
-
-  // Verify key against API and load real data
-  const verifyAndLoad = async (key: string): Promise<boolean> => {
-    const startTime = performance.now();
-    try {
-      const headers = getHeaders(key);
-      const sRes = await fetch('/api/admin/stats', { headers });
-
-      if (sRes.status === 403) {
-        setIsAuthenticated(false);
-        setDbStatus('error');
-        return false;
-      }
-
-      const sData = await sRes.json();
-      if (!sData.success) {
-        setIsAuthenticated(false);
-        setDbStatus('error');
-        return false;
-      }
-
-      const duration = Math.round(performance.now() - startTime);
-      setLiveLatency(duration);
-      setLastSyncTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-      setDbStatus('connected');
-      setIsAuthenticated(true);
-      setAdminSecret(key);
-      setStats(sData.stats);
-
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('project_she_admin_key', key);
-        localStorage.setItem('project_she_admin_key', key);
-      }
-
-      // Load supporting records in parallel without heavy polling
-      const [uRes, rRes, fRes, pRes, upRes, cRes] = await Promise.all([
-        fetch('/api/admin/users', { headers }),
-        fetch('/api/admin/reviews', { headers }),
-        fetch('/api/admin/feedback', { headers }),
-        fetch('/api/admin/posts', { headers }),
-        fetch('/api/admin/updates', { headers }),
-        fetch('/api/admin/config', { headers }),
-      ]);
-
-      const [uData, rData, fData, pData, upData, cData] = await Promise.all([
-        uRes.json(),
-        rRes.json(),
-        fRes.json(),
-        pRes.json(),
-        upRes.json(),
-        cRes.json(),
-      ]);
-
-      if (uData.success) setUsers(uData.users);
-      if (rData.success) setReviews(rData.reviews);
-      if (fData.success) setFeedback(fData.feedback);
-      if (pData.success) setPosts(pData.posts);
-      if (upData.success) setUpdates(upData.updates);
-      if (cData.success) setConfig(cData.config);
-
-      return true;
-    } catch (e) {
-      console.warn('Admin load failed:', e);
-      setDbStatus('error');
-      return false;
-    }
-  };
-
-  // Check saved session on mount and respond to verified director email
+  // --- PASSKEY AUTHENTICATION ---
   useEffect(() => {
-    const initAuth = async () => {
-      setAuthChecking(true);
-      if (typeof window !== 'undefined') {
-        const storedKey = sessionStorage.getItem('project_she_admin_key') || localStorage.getItem('project_she_admin_key');
-        if (storedKey) {
-          const ok = await verifyAndLoad(storedKey);
-          if (!ok && !(user?.email && isAuthorizedAdminEmail(user.email))) {
-            sessionStorage.removeItem('project_she_admin_key');
-            localStorage.removeItem('project_she_admin_key');
-          }
-        } else if (user?.email && isAuthorizedAdminEmail(user.email)) {
-          await verifyAndLoad('');
-        }
-      }
+    const saved = sessionStorage.getItem('she_team_passkey');
+    if (saved) {
+      setAdminSecret(saved);
+      verifySecret(saved);
+    } else {
       setAuthChecking(false);
-    };
+    }
+  }, []);
 
-    initAuth();
-  }, [user]);
-
-  // Handle password form submission
-  const handlePasswordLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!passwordInput.trim()) return;
-
-    setActionLoading(true);
+  const verifySecret = async (secretToTest: string) => {
+    setAuthChecking(true);
     setLoginError('');
-
     try {
-      const ok = await verifyAndLoad(passwordInput.trim());
-      if (!ok) {
-        setLoginError('Incorrect password. Access denied.');
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ secret: secretToTest.trim() }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsAuthenticated(true);
+        setAdminSecret(secretToTest.trim());
+        sessionStorage.setItem('she_team_passkey', secretToTest.trim());
+        loadAllData(secretToTest.trim());
       } else {
-        showToast('Admin access granted');
+        setIsAuthenticated(false);
+        sessionStorage.removeItem('she_team_passkey');
+        setLoginError(data.error || 'Invalid passkey. Access denied.');
       }
-    } catch (e: any) {
-      setLoginError('Verification failed. Please check your connection.');
+    } catch {
+      setLoginError('Unable to connect to verification server.');
+      setIsAuthenticated(false);
     } finally {
-      setActionLoading(false);
+      setAuthChecking(false);
     }
   };
 
-  // Explicit Lock / Log Out
-  const handleLockAdmin = () => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.removeItem('project_she_admin_key');
-      localStorage.removeItem('project_she_admin_key');
-    }
+  const handleKeySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!keyInput.trim()) return;
+    verifySecret(keyInput.trim());
+  };
+
+  const handleSignOut = () => {
+    sessionStorage.removeItem('she_team_passkey');
     setAdminSecret('');
     setIsAuthenticated(false);
-    setPasswordInput('');
-    setLoginError('');
-    showToast('Admin panel locked');
+    setKeyInput('');
+    if (user) logout();
   };
 
-  // Refresh data explicitly on click (keeps egress low)
-  const handleRefreshData = async () => {
-    if (!adminSecret) return;
-    setActionLoading(true);
-    await Promise.all([
-      verifyAndLoad(adminSecret),
-      new Promise((resolve) => setTimeout(resolve, 600)),
-    ]);
-    setActionLoading(false);
-    showToast('Data refreshed');
+  const getHeaders = (token?: string) => ({
+    'Content-Type': 'application/json',
+    'x-admin-secret': token || adminSecret,
+    Authorization: `Bearer ${token || adminSecret}`,
+  });
+
+  // --- LOAD ALL DATA ---
+  const loadAllData = async (token?: string) => {
+    const activeKey = token || adminSecret;
+    if (!activeKey) return;
+    setLoadingData(true);
+
+    try {
+      const [
+        settingsRes,
+        galleryRes,
+        insightsRes,
+        reviewsRes,
+        updatesRes,
+        feedbackRes,
+        usersRes,
+      ] = await Promise.allSettled([
+        fetch('/api/admin/settings', { headers: getHeaders(activeKey) }),
+        fetch('/api/admin/gallery', { headers: getHeaders(activeKey) }),
+        fetch('/api/admin/insights', { headers: getHeaders(activeKey) }),
+        fetch('/api/admin/reviews', { headers: getHeaders(activeKey) }),
+        fetch('/api/admin/updates', { headers: getHeaders(activeKey) }),
+        fetch('/api/admin/feedback', { headers: getHeaders(activeKey) }),
+        fetch('/api/admin/users', { headers: getHeaders(activeKey) }),
+      ]);
+
+      if (settingsRes.status === 'fulfilled' && settingsRes.value.ok) {
+        const data = await settingsRes.value.json();
+        if (data.settings) {
+          setSiteSettings((prev) => ({ ...prev, ...data.settings }));
+        }
+      }
+
+      if (galleryRes.status === 'fulfilled' && galleryRes.value.ok) {
+        const data = await galleryRes.value.json();
+        if (Array.isArray(data.items)) {
+          setGalleryItems(data.items);
+        }
+      }
+
+      if (insightsRes.status === 'fulfilled' && insightsRes.value.ok) {
+        const data = await insightsRes.value.json();
+        if (Array.isArray(data.visitors)) setVisitorLogs(data.visitors);
+        if (Array.isArray(data.accessLogs)) setTeamAccessLogs(data.accessLogs);
+      }
+
+      if (reviewsRes.status === 'fulfilled' && reviewsRes.value.ok) {
+        const data = await reviewsRes.value.json();
+        if (Array.isArray(data.reviews)) setReviews(data.reviews);
+      }
+
+      if (updatesRes.status === 'fulfilled' && updatesRes.value.ok) {
+        const data = await updatesRes.value.json();
+        if (Array.isArray(data.updates)) setUpdates(data.updates);
+      }
+
+      if (feedbackRes.status === 'fulfilled' && feedbackRes.value.ok) {
+        const data = await feedbackRes.value.json();
+        if (Array.isArray(data.feedback)) setFeedback(data.feedback);
+      }
+
+      if (usersRes.status === 'fulfilled' && usersRes.value.ok) {
+        const data = await usersRes.value.json();
+        if (Array.isArray(data.users)) setRegisteredUsersCount(data.users.length);
+      }
+    } catch (e) {
+      console.warn('Error loading team data:', e);
+    } finally {
+      setLoadingData(false);
+    }
   };
 
-  // Delete User Account
-  const handleDeleteUser = async (userId: string, email: string) => {
-    if (!confirm(`Are you sure you want to permanently delete this user account?\n\nEmail: ${email}\n\nThis will remove their profile and access immediately.`)) {
+  // --- ACTIONS: SITE TEXT & LINKS ---
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify(siteSettings),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.settings) {
+          setSiteSettings((prev) => ({ ...prev, ...data.settings }));
+        }
+        showNotice('Website changes saved live for all visitors.');
+      } else {
+        showNotice('Unable to save changes. Please try again.');
+      }
+    } catch {
+      showNotice('Connection error while saving site content.');
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  const handleRestoreDefaults = () => {
+    if (confirm('Restore all site text, pillars, and contacts to default NGO values?')) {
+      setSiteSettings({ ...DEFAULT_SITE_SETTINGS });
+      showNotice('Default values restored in editor. Click "Save Live Changes" to apply.');
+    }
+  };
+
+  // --- ACTIONS: PICTURES & GALLERY ---
+  const handleAddPhotograph = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPhotoSrc.trim()) {
+      showNotice('Please provide a photo URL or image path.');
       return;
     }
 
-    setActionLoading(true);
+    setIsAddingPhoto(true);
     try {
-      const res = await fetch(`/api/admin/users?id=${userId}`, {
-        method: 'DELETE',
+      const res = await fetch('/api/admin/gallery', {
+        method: 'POST',
         headers: getHeaders(),
+        body: JSON.stringify({
+          src: newPhotoSrc.trim(),
+          title: newPhotoTitle.trim() || 'Community Event Photograph',
+          category: newPhotoCategory,
+        }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast(`Account deleted: ${email}`);
-        setUsers((prev) => prev.filter((u) => u.id !== userId));
-        if (stats) {
-          setStats({ ...stats, totalUsers: Math.max(0, stats.totalUsers - 1) });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.item) {
+          setGalleryItems((prev) => [data.item, ...prev]);
         }
+        setNewPhotoSrc('');
+        setNewPhotoTitle('');
+        setShowAddPhoto(false);
+        showNotice('Photograph added to gallery.');
       } else {
-        alert(data.error || 'Failed to delete member account');
+        showNotice('Unable to add photograph.');
       }
-    } catch (e) {
-      alert('Error deleting member account');
+    } catch {
+      showNotice('Connection error while adding photo.');
     } finally {
-      setActionLoading(false);
+      setIsAddingPhoto(false);
     }
   };
 
-  // Review Actions
-  const handleModerateReview = async (id: string, status: 'approved' | 'rejected' | 'pending' | 'archived') => {
-    setActionLoading(true);
+  const handleDeletePhotograph = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this photograph from the gallery?')) return;
+
+    try {
+      const res = await fetch(`/api/admin/gallery?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+
+      if (res.ok) {
+        setGalleryItems((prev) => prev.filter((item) => item.id !== id));
+        showNotice('Photograph permanently removed from all devices.');
+      } else {
+        showNotice('Unable to delete photograph.');
+      }
+    } catch {
+      showNotice('Connection error while removing photograph.');
+    }
+  };
+
+  // Filtered & Paginated Gallery Photos
+  const filteredGalleryPhotos = useMemo(() => {
+    return galleryItems.filter((item) => {
+      const matchesCategory =
+        galleryCategoryFilter === 'ALL' || item.category === galleryCategoryFilter;
+      const matchesSearch =
+        !gallerySearchQuery.trim() ||
+        (item.title && item.title.toLowerCase().includes(gallerySearchQuery.toLowerCase())) ||
+        (item.src && item.src.toLowerCase().includes(gallerySearchQuery.toLowerCase())) ||
+        (item.id && item.id.toLowerCase().includes(gallerySearchQuery.toLowerCase()));
+      return matchesCategory && matchesSearch;
+    });
+  }, [galleryItems, galleryCategoryFilter, gallerySearchQuery]);
+
+  const totalGalleryPages = Math.max(1, Math.ceil(filteredGalleryPhotos.length / photosPerPage));
+  const paginatedPhotos = useMemo(() => {
+    const start = (galleryPage - 1) * photosPerPage;
+    return filteredGalleryPhotos.slice(start, start + photosPerPage);
+  }, [filteredGalleryPhotos, galleryPage, photosPerPage]);
+
+  // --- ACTIONS: CLEAR WASTE LOGS ---
+  const handleClearWasteData = async (target: 'visitors' | 'access' | 'all') => {
+    const message =
+      target === 'all'
+        ? 'Clear all visitor activity and security access logs?'
+        : target === 'visitors'
+        ? 'Clear all visitor browsing records?'
+        : 'Clear all security and team access logs?';
+
+    if (!confirm(message)) return;
+
+    setClearingWaste(true);
+    try {
+      const res = await fetch(`/api/admin/insights?target=${target}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+      });
+
+      if (res.ok) {
+        if (target === 'visitors' || target === 'all') {
+          setVisitorLogs([]);
+        }
+        if (target === 'access' || target === 'all') {
+          setTeamAccessLogs([]);
+        }
+        showNotice('Activity logs successfully cleared.');
+      } else {
+        showNotice('Unable to clear activity logs.');
+      }
+    } catch {
+      showNotice('Connection error while clearing logs.');
+    } finally {
+      setClearingWaste(false);
+    }
+  };
+
+  // --- ACTIONS: REVIEWS ---
+  const handleUpdateReviewStatus = async (id: string, newStatus: 'approved' | 'rejected' | 'pending') => {
     try {
       const res = await fetch('/api/admin/reviews', {
         method: 'PATCH',
         headers: getHeaders(),
-        body: JSON.stringify({ id, status }),
+        body: JSON.stringify({ id, status: newStatus }),
       });
       if (res.ok) {
-        showToast(`Review marked as ${status.toUpperCase()}`);
         setReviews((prev) =>
-          prev.map((r) => (r.id === id ? { ...r, status, reviewed_at: new Date().toISOString() } : r))
+          prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
         );
-        if (stats) {
-          const wasPending = reviews.find((r) => r.id === id)?.status === 'pending';
-          const wasApproved = reviews.find((r) => r.id === id)?.status === 'approved';
-          const pendingChange = wasPending && status !== 'pending' ? -1 : (!wasPending && status === 'pending' ? 1 : 0);
-          const pubChange = status === 'approved' ? (wasApproved ? 0 : 1) : (wasApproved ? -1 : 0);
-          setStats({
-            ...stats,
-            pendingReviews: Math.max(0, stats.pendingReviews + pendingChange),
-            publishedReviews: Math.max(0, stats.publishedReviews + pubChange),
-          });
-        }
+        showNotice(newStatus === 'approved' ? 'Review approved and published live.' : 'Review hidden from live site.');
+      } else {
+        showNotice('Unable to update review status.');
       }
-    } catch (e) {
-      showToast('Action failed');
-    } finally {
-      setActionLoading(false);
+    } catch {
+      showNotice('Connection error while updating review.');
     }
   };
 
   const handleDeleteReview = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this review?')) return;
+
     try {
       const res = await fetch(`/api/admin/reviews?id=${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });
       if (res.ok) {
-        showToast('Review permanently deleted');
         setReviews((prev) => prev.filter((r) => r.id !== id));
-      }
-    } catch (e) {
-      showToast('Delete failed');
-    }
-  };
-
-  // Feedback Actions
-  const handleUpdateFeedbackStatus = async (id: string, status: 'new' | 'reviewed' | 'resolved') => {
-    try {
-      const res = await fetch('/api/admin/feedback', {
-        method: 'PATCH',
-        headers: getHeaders(),
-        body: JSON.stringify({ id, status }),
-      });
-      if (res.ok) {
-        showToast(`Status updated to ${status}`);
-        setFeedback((prev) =>
-          prev.map((f) => (f.id === id ? { ...f, status, resolved_at: new Date().toISOString() } : f))
-        );
-      }
-    } catch (e) {
-      showToast('Status update failed');
-    }
-  };
-
-  const handleDeleteFeedback = async (id: string) => {
-    if (!confirm('Delete this message entry?')) return;
-    try {
-      const res = await fetch(`/api/admin/feedback?id=${id}`, {
-        method: 'DELETE',
-        headers: getHeaders(),
-      });
-      if (res.ok) {
-        showToast('Message deleted');
-        setFeedback((prev) => prev.filter((f) => f.id !== id));
-      }
-    } catch (e) {
-      showToast('Delete failed');
-    }
-  };
-
-  // Post Actions
-  const handleSavePost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingPost?.title || !editingPost?.body) {
-      alert('Title and Body are required.');
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      const res = await fetch('/api/admin/posts', {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify(editingPost),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast('Article saved successfully');
-        setEditingPost(null);
-        await verifyAndLoad(adminSecret);
+        showNotice('Review permanently deleted.');
       } else {
-        alert(data.error || 'Failed to save article');
+        showNotice('Unable to delete review.');
       }
-    } catch (e) {
-      showToast('Failed to save article');
-    } finally {
-      setActionLoading(false);
+    } catch {
+      showNotice('Connection error while deleting review.');
     }
   };
 
-  const handleDeletePost = async (id: string) => {
-    if (!confirm('Delete this article permanently?')) return;
-    try {
-      const res = await fetch(`/api/admin/posts?id=${id}`, {
-        method: 'DELETE',
-        headers: getHeaders(),
-      });
-      if (res.ok) {
-        showToast('Article deleted');
-        setPosts((prev) => prev.filter((p) => p.id !== id));
-      }
-    } catch (e) {
-      showToast('Delete failed');
-    }
-  };
-
-  const handleTogglePinPost = async (post: BlogPost) => {
-    const currentlyPinned = posts.filter((p) => p.is_pinned).length;
-    if (!post.is_pinned && currentlyPinned >= 3) {
-      alert('Maximum 3 blogs can be pinned simultaneously. Please unpin an existing blog first.');
-      return;
-    }
-
-    setActionLoading(true);
-    try {
-      const res = await fetch('/api/admin/posts', {
-        method: 'PATCH',
-        headers: getHeaders(),
-        body: JSON.stringify({ id: post.id, is_pinned: !post.is_pinned }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast(post.is_pinned ? 'Blog unpinned' : 'Blog pinned to top (Max 3)');
-        setPosts((prev) =>
-          prev.map((p) => (p.id === post.id ? { ...p, is_pinned: !post.is_pinned } : p))
-        );
-      } else {
-        alert(data.error || 'Failed to toggle pin state');
-      }
-    } catch (e) {
-      showToast('Error toggling pin status');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // Update Actions
-  const handleCreateUpdate = async (e: React.FormEvent) => {
+  // --- ACTIONS: NOTICE BOARD ---
+  const handleCreateNotice = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newUpdateTitle || !newUpdateContent) {
-      alert('Title and Content required');
+    if (!newNoticeTitle.trim() || !newNoticeContent.trim()) {
+      showNotice('Please write a headline and message for the announcement.');
       return;
     }
 
-    setActionLoading(true);
+    setIsSubmittingNotice(true);
     try {
+      const payload = {
+        title: newNoticeTitle.trim(),
+        category: newNoticeCategory,
+        content: newNoticeContent.trim(),
+        link_url: newNoticeLinkUrl.trim() || undefined,
+        link_text: newNoticeLinkText.trim() || undefined,
+        is_banner: true,
+        status: 'published',
+      };
+
       const res = await fetch('/api/admin/updates', {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({
-          title: newUpdateTitle,
-          content: newUpdateContent,
-          category: newUpdateCategory,
-          card_style: newUpdateCardStyle,
-          image_url: newUpdateImageUrl,
-          is_banner: newUpdateIsBanner,
-          link_url: newUpdateLinkUrl,
-          link_text: newUpdateLinkText,
-          doodle_icon: newUpdateDoodleIcon,
-        }),
+        body: JSON.stringify(payload),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast('Bulletin posted successfully to website & banner');
-        setNewUpdateTitle('');
-        setNewUpdateContent('');
-        setNewUpdateImageUrl('');
-        setNewUpdateLinkUrl('');
+
+      if (res.ok) {
+        const data = await res.json();
         if (data.update) {
           setUpdates((prev) => [data.update, ...prev]);
         }
+        setNewNoticeTitle('');
+        setNewNoticeContent('');
+        setNewNoticeLinkUrl('');
+        showNotice('Announcement published to live notice board.');
+      } else {
+        showNotice('Unable to publish announcement.');
       }
-    } catch (e) {
-      showToast('Failed to post bulletin');
+    } catch {
+      showNotice('Connection error while publishing announcement.');
     } finally {
-      setActionLoading(false);
+      setIsSubmittingNotice(false);
     }
   };
 
-  const handleDeleteUpdate = async (id: string) => {
-    if (!confirm('Delete this bulletin?')) return;
+  const handleDeleteNotice = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this announcement?')) return;
+
     try {
       const res = await fetch(`/api/admin/updates?id=${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
       });
       if (res.ok) {
-        showToast('Bulletin deleted');
         setUpdates((prev) => prev.filter((u) => u.id !== id));
+        showNotice('Announcement deleted.');
+      } else {
+        showNotice('Unable to delete announcement.');
       }
-    } catch (e) {
-      showToast('Delete failed');
+    } catch {
+      showNotice('Connection error while deleting announcement.');
     }
   };
 
-  const handleModerateBulletin = async (updateId: string, action: 'pin' | 'lock' | 'toggle_banner' | 'delete') => {
-    if (action === 'delete' && !confirm('Are you sure you want to permanently delete this bulletin topic?')) return;
-    try {
-      const res = await fetch('/api/bulletin/moderate', {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ updateId, action }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        showToast(`Bulletin ${action} updated`);
-        if (data.updates) {
-          setUpdates(data.updates);
-        } else if (action === 'delete') {
-          setUpdates((prev) => prev.filter((u) => u.id !== updateId));
-        }
-      }
-    } catch (e) {
-      showToast('Moderation action failed');
-    }
-  };
+  // --- ACTIONS: MESSAGES ---
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm('Are you sure you want to remove this message?')) return;
 
-  // Config Actions
-  const handleSaveConfig = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!config) return;
-
-    setActionLoading(true);
     try {
-      const res = await fetch('/api/admin/config', {
-        method: 'POST',
+      const res = await fetch(`/api/admin/feedback?id=${id}`, {
+        method: 'DELETE',
         headers: getHeaders(),
-        body: JSON.stringify(config),
       });
       if (res.ok) {
-        showToast('Website settings updated successfully');
-      }
-    } catch (e) {
-      showToast('Failed to update website settings');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // Global Save Changes Action
-  const handleGlobalSaveChanges = async () => {
-    setActionLoading(true);
-    try {
-      if (config) {
-        await fetch('/api/admin/config', {
-          method: 'POST',
-          headers: getHeaders(),
-          body: JSON.stringify(config),
-        });
-      }
-      await verifyAndLoad(adminSecret);
-      showToast('All changes saved and synchronized with database!');
-    } catch (e) {
-      showToast('Error saving changes');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  // Handle Admin Password Change
-  const handleChangeMasterPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMasterPassword || newMasterPassword.length < 6) {
-      setPasswordChangeStatus({ type: 'error', message: 'Password must be at least 6 characters long.' });
-      return;
-    }
-    if (newMasterPassword !== confirmMasterPassword) {
-      setPasswordChangeStatus({ type: 'error', message: 'Passwords do not match. Please re-enter.' });
-      return;
-    }
-
-    setPasswordChangeStatus({ type: 'loading', message: 'Saving new password...' });
-    try {
-      const res = await fetch('/api/admin/password', {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ newPassword: newMasterPassword.trim() }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        const updatedKey = newMasterPassword.trim();
-        setAdminSecret(updatedKey);
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('project_she_admin_key', updatedKey);
-          localStorage.setItem('project_she_admin_key', updatedKey);
-        }
-        setPasswordChangeStatus({ type: 'success', message: 'Password updated successfully!' });
-        setNewMasterPassword('');
-        setConfirmMasterPassword('');
-        showToast('Password updated successfully');
+        setFeedback((prev) => prev.filter((f) => f.id !== id));
+        showNotice('Message removed.');
       } else {
-        setPasswordChangeStatus({ type: 'error', message: data.error || 'Failed to update password' });
+        showNotice('Unable to remove message.');
       }
-    } catch (err: any) {
-      setPasswordChangeStatus({ type: 'error', message: err?.message || 'Network error updating password' });
+    } catch {
+      showNotice('Connection error while removing message.');
     }
   };
 
-  // Newsletter Actions
-  const handleSendNewsletter = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailSubject.trim() || !emailContent.trim()) {
-      alert('Subject and Content are required.');
-      return;
-    }
-
-    const recipientDesc =
-      emailTarget === 'test_admin'
-        ? 'Test to your Admin Email'
-        : emailTarget === 'all'
-          ? 'ALL registered members'
-          : 'SUBSCRIBED members only';
-
-    if (!confirm(`Are you sure you want to send this newsletter to ${recipientDesc}?`)) return;
-
-    setActionLoading(true);
+  const handleMarkMessageRead = async (id: string) => {
     try {
-      const res = await fetch('/api/admin/newsletter/send', {
-        method: 'POST',
+      const res = await fetch('/api/admin/feedback', {
+        method: 'PATCH',
         headers: getHeaders(),
-        body: JSON.stringify({
-          subject: emailSubject.trim(),
-          headline: (emailHeadline || emailSubject).trim(),
-          subtitle: emailSubtitle.trim(),
-          content: emailContent.trim(),
-          ctaText: emailCtaText.trim(),
-          ctaUrl: emailCtaUrl.trim(),
-          targetAudience: emailTarget,
-        }),
+        body: JSON.stringify({ id, status: 'reviewed' }),
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast(data.message || 'Newsletter sent successfully!');
-        if (emailTarget !== 'test_admin') {
-          setEmailSubject('');
-          setEmailHeadline('');
-          setEmailSubtitle('');
-          setEmailContent('');
-        }
+      if (res.ok) {
+        setFeedback((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, status: 'reviewed' } : f))
+        );
+        showNotice('Message marked as read.');
       } else {
-        alert(data.error || data.message || 'Newsletter send error');
+        showNotice('Unable to update message.');
       }
-    } catch (e: any) {
-      alert('Error sending newsletter: ' + e.message);
-    } finally {
-      setActionLoading(false);
+    } catch {
+      showNotice('Connection error while updating message.');
     }
   };
 
-  // 1. Loading screen while checking existing session
-  if (authChecking) {
+  // --- SCREEN 1: CLEAN VERIFYING SPINNER ---
+  if (authChecking || (isAuthenticated && loadingData && galleryItems.length === 0)) {
     return (
-      <div className="pt-36 pb-20 px-4 max-w-md mx-auto min-h-[70vh] font-mono flex flex-col items-center justify-center">
-        <PunkLoader
-          label="Checking admin session..."
-          size="full"
+      <div
+        className={`min-h-screen flex flex-col items-center justify-center p-6 select-none transition-colors ${
+          isLight ? 'bg-[#EFECE6] text-[#111111]' : 'bg-[#080808] text-white'
+        }`}
+      >
+        <div
+          className={`w-9 h-9 border-2 animate-spin mb-4 ${
+            isLight
+              ? 'border-neutral-300 border-t-[#E6192B]'
+              : 'border-neutral-800 border-t-[#E6192B]'
+          }`}
+          style={{ borderRadius: '0px' }}
         />
+        <p className="font-heading font-black text-sm uppercase tracking-wider">
+          PROJECT S.H.E.
+        </p>
+        <p
+          className={`font-sans text-xs mt-1 ${
+            isLight ? 'text-neutral-600' : 'text-neutral-400'
+          }`}
+        >
+          Loading team access hub...
+        </p>
       </div>
     );
   }
 
-  // 2. PASSWORD GATE SCREEN (Strict Lock Screen)
+  // --- SCREEN 2: TEAM ACCESS LOGIN ---
   if (!isAuthenticated) {
     return (
-      <div className="pt-32 pb-20 px-4 max-w-md mx-auto min-h-[80vh] font-mono select-none relative">
-        {/* Pinned Extracted Punk Spiral Star Sticker */}
-        <div className="absolute -top-5 -right-5 w-20 h-20 pointer-events-none z-20 hidden sm:block">
-          <div className="zine-tape absolute -top-2 left-3 z-10 scale-75" />
-          <Image
-            src="/assets/punk-red-spiral-star-clean.png"
-            alt="Punk Spiral Star"
-            fill
-            sizes="76px"
-            priority
-            className="object-contain drop-shadow-[0_0_10px_rgba(229,9,20,0.7)] animate-[spin_10s_linear_infinite]"
-          />
-        </div>
-
-        {/* Pinned Polly Barbed Star Sticker on Left */}
-        <div className="absolute -bottom-6 -left-6 w-16 h-24 pointer-events-none z-20 hidden sm:block">
-          <div className="zine-tape absolute -top-2 left-2 z-10 scale-50" />
-          <Image
-            src="/assets/punk-polly-stars-clean.png"
-            alt="Polly Star"
-            fill
-            sizes="64px"
-            priority
-            className="object-contain drop-shadow-[0_0_8px_rgba(229,9,20,0.6)] -rotate-12"
-          />
-        </div>
-
-        <div className="p-8 bg-[#0E0E0E] border-4 border-[#E50914] shadow-[8px_8px_0px_0px_#E50914] text-[#F4F1EA] space-y-6 relative stencil-cut overflow-hidden">
-          {/* Subtle Cyber Lily Watermark */}
-          <div className="absolute -bottom-10 -right-6 w-36 h-52 opacity-15 pointer-events-none z-0">
-            <Image
-              src="/assets/punk-lily-clean.png"
-              alt="Cyber Lily Watermark"
-              fill
-              sizes="144px"
-              priority
-              className="object-contain"
-            />
-          </div>
-
-          <div className="zine-tape absolute -top-3 left-6 z-10" />
-
-          <div className="text-center space-y-2 relative z-10">
-            <div className="inline-flex p-3 bg-[#181818] border-2 border-[#E50914] mb-2 stencil-cut">
-              <GrungeGlyph name="lock" className="w-8 h-8 text-[#E50914]" />
-            </div>
-            <h1 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-              ADMIN LOGIN
+      <div
+        className={`min-h-screen flex flex-col justify-center items-center px-4 py-16 selection:bg-[#E6192B] selection:text-white select-none transition-colors ${
+          isLight ? 'bg-[#EFECE6] text-[#111111]' : 'bg-[#090909] text-white'
+        }`}
+      >
+        <div
+          className={`w-full max-w-md p-8 sm:p-10 space-y-6 shadow-xl border ${
+            isLight
+              ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+              : 'bg-[#111111] border-neutral-800'
+          }`}
+          style={{ borderRadius: '0px' }}
+        >
+          <div className="space-y-2 text-center">
+            <span className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+              PROJECT S.H.E.
+            </span>
+            <h1
+              className={`font-heading font-black text-2xl sm:text-3xl uppercase tracking-tight ${
+                isLight ? 'text-[#111111]' : 'text-white'
+              }`}
+            >
+              Team Access
             </h1>
-            <p className="text-xs text-neutral-400 leading-relaxed font-sans">
-              Enter your password to access the Project S.H.E. admin panel.
+            <p
+              className={`font-sans text-xs leading-relaxed ${
+                isLight ? 'text-neutral-600' : 'text-neutral-400'
+              }`}
+            >
+              Enter the team passkey to manage site content, photographs, reviews, and community insights.
             </p>
           </div>
 
-          {user?.email && isAuthorizedAdminEmail(user.email) && (
-            <div className="p-4 bg-[#141414] border-2 border-[#00FF66] shadow-[4px_4px_0px_0px_#00FF66] text-[#00FF66] space-y-2 text-center relative z-10">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-300 block">
-                SIGNED IN AS ADMIN
-              </span>
-              <div className="text-xs font-bold text-white font-mono break-all">
-                {user.email}
-              </div>
-              <button
-                type="button"
-                onClick={() => verifyAndLoad(adminSecret || '')}
-                disabled={actionLoading}
-                className="w-full py-2.5 bg-[#00FF66] hover:bg-white text-black font-heading font-black text-xs uppercase tracking-wider transition-all border border-[#00FF66]"
-              >
-                {actionLoading ? 'SIGNING IN...' : 'CONTINUE TO ADMIN PANEL'}
-              </button>
+          {loginError && (
+            <div
+              className={`p-3 border text-xs font-sans ${
+                isLight
+                  ? 'bg-red-50 border-red-300 text-red-800'
+                  : 'bg-red-950/40 border-red-800 text-red-200'
+              }`}
+              style={{ borderRadius: '0px' }}
+            >
+              {loginError}
             </div>
           )}
 
-          <form onSubmit={handlePasswordLogin} className="space-y-4 relative z-10">
-            <div>
-              <label className="block text-[11px] uppercase font-bold text-neutral-400 mb-1.5">
-                Password
+          <form onSubmit={handleKeySubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label
+                className={`block font-mono text-[11px] uppercase tracking-wider ${
+                  isLight ? 'text-[#111111] font-bold' : 'text-neutral-300'
+                }`}
+              >
+                Passkey
               </label>
-              <input
-                type="password"
-                required
-                autoFocus
-                autoComplete="current-password"
-                spellCheck={false}
-                placeholder="Enter password..."
-                value={passwordInput}
-                onChange={(e) => {
-                  setPasswordInput(e.target.value);
-                  if (loginError) setLoginError('');
-                }}
-                className="w-full p-3 bg-[#141414] border-2 border-neutral-700 focus:border-[#E50914] text-white text-xs outline-none font-mono"
-              />
-            </div>
-
-            {loginError && (
-              <div className="p-3 bg-red-950/80 border border-red-800 text-red-300 text-xs flex items-center gap-2">
-                <GrungeGlyph name="alert" className="w-4 h-4 shrink-0 text-red-400" />
-                <span>{loginError}</span>
+              <div className="relative">
+                <input
+                  type={showKeyText ? 'text' : 'password'}
+                  value={keyInput}
+                  onChange={(e) => setKeyInput(e.target.value)}
+                  placeholder="Enter passkey..."
+                  className={`w-full px-3.5 py-2.5 font-mono text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                    isLight
+                      ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111] placeholder-neutral-400'
+                      : 'bg-[#090909] border-neutral-700 text-white placeholder-neutral-500'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowKeyText(!showKeyText)}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 ${
+                    isLight
+                      ? 'text-neutral-500 hover:text-black'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  {showKeyText ? <HiEyeSlash className="w-4 h-4" /> : <HiEye className="w-4 h-4" />}
+                </button>
               </div>
-            )}
+            </div>
 
             <button
               type="submit"
-              disabled={actionLoading || !passwordInput.trim()}
-              className="w-full py-3 bg-[#E50914] hover:bg-white hover:text-black text-white font-heading font-black text-xs uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 stencil-cut border border-[#E50914]"
+              className="w-full py-3 bg-[#E6192B] hover:bg-black text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors duration-150"
+              style={{ borderRadius: '0px' }}
             >
-              {actionLoading ? (
-                <PunkLoader size="sm" label="Signing in..." className="text-white" />
-              ) : (
-                <>
-                  <GrungeGlyph name="key" className="w-4 h-4" />
-                  <span>SIGN IN</span>
-                </>
-              )}
+              Enter Team Hub
             </button>
           </form>
 
-          <div className="pt-4 border-t border-neutral-800 text-center">
-            <button
-              type="button"
-              onClick={() => router.push('/')}
-              className="text-xs text-neutral-500 hover:text-neutral-300 uppercase underline underline-offset-4 font-bold"
+          <div
+            className={`pt-4 border-t text-center ${
+              isLight ? 'border-[#EAE5DB]' : 'border-neutral-800'
+            }`}
+          >
+            <Link
+              href="/"
+              className={`font-mono text-xs transition-colors ${
+                isLight ? 'text-neutral-500 hover:text-black' : 'text-neutral-500 hover:text-white'
+              }`}
             >
-              Back to Website
-            </button>
+              ← Return to public website
+            </Link>
           </div>
         </div>
       </div>
     );
   }
 
-  // Filtered lists for simple UI
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch =
-      userSearch === '' ||
-      (u.email && u.email.toLowerCase().includes(userSearch.toLowerCase())) ||
-      (u.display_name && u.display_name.toLowerCase().includes(userSearch.toLowerCase()));
-
-    if (!matchesSearch) return false;
-    if (userSubscriptionFilter === 'subscribed') return u.email_subscribed;
-    if (userSubscriptionFilter === 'unsubscribed') return !u.email_subscribed;
+  // Filtered reviews
+  const filteredReviews = reviews.filter((r) => {
+    if (reviewFilter === 'pending') return r.status === 'pending';
+    if (reviewFilter === 'approved') return r.status === 'approved';
     return true;
   });
 
-  const filteredReviews = reviews.filter((r) => {
-    if (reviewFilter === 'all') return true;
-    return r.status === reviewFilter;
-  });
+  const pendingCount = reviews.filter((r) => r.status === 'pending').length;
+  const unreadMessagesCount = feedback.filter((f) => f.status === 'new').length;
 
-  const filteredFeedback = feedback.filter((f) => {
-    if (feedbackTypeFilter === 'all') return true;
-    return f.type === feedbackTypeFilter;
-  });
+  const navMenuItems = [
+    {
+      id: 'site_text' as const,
+      label: 'Site Content & Editor',
+      icon: HiPencilSquare,
+      badge: null,
+    },
+    {
+      id: 'gallery' as const,
+      label: 'Pictures & Gallery',
+      icon: HiPhoto,
+      badge: galleryItems.length.toString(),
+    },
+    {
+      id: 'insights' as const,
+      label: 'Visitor Insights',
+      icon: HiUserGroup,
+      badge: null,
+    },
+    {
+      id: 'reviews' as const,
+      label: 'Community Reviews',
+      icon: HiChatBubbleBottomCenterText,
+      badge: pendingCount > 0 ? `${pendingCount} new` : null,
+      badgeColor: 'bg-[#E6192B] text-white',
+    },
+    {
+      id: 'notices' as const,
+      label: 'Notice Board',
+      icon: HiMegaphone,
+      badge: updates.length > 0 ? updates.length.toString() : null,
+    },
+    {
+      id: 'messages' as const,
+      label: 'Messages',
+      icon: HiInbox,
+      badge: unreadMessagesCount > 0 ? `${unreadMessagesCount} new` : null,
+      badgeColor: 'bg-[#E6192B] text-white',
+    },
+  ];
+
+  // Active visitors calculation (seen in last 15 mins)
+  const activeOnlineCount = visitorLogs.filter((v) => {
+    const diffMin = (Date.now() - new Date(v.last_online).getTime()) / (1000 * 60);
+    return diffMin <= 15;
+  }).length;
 
   return (
-    <div className="pt-24 pb-20 px-4 sm:px-6 max-w-7xl mx-auto min-h-screen select-none font-mono">
-
-      {/* Top Banner */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b-2 border-current">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="punk-stamp text-xs bg-[#E50914] text-white border-black">
-              ADMIN DASHBOARD
-            </span>
-            <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-              Live &amp; Connected
-            </span>
-          </div>
-          <h1 className="font-heading font-black text-2xl sm:text-3xl md:text-4xl uppercase tracking-tight text-white">
-            PROJECT S.H.E. ADMIN
-          </h1>
+    <div
+      className={`min-h-screen flex flex-col md:flex-row selection:bg-[#E6192B] selection:text-white select-none transition-colors ${
+        isLight ? 'bg-[#EFECE6] text-[#111111]' : 'bg-[#080808] text-[#EDEDED]'
+      }`}
+    >
+      {/* ============================================================== */}
+      {/* MOBILE TOP BAR */}
+      {/* ============================================================== */}
+      <div
+        className={`md:hidden flex items-center justify-between px-4 py-3 border-b sticky top-0 z-40 ${
+          isLight
+            ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+            : 'bg-[#0F0F0F] border-neutral-800'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 bg-[#E6192B]" />
+          <span
+            className={`font-heading font-black text-sm tracking-tight ${
+              isLight ? 'text-[#111111]' : 'text-white'
+            }`}
+          >
+            PROJECT S.H.E.
+          </span>
+          <span className="font-mono text-[10px] bg-[#E6192B] text-white px-1.5 py-0.5 uppercase font-bold">
+            Hub
+          </span>
         </div>
-
-        <div className="flex items-center flex-wrap gap-2">
-          {/* SAVE CHANGES BUTTON */}
+        <div className="flex items-center gap-2">
           <button
-            type="button"
-            onClick={handleGlobalSaveChanges}
-            disabled={actionLoading}
-            className="group px-4 py-2 bg-[#E50914] hover:bg-white text-white hover:text-black border-2 border-white shadow-[3px_3px_0px_0px_#000000] text-xs font-heading font-black uppercase flex items-center gap-1.5 transition-all hover-lift disabled:opacity-50 stencil-cut"
-            title="Save all changes and force database sync"
+            onClick={() => togglePreviewTheme(isLight ? 'dark' : 'light')}
+            className={`p-1.5 border text-xs font-mono flex items-center gap-1 ${
+              isLight
+                ? 'bg-[#F2EFE9] border-[#C5BFB2] text-[#111111]'
+                : 'bg-neutral-900 border-neutral-700 text-white'
+            }`}
+            title="Toggle theme preview"
           >
-            <GrungeGlyph name="save" className="w-3.5 h-3.5 text-white group-hover:text-black transition-colors" />
-            <span>{actionLoading ? 'SAVING...' : 'SAVE CHANGES'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleRefreshData}
-            disabled={actionLoading}
-            className="group px-3 py-2 bg-[#141414] border border-neutral-700 hover:border-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors hover-lift stencil-cut disabled:opacity-50"
-            title="Refresh database records"
-          >
-            <GrungeGlyph
-              name="loader"
-              className={`w-3.5 h-3.5 ${
-                actionLoading
-                  ? 'animate-spin text-[#E50914]'
-                  : 'text-neutral-400 group-hover:text-white group-hover:rotate-180 transition-transform duration-500'
-              }`}
-            />
-            <span>{actionLoading ? 'REFRESHING...' : 'REFRESH'}</span>
+            {isLight ? <HiMoon className="w-4 h-4" /> : <HiSun className="w-4 h-4" />}
           </button>
           <button
-            type="button"
-            onClick={() => router.push('/')}
-            className="px-3 py-2 border border-neutral-700 hover:border-white text-neutral-300 text-xs font-bold uppercase stencil-cut"
+            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            className={`p-1.5 border ${
+              isLight
+                ? 'bg-[#F2EFE9] border-[#C5BFB2] text-[#111111]'
+                : 'bg-neutral-900 border-neutral-700 text-white'
+            }`}
           >
-            VIEW WEBSITE
-          </button>
-          <button
-            type="button"
-            onClick={handleLockAdmin}
-            className="px-3 py-2 bg-red-950/60 border border-red-800 hover:bg-[#E50914] text-white text-xs font-bold uppercase flex items-center gap-1.5 transition-colors stencil-cut"
-            title="Log Out of Admin Panel"
-          >
-            <GrungeGlyph name="lock" className="w-3.5 h-3.5" />
-            <span>LOG OUT</span>
+            <HiBars3 className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Status Toast Notification (Top Right to prevent any content or footer overlap) */}
-      {feedbackMsg && (
-        <div className="fixed top-24 right-6 z-50 p-4 bg-[#E50914] text-white font-mono text-xs font-bold uppercase shadow-[4px_4px_0px_0px_#000000] border-2 border-white animate-bounce stencil-cut">
-          {feedbackMsg}
-        </div>
-      )}
+      {/* ============================================================== */}
+      {/* LEFT SIDEBAR */}
+      {/* ============================================================== */}
+      <aside
+        className={`fixed md:sticky top-0 left-0 h-screen w-72 border-r flex flex-col justify-between z-50 transition-all duration-200 ${
+          isLight
+            ? 'bg-[#FFFFFF] border-[#D4CFC4] text-[#111111]'
+            : 'bg-[#0C0C0C] border-neutral-800 text-[#EDEDED]'
+        } ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        style={{ borderRadius: '0px' }}
+      >
+        {/* Sidebar Header */}
+        <div
+          className={`p-5 border-b ${
+            isLight ? 'border-[#EAE5DB]' : 'border-neutral-800'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <span className="w-2.5 h-2.5 bg-[#E6192B] shrink-0" />
+              <div>
+                <span
+                  className={`font-heading font-black text-base tracking-tight block transition-colors ${
+                    isLight ? 'text-[#111111] group-hover:text-[#E6192B]' : 'text-white group-hover:text-[#E6192B]'
+                  }`}
+                >
+                  PROJECT S.H.E.
+                </span>
+                <span
+                  className={`font-mono text-[10px] uppercase tracking-widest block font-bold ${
+                    isLight ? 'text-neutral-500' : 'text-neutral-400'
+                  }`}
+                >
+                  TEAM HUB
+                </span>
+              </div>
+            </Link>
 
-      {/* Navigation Sub-Tabs */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-4 mb-8 text-xs font-bold uppercase border-b border-neutral-800">
-        {[
-          { id: 'overview', label: 'OVERVIEW', count: null },
-          { id: 'users', label: 'MEMBERS', count: users.length },
-          { id: 'reviews', label: 'REVIEWS', count: stats?.pendingReviews },
-          { id: 'feedback', label: 'SUGGESTIONS & MESSAGES', count: (stats?.newSuggestions || 0) + (stats?.newFeedback || 0) },
-          { id: 'posts', label: 'STORIES & BLOG', count: posts.length },
-          { id: 'updates', label: 'BULLETINS', count: updates.length },
-          { id: 'email', label: 'NEWSLETTER', count: stats?.emailSubscribers },
-          { id: 'config', label: 'SETTINGS', count: null },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`py-2 px-3 sm:px-4 border-2 transition-all shrink-0 flex items-center gap-1.5 ${activeTab === tab.id
-              ? 'border-[#E50914] bg-[#E50914] text-white shadow-[2px_2px_0px_0px_#000000]'
-              : 'border-transparent bg-[#121212] text-neutral-400 hover:text-white hover:border-neutral-700'
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className={`md:hidden ${
+                isLight ? 'text-neutral-500 hover:text-black' : 'text-neutral-400 hover:text-white'
               }`}
-          >
-            <span>{tab.label}</span>
-            {tab.count !== null && tab.count !== undefined && tab.count > 0 && (
-              <span className="px-1.5 py-0.2 bg-black text-white text-[10px] font-black rounded">
-                {tab.count}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* TAB 1: OVERVIEW & REAL TELEMETRY */}
-      {activeTab === 'overview' && stats && (
-        <div className="space-y-8">
-          {/* Real Metrics Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-            <div
-              onClick={() => setActiveTab('users')}
-              className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#000000] cursor-pointer hover:-translate-y-1 transition-transform"
             >
-              <span className="text-[10px] text-neutral-400 uppercase font-bold block">
-                REGISTERED MEMBERS
-              </span>
-              <span className="font-heading font-black text-4xl text-white block mt-1">
-                {stats.totalUsers}
-              </span>
-              <span className="text-[10px] text-neutral-500 mt-2 block">
-                View &amp; manage accounts →
-              </span>
-            </div>
-
-            <div
-              onClick={() => setActiveTab('reviews')}
-              className="p-5 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[4px_4px_0px_0px_#E50914] cursor-pointer hover:-translate-y-1 transition-transform"
-            >
-              <span className="text-[10px] text-[#E50914] uppercase font-bold block">
-                REVIEWS WAITING
-              </span>
-              <span className="font-heading font-black text-4xl text-white block mt-1">
-                {stats.pendingReviews}
-              </span>
-              <span className="text-[10px] text-neutral-500 mt-2 block">
-                {stats.publishedReviews} approved on site →
-              </span>
-            </div>
-
-            <div
-              onClick={() => setActiveTab('feedback')}
-              className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#000000] cursor-pointer hover:-translate-y-1 transition-transform"
-            >
-              <span className="text-[10px] text-neutral-400 uppercase font-bold block">
-                MESSAGES &amp; SUGGESTIONS
-              </span>
-              <span className="font-heading font-black text-4xl text-white block mt-1">
-                {(stats.newSuggestions || 0) + (stats.newFeedback || 0)}
-              </span>
-              <span className="text-[10px] text-neutral-500 mt-2 block">
-                Private feedback inbox →
-              </span>
-            </div>
-
-            <div
-              onClick={() => setActiveTab('email')}
-              className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] shadow-[4px_4px_0px_0px_#000000] cursor-pointer hover:-translate-y-1 transition-transform"
-            >
-              <span className="text-[10px] text-neutral-400 uppercase font-bold block">
-                EMAIL SUBSCRIBERS
-              </span>
-              <span className="font-heading font-black text-4xl text-emerald-400 block mt-1">
-                {stats.emailSubscribers}
-              </span>
-              <span className="text-[10px] text-neutral-500 mt-2 block">
-                Opted-in for updates →
-              </span>
-            </div>
-
+              <HiXMark className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Quick Actions & Live Telemetry Box */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div
+            className={`mt-4 pt-3 border-t flex items-center justify-between font-mono text-[11px] ${
+              isLight ? 'border-[#EAE5DB] text-neutral-600' : 'border-neutral-800 text-neutral-400'
+            }`}
+          >
+            <button
+              onClick={() => togglePreviewTheme(isLight ? 'dark' : 'light')}
+              className={`flex items-center gap-1.5 px-2 py-1 border transition-colors ${
+                isLight
+                  ? 'border-[#D4CFC4] bg-[#FAF8F5] text-neutral-800 hover:bg-[#EFECE6]'
+                  : 'border-neutral-800 bg-[#141414] text-neutral-300 hover:text-white'
+              }`}
+              style={{ borderRadius: '0px' }}
+              title="Toggle preview theme for testing"
+            >
+              {isLight ? (
+                <>
+                  <HiMoon className="w-3.5 h-3.5 text-[#E6192B]" />
+                  <span>DARK PREVIEW</span>
+                </>
+              ) : (
+                <>
+                  <HiSun className="w-3.5 h-3.5 text-amber-400" />
+                  <span>LIGHT PREVIEW</span>
+                </>
+              )}
+            </button>
 
-            {/* Quick Actions */}
-            <div className="p-6 bg-[#0E0E0E] border border-neutral-800 space-y-4">
-              <span className="font-heading font-black text-lg text-white uppercase block">
-                QUICK SHORTCUTS
-              </span>
-              <div className="grid grid-cols-2 gap-3 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('users')}
-                  className="p-3 bg-[#141414] hover:bg-[#E50914] hover:text-white border border-neutral-700 transition-colors flex items-center justify-center gap-1.5 stencil-cut"
-                >
-                  <GrungeGlyph name="users" className="w-4 h-4" />
-                  <span>VIEW MEMBERS</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingPost({
-                      title: '',
-                      body: '',
-                      category: 'Awareness & Action',
-                      status: 'draft',
-                      tags: ['Project SHE', 'Awareness'],
-                      author_name: 'Lead Director',
-                    });
-                    setActiveTab('posts');
-                  }}
-                  className="p-3 bg-[#141414] hover:bg-[#E50914] hover:text-white border border-neutral-700 transition-colors flex items-center justify-center gap-1.5 stencil-cut"
-                >
-                  <GrungeGlyph name="plus" className="w-4 h-4" />
-                  <span>WRITE ARTICLE</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('updates')}
-                  className="p-3 bg-[#141414] hover:bg-[#E50914] hover:text-white border border-neutral-700 transition-colors flex items-center justify-center gap-1.5 stencil-cut"
-                >
-                  <GrungeGlyph name="bell" className="w-4 h-4" />
-                  <span>POST BULLETIN</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('email')}
-                  className="p-3 bg-[#141414] hover:bg-[#E50914] hover:text-white border border-neutral-700 transition-colors flex items-center justify-center gap-1.5 stencil-cut"
-                >
-                  <GrungeGlyph name="send" className="w-4 h-4" />
-                  <span>SEND NEWSLETTER</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 100% REAL LIVE TELEMETRY (No fake indicators) */}
-            <div className="p-6 bg-[#0E0E0E] border border-neutral-800 space-y-3 text-xs relative overflow-hidden stencil-cut">
-              {/* Permitted Vinyl watermark */}
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-10 pointer-events-none z-0">
-                <Image
-                  src="/assets/punk-vinyl-clean.png"
-                  alt="Vinyl watermark"
-                  width={128}
-                  height={128}
-                  className="object-contain"
-                />
-              </div>
-
-              <div className="flex items-center justify-between relative z-10">
-                <span className="font-heading font-black text-lg text-white uppercase block">
-                  SYSTEM STATUS
-                </span>
-                <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                  <GrungeGlyph name="activity" className="w-3.5 h-3.5" />
-                  ONLINE
-                </span>
-              </div>
-
-              <div className="space-y-2 text-[11px] text-neutral-300 relative z-10">
-                <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Database</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1">
-                    <GrungeGlyph name="check" className="w-3.5 h-3.5" />
-                    Connected
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Response Speed</span>
-                  <span className="text-white font-bold">
-                    {liveLatency !== null ? `${liveLatency} ms (Normal)` : 'Normal'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Last Synced</span>
-                  <span className="text-white font-bold">
-                    {lastSyncTime || 'Just now'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-2.5 bg-[#141414] border border-neutral-800">
-                  <span className="text-neutral-400">Website Status</span>
-                  <span className="text-emerald-400 font-bold">
-                    Active &amp; Ready
-                  </span>
-                </div>
-              </div>
-            </div>
-
+            <button
+              onClick={() => loadAllData()}
+              disabled={loadingData}
+              className={`flex items-center gap-1 px-2 py-1 border transition-colors disabled:opacity-50 ${
+                isLight
+                  ? 'border-[#D4CFC4] bg-[#FAF8F5] text-neutral-800 hover:bg-[#EFECE6]'
+                  : 'border-neutral-800 bg-[#141414] text-neutral-300 hover:text-white'
+              }`}
+              style={{ borderRadius: '0px' }}
+              title="Refresh all data"
+            >
+              <HiArrowPath className={`w-3.5 h-3.5 ${loadingData ? 'animate-spin text-[#E6192B]' : ''}`} />
+              <span>{loadingData ? 'SYNC' : 'REFRESH'}</span>
+            </button>
           </div>
         </div>
-      )}
 
-      {/* TAB 2: REGISTERED MEMBERS & USERS */}
-      {activeTab === 'users' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                REGISTERED MEMBERS &amp; LOGINS
-              </h2>
-              <p className="text-xs text-neutral-400">
-                View all individuals who have created an account or logged into Project S.H.E.
-              </p>
-            </div>
+        {/* Sidebar Navigation Items */}
+        <nav className="flex-1 py-4 px-3 space-y-1.5 overflow-y-auto">
+          {navMenuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setMobileSidebarOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3.5 py-3 border text-left font-mono text-xs uppercase tracking-wider transition-all ${
+                  isActive
+                    ? 'bg-[#E6192B] border-[#E6192B] text-white font-bold shadow-md'
+                    : isLight
+                    ? 'bg-transparent border-transparent hover:border-[#D4CFC4] hover:bg-[#F2EFE9] text-neutral-700 hover:text-black'
+                    : 'bg-transparent border-transparent hover:border-neutral-800 hover:bg-[#141414] text-neutral-400 hover:text-white'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : isLight ? 'text-neutral-600' : 'text-neutral-400'}`} />
+                  <span>{item.label}</span>
+                </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-neutral-400">
-                Total Members: <strong className="text-white">{users.length}</strong>
-              </span>
-            </div>
-          </div>
-
-          {/* Search & Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="relative flex-1">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
-                <GrungeGlyph name="search" className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                value={userSearch}
-                onChange={(e) => setUserSearch(e.target.value)}
-                placeholder="Search member by name or email..."
-                className="w-full pl-9 pr-3 py-2 bg-[#141414] border border-neutral-700 text-white text-xs outline-none font-mono"
-              />
-            </div>
-
-            <div className="flex items-center gap-1 text-xs">
-              {(['all', 'subscribed', 'unsubscribed'] as const).map((sub) => (
-                <button
-                  key={sub}
-                  type="button"
-                  onClick={() => setUserSubscriptionFilter(sub)}
-                  className={`px-3 py-2 uppercase font-bold border ${userSubscriptionFilter === sub
-                    ? 'border-[#E50914] bg-[#E50914] text-white'
-                    : 'border-neutral-700 bg-[#141414] text-neutral-400 hover:text-white'
+                {item.badge && (
+                  <span
+                    className={`font-mono text-[10px] px-2 py-0.5 font-bold uppercase ${
+                      item.badgeColor ||
+                      (isActive
+                        ? 'bg-black text-white'
+                        : isLight
+                        ? 'bg-[#EAE5DB] text-neutral-800'
+                        : 'bg-neutral-800 text-neutral-300')
                     }`}
-                >
-                  {sub}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Members Table / List */}
-          {filteredUsers.length === 0 ? (
-            <div className="p-12 text-center border-2 border-dashed border-neutral-800 text-neutral-500 text-xs">
-              No registered members match your search criteria.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredUsers.map((u) => {
-                const joinedDate = u.created_at
-                  ? new Date(u.created_at).toLocaleDateString(undefined, {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
-                  : 'Recently';
-
-                return (
-                  <div
-                    key={u.id}
-                    className="p-4 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs transition-colors stencil-cut"
+                    style={{ borderRadius: '0px' }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-none bg-neutral-900 border border-neutral-700 flex items-center justify-center font-bold text-white uppercase text-sm shrink-0">
-                        {u.display_name ? u.display_name.slice(0, 2).toUpperCase() : (u.email ? u.email.slice(0, 2).toUpperCase() : 'U')}
-                      </div>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
 
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-white text-sm">
-                            {u.display_name || 'Community Member'}
-                          </span>
-                          {u.is_admin ? (
-                            <span className="px-1.5 py-0.5 bg-[#E50914] text-white text-[9px] font-black uppercase">
-                              ADMIN
-                            </span>
-                          ) : (
-                            <span className="px-1.5 py-0.5 bg-neutral-800 text-neutral-300 text-[9px] font-bold uppercase">
-                              MEMBER
-                            </span>
-                          )}
-                          {u.email_subscribed ? (
-                            <span className="px-1.5 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[9px] font-bold uppercase">
-                              SUBSCRIBED
-                            </span>
-                          ) : (
-                            <span className="px-1.5 py-0.5 bg-neutral-900 text-neutral-500 border border-neutral-800 text-[9px] font-bold uppercase">
-                              NO NEWSLETTER
-                            </span>
-                          )}
-                        </div>
+        {/* Sidebar Footer */}
+        <div
+          className={`p-4 border-t space-y-2 ${
+            isLight
+              ? 'bg-[#FAF8F5] border-[#EAE5DB]'
+              : 'bg-[#090909] border-neutral-800'
+          }`}
+        >
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`w-full py-2.5 px-3 border font-mono text-xs uppercase tracking-wider flex items-center justify-between transition-colors ${
+              isLight
+                ? 'bg-white border-[#D4CFC4] hover:bg-[#EFECE6] text-neutral-800'
+                : 'bg-[#121212] border-neutral-800 hover:bg-neutral-800 text-neutral-300 hover:text-white'
+            }`}
+            style={{ borderRadius: '0px' }}
+          >
+            <span>Public Website</span>
+            <HiArrowTopRightOnSquare className="w-3.5 h-3.5" />
+          </Link>
 
-                        <div className="text-neutral-400 text-[11px] font-mono">
-                          {u.email || 'No email provided'}
-                        </div>
-
-                        <div className="text-[10px] text-neutral-500 font-mono">
-                          Joined on: {joinedDate} • User ID: {u.id.slice(0, 16)}...
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteUser(u.id, u.email || 'this member')}
-                        disabled={actionLoading}
-                        className="px-3 py-1.5 border border-red-900 hover:bg-red-700 hover:text-white text-red-400 font-bold uppercase flex items-center gap-1.5 transition-colors text-xs stencil-cut"
-                        title="Delete User Account Permanently"
-                      >
-                        <GrungeGlyph name="trash" className="w-3.5 h-3.5" />
-                        <span>DELETE ACCOUNT</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          <button
+            onClick={handleSignOut}
+            className={`w-full py-2.5 px-3 border font-mono text-xs uppercase tracking-wider flex items-center justify-between transition-colors ${
+              isLight
+                ? 'bg-white border-[#D4CFC4] hover:border-red-600 hover:bg-red-50 text-neutral-700 hover:text-red-700'
+                : 'bg-[#121212] border-neutral-800 hover:border-red-800 hover:bg-red-950/40 text-neutral-400 hover:text-red-300'
+            }`}
+            style={{ borderRadius: '0px' }}
+          >
+            <span>Sign Out</span>
+            <HiArrowRightOnRectangle className="w-3.5 h-3.5" />
+          </button>
         </div>
-      )}
+      </aside>
 
-      {/* TAB 3: REVIEW MODERATION */}
-      {activeTab === 'reviews' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                COMMUNITY REVIEWS QUEUE
-              </h2>
-              <p className="text-xs text-neutral-400">
-                Only reviews marked as APPROVED appear publicly on the website.
-              </p>
-            </div>
-
-            {/* Filter Pills */}
-            <div className="flex items-center gap-1 text-xs flex-wrap">
-              {(['pending', 'approved', 'rejected', 'archived', 'all'] as const).map((f) => (
-                <button
-                  key={f}
-                  type="button"
-                  onClick={() => setReviewFilter(f)}
-                  className={`px-3 py-1.5 uppercase font-bold border transition-colors ${reviewFilter === f
-                    ? 'border-[#E50914] bg-[#E50914] text-white'
-                    : 'border-neutral-700 bg-[#141414] text-neutral-400 hover:text-white'
-                    }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
+      {/* ============================================================== */}
+      {/* MAIN CONTENT AREA */}
+      {/* ============================================================== */}
+      <main className="flex-1 p-4 sm:p-8 lg:p-10 max-w-6xl w-full mx-auto space-y-8 overflow-y-auto">
+        {/* Floating Status Notice */}
+        {statusNotice && (
+          <div
+            className="fixed bottom-6 right-6 z-50 px-5 py-3 bg-[#111111] border-2 border-[#E6192B] text-white font-mono text-xs shadow-2xl animate-in fade-in duration-200"
+            style={{ borderRadius: '0px' }}
+          >
+            {statusNotice}
           </div>
+        )}
 
-          {filteredReviews.length === 0 ? (
-            <div className="p-12 text-center border-2 border-dashed border-neutral-800 text-neutral-500 text-xs">
-              No reviews found in this queue.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredReviews.map((rev) => (
-                <div
-                  key={rev.id}
-                  className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs max-w-full overflow-hidden"
+        {/* ============================================================== */}
+        {/* SECTION 1: SITE CONTENT & MINI WEBSITE EDITOR */}
+        {/* ============================================================== */}
+        {activeTab === 'site_text' && (
+          <div className="space-y-6">
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <div>
+                <h2
+                  className={`font-heading font-black text-2xl uppercase tracking-tight ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
                 >
-                  <div className="space-y-2 flex-1 min-w-0 max-w-full">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-white text-sm truncate max-w-[200px] sm:max-w-none">{rev.display_name}</span>
-                      <span className="text-neutral-500 text-[10px]">({rev.role_or_relation || 'Community'})</span>
-                      <div className="flex items-center text-amber-500 ml-2 shrink-0">
-                        {[...Array(rev.rating)].map((_, i) => (
-                          <GrungeGlyph key={i} name="star" className="w-3 h-3 text-amber-500" />
-                        ))}
-                      </div>
-                      <span
-                        className={`px-2 py-0.5 text-[9px] uppercase font-bold shrink-0 ${rev.status === 'approved'
-                          ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                          : rev.status === 'pending'
-                            ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                            : rev.status === 'archived'
-                              ? 'bg-neutral-800 text-neutral-300 border border-neutral-600'
-                              : 'bg-red-950 text-red-400 border border-red-800'
-                          }`}
-                      >
-                        {rev.status}
-                      </span>
-                    </div>
-
-                    <p className="text-neutral-300 italic font-sans leading-relaxed break-words break-all [overflow-wrap:anywhere] max-w-full">
-                      &ldquo;{rev.review_text}&rdquo;
-                    </p>
-
-                    <div className="text-[10px] text-neutral-500 truncate font-mono">
-                      ID: {rev.id} • Submitted: {new Date(rev.created_at).toLocaleString()}
-                    </div>
-                  </div>
-
-                  {/* Actions: Approve, Archive, Reject, Delete */}
-                  <div className="flex items-center gap-2 shrink-0 flex-wrap pt-2 md:pt-0 border-t border-neutral-900 md:border-t-0">
-                    {rev.status !== 'approved' && (
-                      <button
-                        type="button"
-                        onClick={() => handleModerateReview(rev.id, 'approved')}
-                        disabled={actionLoading}
-                        className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold uppercase flex items-center gap-1.5 transition-colors text-xs hover-lift stencil-cut"
-                        title="Approve and publish to public website"
-                      >
-                        <GrungeGlyph name="check" className="w-3.5 h-3.5" />
-                        <span>APPROVE</span>
-                      </button>
-                    )}
-                    {rev.status !== 'archived' && (
-                      <button
-                        type="button"
-                        onClick={() => handleModerateReview(rev.id, 'archived')}
-                        disabled={actionLoading}
-                        className="px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white font-bold uppercase flex items-center gap-1.5 transition-colors text-xs hover-lift border border-neutral-700 stencil-cut"
-                        title="Archive review without deleting"
-                      >
-                        <GrungeGlyph name="archive" className="w-3.5 h-3.5" />
-                        <span>ARCHIVE</span>
-                      </button>
-                    )}
-                    {rev.status !== 'rejected' && (
-                      <button
-                        type="button"
-                        onClick={() => handleModerateReview(rev.id, 'rejected')}
-                        disabled={actionLoading}
-                        className="px-3 py-1.5 bg-amber-950 hover:bg-amber-800 text-amber-200 hover:text-white font-bold uppercase flex items-center gap-1.5 transition-colors text-xs hover-lift border border-amber-800 stencil-cut"
-                        title="Mark review as rejected"
-                      >
-                        <GrungeGlyph name="close" className="w-3.5 h-3.5" />
-                        <span>REJECT</span>
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteReview(rev.id)}
-                      disabled={actionLoading}
-                      className="px-3 py-1.5 bg-red-950/60 hover:bg-[#E50914] text-red-300 hover:text-white border border-red-800 font-bold uppercase flex items-center gap-1.5 transition-colors text-xs hover-lift stencil-cut"
-                      title="Permanently delete review from database"
-                    >
-                      <GrungeGlyph name="trash" className="w-3.5 h-3.5" />
-                      <span>DELETE</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 4: SUGGESTIONS & FEEDBACK */}
-      {activeTab === 'feedback' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                SUGGESTIONS &amp; FEEDBACK INBOX
-              </h2>
-              <p className="text-xs text-neutral-400">
-                Direct messages submitted privately by community members.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-1 text-xs">
-              {(['all', 'suggestion', 'feedback'] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setFeedbackTypeFilter(t)}
-                  className={`px-3 py-1.5 uppercase font-bold border ${feedbackTypeFilter === t
-                    ? 'border-[#E50914] bg-[#E50914] text-white'
-                    : 'border-neutral-700 bg-[#141414] text-neutral-400'
-                    }`}
+                  Site Content &amp; Editor
+                </h2>
+                <p
+                  className={`font-sans text-xs mt-1 ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
                 >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {filteredFeedback.length === 0 ? (
-            <div className="p-12 text-center border-2 border-dashed border-neutral-800 text-neutral-500 text-xs">
-              No suggestions or feedback in this category.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredFeedback.map((fb) => (
-                <div
-                  key={fb.id}
-                  className="p-5 bg-[#0E0E0E] border-2 border-neutral-800 hover:border-[#E50914] space-y-3 text-xs stencil-cut"
-                >
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 bg-[#E50914] text-white font-bold uppercase text-[9px]">
-                        {fb.type}
-                      </span>
-                      <span className="font-bold text-white text-sm">{fb.subject}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-neutral-400">Status: {fb.status}</span>
-                      <select
-                        value={fb.status}
-                        onChange={(e) => handleUpdateFeedbackStatus(fb.id, e.target.value as any)}
-                        className="p-1 bg-[#141414] border border-neutral-700 text-neutral-300 text-[10px] outline-none font-mono"
-                      >
-                        <option value="new">NEW</option>
-                        <option value="reviewed">REVIEWED</option>
-                        <option value="resolved">RESOLVED</option>
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteFeedback(fb.id)}
-                        className="p-1 text-neutral-500 hover:text-red-500"
-                        title="Delete"
-                      >
-                        <GrungeGlyph name="trash" className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <p className="text-neutral-300 leading-relaxed font-sans text-xs whitespace-pre-line break-words break-all [overflow-wrap:anywhere] max-w-full">
-                    {fb.message}
-                  </p>
-
-                  <div className="pt-2 border-t border-neutral-900 flex items-center justify-between text-[10px] text-neutral-500">
-                    <span>From: {fb.name} ({fb.email})</span>
-                    <span>Date: {new Date(fb.created_at).toLocaleString()}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 5: BLOG & STORIES */}
-      {activeTab === 'posts' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                STORIES &amp; ARTICLES
-              </h2>
-              <p className="text-xs text-neutral-400 font-sans">
-                Write, edit, and publish awareness articles, stories, and campaign updates.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-black/60 border border-neutral-800 text-[11px] font-mono text-neutral-300 stencil-cut">
-                <Image src="/assets/punk-red-pin.png" alt="Pin" width={14} height={14} className="w-3.5 h-3.5 object-contain" />
-                <span>PINNED:</span>
-                <span className={`font-bold ${posts.filter((p) => p.is_pinned).length >= 3 ? 'text-amber-400' : 'text-[#E50914]'}`}>
-                  {posts.filter((p) => p.is_pinned).length}/3
-                </span>
+                  Manage the default website theme, payment QR, hero copy, three core pillars, and external forms without code.
+                </p>
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setEditingPost({
-                    title: '',
-                    body: '',
-                    category: 'Awareness & Action',
-                    status: 'draft',
-                    author_name: 'Project S.H.E. Core Team',
-                    tags: ['Project SHE', 'Awareness', 'Rehabilitation'],
-                  })
-                }
-                className="px-4 py-2 bg-[#E50914] text-white hover:bg-white hover:text-black text-xs font-bold uppercase transition-colors flex items-center gap-1.5 stencil-cut"
+                onClick={handleRestoreDefaults}
+                className={`self-start sm:self-auto px-3.5 py-1.5 border font-mono text-xs uppercase transition-colors ${
+                  isLight
+                    ? 'border-[#C5BFB2] bg-[#FAF8F5] hover:bg-[#EAE5DB] text-neutral-800'
+                    : 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white'
+                }`}
+                style={{ borderRadius: '0px' }}
               >
-                <GrungeGlyph name="plus" className="w-4 h-4" />
-                <span>NEW ARTICLE</span>
+                Restore NGO Defaults
               </button>
             </div>
-          </div>
 
-          {/* Post Editor Drawer */}
-          {editingPost && (
-            <form
-              onSubmit={handleSavePost}
-              className="p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut"
-            >
-              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-                <span className="font-heading font-black text-base text-white uppercase">
-                  {editingPost.id ? 'EDIT ARTICLE' : 'WRITE NEW ARTICLE'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setEditingPost(null)}
-                  className="text-neutral-400 hover:text-white"
-                >
-                  CANCEL
-                </button>
+            <form onSubmit={handleSaveSettings} className="space-y-8">
+              {/* BLOCK 1: GLOBAL SITE THEME */}
+              <div
+                className={`p-6 border space-y-4 shadow-sm ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="border-b pb-3 flex items-center justify-between border-neutral-800/30">
+                  <div>
+                    <h3
+                      className={`font-heading font-black text-base uppercase tracking-wider ${
+                        isLight ? 'text-[#111111]' : 'text-white'
+                      }`}
+                    >
+                      Default Website Theme
+                    </h3>
+                    <p
+                      className={`font-sans text-xs mt-0.5 ${
+                        isLight ? 'text-neutral-600' : 'text-neutral-400'
+                      }`}
+                    >
+                      Controls the initial theme visitors see when opening the website on any phone or laptop.
+                    </p>
+                  </div>
+                  <span className="font-mono text-xs text-[#E6192B] uppercase font-bold">
+                    {siteSettings.default_theme === 'light' ? 'LIGHT THEME DEFAULT' : 'DARK THEME DEFAULT'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSiteSettings((prev) => ({ ...prev, default_theme: 'dark' }))
+                    }
+                    className={`p-4 border text-left font-mono transition-all flex items-center justify-between ${
+                      (siteSettings.default_theme || 'dark') === 'dark'
+                        ? 'border-[#E6192B] bg-[#E6192B]/10 text-white'
+                        : isLight
+                        ? 'border-[#D4CFC4] bg-[#FAF8F5] text-neutral-700 hover:border-black'
+                        : 'border-neutral-800 bg-[#0A0A0A] text-neutral-400 hover:border-neutral-700'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <HiMoon className="w-5 h-5 text-[#E6192B]" />
+                      <div>
+                        <div
+                          className={`font-bold text-xs uppercase ${
+                            isLight && siteSettings.default_theme !== 'dark'
+                              ? 'text-[#111111]'
+                              : 'text-white'
+                          }`}
+                        >
+                          Dark Brutalist Theme
+                        </div>
+                        <div
+                          className={`text-[11px] ${
+                            isLight && siteSettings.default_theme !== 'dark'
+                              ? 'text-neutral-500'
+                              : 'text-neutral-400'
+                          }`}
+                        >
+                          Rich charcoal canvas, high-contrast imagery
+                        </div>
+                      </div>
+                    </div>
+                    {(siteSettings.default_theme || 'dark') === 'dark' && (
+                      <HiCheck className="w-5 h-5 text-[#E6192B]" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSiteSettings((prev) => ({ ...prev, default_theme: 'light' }))
+                    }
+                    className={`p-4 border text-left font-mono transition-all flex items-center justify-between ${
+                      siteSettings.default_theme === 'light'
+                        ? 'border-[#E6192B] bg-[#E6192B]/10 text-[#111111]'
+                        : isLight
+                        ? 'border-[#D4CFC4] bg-[#FAF8F5] text-neutral-700 hover:border-black'
+                        : 'border-neutral-800 bg-[#0A0A0A] text-neutral-400 hover:border-neutral-700'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <HiSun className="w-5 h-5 text-amber-500" />
+                      <div>
+                        <div
+                          className={`font-bold text-xs uppercase ${
+                            isLight ? 'text-[#111111]' : 'text-white'
+                          }`}
+                        >
+                          Light Editorial Theme
+                        </div>
+                        <div
+                          className={`text-[11px] ${
+                            isLight ? 'text-neutral-500' : 'text-neutral-400'
+                          }`}
+                        >
+                          Warm newsprint grain, clean editorial look
+                        </div>
+                      </div>
+                    </div>
+                    {siteSettings.default_theme === 'light' && (
+                      <HiCheck className="w-5 h-5 text-[#E6192B]" />
+                    )}
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-neutral-400 uppercase font-bold mb-1">
-                    Article Title *
+              {/* BLOCK 2: TICKER & HERO SECTION */}
+              <div
+                className={`p-6 border space-y-6 shadow-sm ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="border-b pb-3 border-neutral-800/30">
+                  <h3
+                    className={`font-heading font-black text-base uppercase tracking-wider ${
+                      isLight ? 'text-[#111111]' : 'text-white'
+                    }`}
+                  >
+                    Hero Section &amp; Top Ticker
+                  </h3>
+                  <p
+                    className={`font-sans text-xs mt-0.5 ${
+                      isLight ? 'text-neutral-600' : 'text-neutral-400'
+                    }`}
+                  >
+                    The first impressions visitors see at the top of the homepage.
+                  </p>
+                </div>
+
+                {/* Marquee / Ticker Text */}
+                <div className="space-y-2">
+                  <label className="block font-mono text-xs text-[#E6192B] uppercase tracking-wider font-bold">
+                    Continuous Live Ticker Statement
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={siteSettings.marquee_text}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, marquee_text: e.target.value }))
+                    }
+                    placeholder="Enter continuous ticker separated by ✦ symbols..."
+                    className={`w-full px-3.5 py-2.5 font-mono text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111] placeholder-neutral-400'
+                        : 'bg-[#090909] border-neutral-700 text-white placeholder-neutral-500'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                    required
+                  />
+                  <p
+                    className={`font-sans text-[11px] ${
+                      isLight ? 'text-neutral-500' : 'text-neutral-400'
+                    }`}
+                  >
+                    Streams across the top red ribbon. Separate announcements with ✦ symbols.
+                  </p>
+                </div>
+
+                {/* Badges Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-300'
+                      }`}
+                    >
+                      Hero Top Badge
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.hero_badge || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, hero_badge: e.target.value }))
+                      }
+                      placeholder="e.g. HYDERABAD'S LEADING STUDENT NGO"
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-300'
+                      }`}
+                    >
+                      Hero Sub-badge / Foundation Tag
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.hero_subbadge || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, hero_subbadge: e.target.value }))
+                      }
+                      placeholder="e.g. SARVA NIRBHAYA FOUNDATION • HYDERABAD, INDIA"
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Hero Headline */}
+                <div className="space-y-2">
+                  <label
+                    className={`block font-mono text-xs uppercase tracking-wider font-bold ${
+                      isLight ? 'text-[#111111]' : 'text-neutral-300'
+                    }`}
+                  >
+                    Hero Primary Headline
                   </label>
                   <input
                     type="text"
+                    value={siteSettings.hero_headline}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, hero_headline: e.target.value }))
+                    }
+                    placeholder="e.g. RAISE YOUR VOICE WHERE THEIRS WAS SILENCED. STAND WITH THOSE WHO SURVIVED."
+                    className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
                     required
-                    value={editingPost.title || ''}
-                    onChange={(e) => setEditingPost({ ...editingPost, title: e.target.value })}
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono"
-                    placeholder="e.g. Sayodhya Women's Safehouse Relief Drive Recap"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-neutral-400 uppercase font-bold mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={editingPost.category || 'Awareness & Action'}
-                    onChange={(e) => setEditingPost({ ...editingPost, category: e.target.value })}
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono"
+                {/* Hero Mission Description */}
+                <div className="space-y-2">
+                  <label
+                    className={`block font-mono text-xs uppercase tracking-wider font-bold ${
+                      isLight ? 'text-[#111111]' : 'text-neutral-300'
+                    }`}
                   >
-                    <option value="Awareness & Action">Awareness &amp; Action</option>
-                    <option value="Survivor Voices">Survivor Voices</option>
-                    <option value="Community Action">Community Action</option>
-                    <option value="Safehouse Relief">Safehouse Relief</option>
-                    <option value="Mental Health">Mental Health</option>
-                  </select>
+                    Hero NGO Mission Paragraph
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={siteSettings.hero_description || ''}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, hero_description: e.target.value }))
+                    }
+                    placeholder="Violence injects itself into the lives of survivors..."
+                    className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-neutral-400 uppercase font-bold mb-1">
-                  Short Summary (Excerpt)
-                </label>
-                <input
-                  type="text"
-                  value={editingPost.excerpt || ''}
-                  onChange={(e) => setEditingPost({ ...editingPost, excerpt: e.target.value })}
-                  placeholder="One sentence summary for previews..."
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono"
-                />
-              </div>
+              {/* BLOCK 3: FOUNDER STORY & THREE PILLARS */}
+              <div
+                className={`p-6 border space-y-6 shadow-sm ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="border-b pb-3 border-neutral-800/30">
+                  <h3
+                    className={`font-heading font-black text-base uppercase tracking-wider ${
+                      isLight ? 'text-[#111111]' : 'text-white'
+                    }`}
+                  >
+                    Founder&apos;s Story &amp; Three Pillars
+                  </h3>
+                  <p
+                    className={`font-sans text-xs mt-0.5 ${
+                      isLight ? 'text-neutral-600' : 'text-neutral-400'
+                    }`}
+                  >
+                    Edit the founder opening quote and the titles/descriptions of each core NGO pillar.
+                  </p>
+                </div>
 
-              <div>
-                <label className="block text-neutral-400 uppercase font-bold mb-1">
-                  Full Article Body (Markdown supported) *
-                </label>
-                <textarea
-                  required
-                  rows={8}
-                  value={editingPost.body || ''}
-                  onChange={(e) => setEditingPost({ ...editingPost, body: e.target.value })}
-                  placeholder="Write the full content here..."
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-sans"
-                />
-              </div>
-
-              <div className="flex items-center gap-4 pt-2">
-                <span className="text-neutral-400 uppercase font-bold">Publish Status:</span>
-                {(['draft', 'published', 'archived'] as const).map((st) => (
-                  <label key={st} className="flex items-center gap-1.5 cursor-pointer uppercase">
-                    <input
-                      type="radio"
-                      name="postStatus"
-                      value={st}
-                      checked={editingPost.status === st}
-                      onChange={() => setEditingPost({ ...editingPost, status: st })}
-                    />
-                    <span className={st === 'published' ? 'text-emerald-400 font-bold' : ''}>
-                      {st}
-                    </span>
+                {/* Founder Statement */}
+                <div className="space-y-2">
+                  <label
+                    className={`block font-mono text-xs uppercase tracking-wider font-bold ${
+                      isLight ? 'text-[#111111]' : 'text-neutral-300'
+                    }`}
+                  >
+                    Founder Sanskriti Mohan Opening Statement
                   </label>
-                ))}
+                  <textarea
+                    rows={2}
+                    value={siteSettings.about_statement || ''}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, about_statement: e.target.value }))
+                    }
+                    placeholder="Hi, I’m Sanskriti Mohan, founder of Project S.H.E..."
+                    className={`w-full px-3.5 py-2.5 font-sans text-xs focus:outline-none focus:border-[#E6192B] transition-colors border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  />
+                </div>
+
+                {/* Pillar 1 */}
+                <div
+                  className={`p-4 border space-y-3 ${
+                    isLight ? 'bg-[#FAF8F5] border-[#E0DCD3]' : 'bg-[#0D0D0D] border-neutral-800'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                >
+                  <span className="font-mono text-xs text-[#E6192B] font-bold block uppercase">
+                    Pillar 01 (Mobilisation &amp; Care)
+                  </span>
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                      }`}
+                    >
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.pillar_1_title || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, pillar_1_title: e.target.value }))
+                      }
+                      placeholder="1. Fundraising"
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-white border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                      }`}
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={siteSettings.pillar_1_desc || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, pillar_1_desc: e.target.value }))
+                      }
+                      placeholder="Pillar 1 description..."
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-white border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Pillar 2 */}
+                <div
+                  className={`p-4 border space-y-3 ${
+                    isLight ? 'bg-[#FAF8F5] border-[#E0DCD3]' : 'bg-[#0D0D0D] border-neutral-800'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                >
+                  <span className="font-mono text-xs text-[#E6192B] font-bold block uppercase">
+                    Pillar 02 (Survivor Shelters)
+                  </span>
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                      }`}
+                    >
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.pillar_2_title || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, pillar_2_title: e.target.value }))
+                      }
+                      placeholder="2. Direct support for survivors."
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-white border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                      }`}
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={siteSettings.pillar_2_desc || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, pillar_2_desc: e.target.value }))
+                      }
+                      placeholder="Pillar 2 description..."
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-white border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Pillar 3 */}
+                <div
+                  className={`p-4 border space-y-3 ${
+                    isLight ? 'bg-[#FAF8F5] border-[#E0DCD3]' : 'bg-[#0D0D0D] border-neutral-800'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                >
+                  <span className="font-mono text-xs text-[#E6192B] font-bold block uppercase">
+                    Pillar 03 (Advocacy &amp; Dialogue)
+                  </span>
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                      }`}
+                    >
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.pillar_3_title || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, pillar_3_title: e.target.value }))
+                      }
+                      placeholder="3. Advocacy and dialogue."
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-white border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                      }`}
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={siteSettings.pillar_3_desc || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, pillar_3_desc: e.target.value }))
+                      }
+                      placeholder="Pillar 3 description..."
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-white border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="pt-3 border-t border-neutral-800 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditingPost(null)}
-                  className="px-4 py-2 border border-neutral-700 text-neutral-300 font-bold uppercase"
+              {/* BLOCK 4: DONATION SECTION & PAYMENT QR CODE */}
+              <div
+                className={`p-6 border space-y-6 shadow-sm ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="border-b pb-3 border-neutral-800/30">
+                  <h3
+                    className={`font-heading font-black text-base uppercase tracking-wider ${
+                      isLight ? 'text-[#111111]' : 'text-white'
+                    }`}
+                  >
+                    Donation &amp; Payment QR Code
+                  </h3>
+                  <p
+                    className={`font-sans text-xs mt-0.5 ${
+                      isLight ? 'text-neutral-600' : 'text-neutral-400'
+                    }`}
+                  >
+                    Change your official donation QR code, UPI address, and instructions.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-300'
+                      }`}
+                    >
+                      Donation Section Headline
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.donation_headline || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, donation_headline: e.target.value }))
+                      }
+                      placeholder="DONATE THROUGH UPI"
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-300'
+                      }`}
+                    >
+                      Official Donation UPI ID
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.donation_upi_id || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, donation_upi_id: e.target.value }))
+                      }
+                      placeholder="shailajalakshmisarao1974-2@okicici"
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label
+                    className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                      isLight ? 'text-[#111111]' : 'text-neutral-300'
+                    }`}
+                  >
+                    Donation Subtext / Contribution Note
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={siteSettings.donation_subtext || ''}
+                    onChange={(e) =>
+                      setSiteSettings((prev) => ({ ...prev, donation_subtext: e.target.value }))
+                    }
+                    placeholder="Convenient, safe, and designed to ensure your contribution reaches those who need it most."
+                    className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  />
+                </div>
+
+                {/* QR Code URL and Live Preview Box */}
+                <div className="space-y-3 pt-2">
+                  <label
+                    className={`block font-mono text-xs uppercase tracking-wider font-bold flex items-center gap-1.5 ${
+                      isLight ? 'text-[#111111]' : 'text-neutral-300'
+                    }`}
+                  >
+                    <HiQrCode className="w-4 h-4 text-[#E6192B]" />
+                    <span>Payment QR Image URL / Path</span>
+                  </label>
+
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
+                    <div className="flex-1 w-full space-y-2">
+                      <input
+                        type="text"
+                        value={siteSettings.donation_qr_url || ''}
+                        onChange={(e) =>
+                          setSiteSettings((prev) => ({ ...prev, donation_qr_url: e.target.value }))
+                        }
+                        placeholder="/assets/donation-qr.png or https://..."
+                        className={`w-full px-3.5 py-2.5 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                          isLight
+                            ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                            : 'bg-[#090909] border-neutral-700 text-white'
+                        }`}
+                        style={{ borderRadius: '0px' }}
+                      />
+                      <p
+                        className={`font-sans text-[11px] ${
+                          isLight ? 'text-neutral-500' : 'text-neutral-400'
+                        }`}
+                      >
+                        Enter any public image URL or local asset path (default: <code className="font-mono">/assets/donation-qr.png</code>).
+                      </p>
+                    </div>
+
+                    {/* Live Visual Preview Container */}
+                    <div
+                      className={`w-36 h-36 border p-2 flex flex-col items-center justify-center shrink-0 text-center ${
+                        isLight ? 'bg-white border-[#C5BFB2]' : 'bg-[#090909] border-neutral-700'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    >
+                      {siteSettings.donation_qr_url ? (
+                        <div className="relative w-full h-full flex items-center justify-center">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={siteSettings.donation_qr_url}
+                            alt="Live QR Preview"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <span className="font-mono text-[10px] text-neutral-400">
+                          No QR Specified
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* BLOCK 5: GOOGLE ACTION FORMS */}
+              <div
+                className={`p-6 border space-y-6 shadow-sm ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="border-b pb-3 border-neutral-800/30">
+                  <h3
+                    className={`font-heading font-black text-base uppercase tracking-wider ${
+                      isLight ? 'text-[#111111]' : 'text-white'
+                    }`}
+                  >
+                    Community Google Action Forms
+                  </h3>
+                  <p
+                    className={`font-sans text-xs mt-0.5 ${
+                      isLight ? 'text-neutral-600' : 'text-neutral-400'
+                    }`}
+                  >
+                    Links for volunteer recruitments, creative submissions, and safe confessions.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-[#111111] font-bold' : 'text-neutral-300'
+                      }`}
+                    >
+                      1. Join Team Form URL
+                    </label>
+                    <input
+                      type="url"
+                      value={siteSettings.google_form_team_app}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({
+                          ...prev,
+                          google_form_team_app: e.target.value,
+                        }))
+                      }
+                      placeholder="https://docs.google.com/forms/..."
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-[#111111] font-bold' : 'text-neutral-300'
+                      }`}
+                    >
+                      2. Artwork &amp; Poetry Form URL
+                    </label>
+                    <input
+                      type="url"
+                      value={siteSettings.google_form_artwork_poetry}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({
+                          ...prev,
+                          google_form_artwork_poetry: e.target.value,
+                        }))
+                      }
+                      placeholder="https://docs.google.com/forms/..."
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase ${
+                        isLight ? 'text-[#111111] font-bold' : 'text-neutral-300'
+                      }`}
+                    >
+                      3. Anonymous Confessions Form URL
+                    </label>
+                    <input
+                      type="url"
+                      value={siteSettings.google_form_anonymous_confessions}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({
+                          ...prev,
+                          google_form_anonymous_confessions: e.target.value,
+                        }))
+                      }
+                      placeholder="https://docs.google.com/forms/..."
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* BLOCK 6: CONTACTS, QUOTES & SOCIAL */}
+              <div
+                className={`p-6 border space-y-6 shadow-sm ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div className="border-b pb-3 border-neutral-800/30">
+                  <h3
+                    className={`font-heading font-black text-base uppercase tracking-wider ${
+                      isLight ? 'text-[#111111]' : 'text-white'
+                    }`}
+                  >
+                    Helplines, Quotes &amp; Contacts
+                  </h3>
+                  <p
+                    className={`font-sans text-xs mt-0.5 ${
+                      isLight ? 'text-neutral-600' : 'text-neutral-400'
+                    }`}
+                  >
+                    Emergency contacts, footer editorial quote, and social channels.
+                  </p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-300'
+                      }`}
+                    >
+                      24/7 National Emergency Helplines
+                    </label>
+                    <input
+                      type="text"
+                      value={siteSettings.emergency_helpline || ''}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, emergency_helpline: e.target.value }))
+                      }
+                      placeholder="Women Helpline: 1091 | Domestic Abuse: 181 | Direct Desk: +91 98765 43210"
+                      className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label
+                      className={`block font-mono text-[11px] uppercase tracking-wider font-bold ${
+                        isLight ? 'text-[#111111]' : 'text-neutral-300'
+                      }`}
+                    >
+                      Footer Editorial Quote
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={siteSettings.footer_quote}
+                      onChange={(e) =>
+                        setSiteSettings((prev) => ({ ...prev, footer_quote: e.target.value }))
+                      }
+                      placeholder="Challenging the violence women face..."
+                      className={`w-full px-3.5 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label
+                        className={`block font-mono text-[11px] uppercase ${
+                          isLight ? 'text-[#111111] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        Official Contact Email
+                      </label>
+                      <input
+                        type="email"
+                        value={siteSettings.contact_email || ''}
+                        onChange={(e) =>
+                          setSiteSettings((prev) => ({ ...prev, contact_email: e.target.value }))
+                        }
+                        placeholder="projectshe.ngo@gmail.com"
+                        className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                          isLight
+                            ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                            : 'bg-[#090909] border-neutral-700 text-white'
+                        }`}
+                        style={{ borderRadius: '0px' }}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label
+                        className={`block font-mono text-[11px] uppercase ${
+                          isLight ? 'text-[#111111] font-bold' : 'text-neutral-300'
+                        }`}
+                      >
+                        Instagram Profile URL
+                      </label>
+                      <input
+                        type="url"
+                        value={siteSettings.instagram_url || ''}
+                        onChange={(e) =>
+                          setSiteSettings((prev) => ({ ...prev, instagram_url: e.target.value }))
+                        }
+                        placeholder="https://instagram.com/projectshe.ngo"
+                        className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                          isLight
+                            ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                            : 'bg-[#090909] border-neutral-700 text-white'
+                        }`}
+                        style={{ borderRadius: '0px' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SAVE ACTION BAR */}
+              <div
+                className={`p-4 border flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky bottom-4 shadow-2xl z-20 ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#C5BFB2]'
+                    : 'bg-[#111111] border-neutral-700'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <span
+                  className={`font-mono text-xs ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
                 >
-                  CANCEL
-                </button>
+                  {siteSettings.updated_at
+                    ? `Last updated: ${new Date(siteSettings.updated_at).toLocaleString()}`
+                    : 'Ready to publish'}
+                </span>
+
                 <button
                   type="submit"
-                  disabled={actionLoading}
-                  className="px-5 py-2 bg-[#E50914] text-white font-bold uppercase hover:bg-white hover:text-black stencil-cut"
+                  disabled={savingSettings}
+                  className="px-8 py-3 bg-[#E6192B] hover:bg-black text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                  style={{ borderRadius: '0px' }}
                 >
-                  {actionLoading ? 'SAVING...' : 'SAVE ARTICLE'}
+                  {savingSettings ? 'Saving Live Changes...' : 'Save Live Changes'}
                 </button>
               </div>
             </form>
-          )}
+          </div>
+        )}
 
-          {/* Posts List */}
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <div
-                key={post.id}
-                className={`p-5 bg-[#0E0E0E] border-2 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs stencil-cut ${post.is_pinned
-                  ? 'border-[#E50914] bg-[#120505]'
-                  : 'border-neutral-800'
+        {/* ============================================================== */}
+        {/* SECTION 2: PICTURES & GALLERY ARCHIVE */}
+        {/* ============================================================== */}
+        {activeTab === 'gallery' && (
+          <div className="space-y-6">
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <div>
+                <h2
+                  className={`font-heading font-black text-2xl uppercase tracking-tight ${
+                    isLight ? 'text-[#111111]' : 'text-white'
                   }`}
+                >
+                  Pictures &amp; Gallery Archive
+                </h2>
+                <p
+                  className={`font-sans text-xs mt-1 ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Managing all {galleryItems.length} photographs in the archive. Deleting a photograph permanently removes it across all devices and phones.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowAddPhoto(!showAddPhoto)}
+                className="flex items-center gap-2 px-4 py-2 bg-[#E6192B] hover:bg-black text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+                style={{ borderRadius: '0px' }}
               >
-                <div className="space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {post.is_pinned && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 text-[9px] uppercase font-bold bg-[#E50914] text-white tracking-widest stencil-cut">
-                        <Image src="/assets/punk-red-pin.png" alt="Pinned" width={12} height={12} className="w-3 h-3 object-contain" />
-                        PINNED TOP
-                      </span>
-                    )}
-                    <span
-                      className={`px-2 py-0.5 text-[9px] uppercase font-bold ${post.status === 'published'
-                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                        : post.status === 'draft'
-                          ? 'bg-amber-950 text-amber-400 border border-amber-800'
-                          : 'bg-neutral-900 text-neutral-500 border border-neutral-700'
-                        }`}
-                    >
-                      {post.status}
-                    </span>
-                    <span className="text-neutral-500 text-[10px]">[{post.category}]</span>
-                    <h3 className="font-bold text-white text-sm">{post.title}</h3>
-                  </div>
-
-                  <div className="flex items-center gap-3 text-[10px] text-neutral-500 font-mono">
-                    <span>Slug: /{post.slug}</span>
-                    <span>•</span>
-                    <span className="text-neutral-400 flex items-center gap-1">
-                      <GrungeGlyph name="heart" className="w-3 h-3 text-[#E50914]" />
-                      <span>{post.likes || 0} Likes</span>
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleTogglePinPost(post)}
-                    disabled={actionLoading}
-                    className={`px-3 py-2 border flex items-center gap-1.5 font-bold text-xs stencil-cut transition-all ${post.is_pinned
-                      ? 'border-[#E50914] bg-[#E50914]/20 text-[#E50914] hover:bg-[#E50914] hover:text-white'
-                      : 'border-neutral-700 text-neutral-400 hover:border-white hover:text-white'
-                      }`}
-                    title={post.is_pinned ? 'Unpin this blog' : 'Pin to top of blog archive (Max 3)'}
-                  >
-                    <Image
-                      src="/assets/punk-red-pin.png"
-                      alt="Pin"
-                      width={14}
-                      height={14}
-                      className={`w-3.5 h-3.5 object-contain transition-transform ${post.is_pinned ? '-rotate-12 scale-110' : 'opacity-60 grayscale'
-                        }`}
-                    />
-                    <span>{post.is_pinned ? 'PINNED' : 'PIN (MAX 3)'}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingPost(post)}
-                    className="p-2 border border-neutral-700 hover:border-white text-white flex items-center gap-1 font-bold text-xs stencil-cut"
-                  >
-                    <GrungeGlyph name="edit" className="w-3.5 h-3.5" />
-                    <span>EDIT</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeletePost(post.id)}
-                    className="p-2 border border-neutral-700 hover:bg-red-700 hover:text-white stencil-cut"
-                    title="Delete Post"
-                  >
-                    <GrungeGlyph name="trash" className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 6: BULLETINS & ANNOUNCEMENTS */}
-      {activeTab === 'updates' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                BULLETINS &amp; ANNOUNCEMENTS
-              </h2>
-              <p className="text-xs text-neutral-400">
-                Customizable bulletins, community topics, and announcements displayed on the top banner and on the star-grid bulletin board.
-              </p>
+                {showAddPhoto ? <HiXMark className="w-4 h-4" /> : <HiPlus className="w-4 h-4" />}
+                <span>{showAddPhoto ? 'Cancel' : 'Add Photograph'}</span>
+              </button>
             </div>
-            <a
-              href="/#bulletin-board"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 bg-neutral-900 border border-neutral-700 hover:border-white text-neutral-200 text-xs font-mono font-bold uppercase flex items-center gap-1.5"
-            >
-              <span>VIEW PUBLIC BULLETIN BOARD</span>
-              <GrungeGlyph name="external" className="w-3.5 h-3.5" />
-            </a>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Form */}
-            <form
-              onSubmit={handleCreateUpdate}
-              className="lg:col-span-7 p-6 bg-[#0E0E0E] border-2 border-neutral-800 space-y-4 text-xs"
-            >
-              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-                <span className="font-heading font-black text-sm uppercase text-[#E50914] block">
-                  CREATE CUSTOM BULLETIN
-                </span>
-                <span className="font-mono text-[10px] text-neutral-500">
-                  STARTS IN REAL-TIME
-                </span>
-              </div>
+            {/* Add Photo Form */}
+            {showAddPhoto && (
+              <form
+                onSubmit={handleAddPhotograph}
+                className={`p-6 border space-y-4 ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <h3
+                  className={`font-heading font-bold text-sm uppercase tracking-wider ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  Add New Photograph to Chronicles
+                </h3>
 
-              {/* Title & Category */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-2">
-                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
-                    Bulletin Title
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2 space-y-1">
+                    <label
+                      className={`block font-mono text-xs uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-300'
+                      }`}
+                    >
+                      Image URL or Public Path
+                    </label>
+                    <input
+                      type="text"
+                      value={newPhotoSrc}
+                      onChange={(e) => setNewPhotoSrc(e.target.value)}
+                      placeholder="/gallery/photo.webp or https://..."
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label
+                      className={`block font-mono text-xs uppercase ${
+                        isLight ? 'text-neutral-700 font-bold' : 'text-neutral-300'
+                      }`}
+                    >
+                      Collection / Event
+                    </label>
+                    <select
+                      value={newPhotoCategory}
+                      onChange={(e) =>
+                        setNewPhotoCategory(e.target.value as 'BOTB 2.0' | 'PROJECT SHE 1.0')
+                      }
+                      className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                        isLight
+                          ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                          : 'bg-[#090909] border-neutral-700 text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    >
+                      <option value="BOTB 2.0">BOTB 2.0</option>
+                      <option value="PROJECT SHE 1.0">PROJECT SHE 1.0</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    className={`block font-mono text-xs uppercase ${
+                      isLight ? 'text-neutral-700 font-bold' : 'text-neutral-300'
+                    }`}
+                  >
+                    Event / Caption
                   </label>
                   <input
                     type="text"
-                    required
-                    value={newUpdateTitle}
-                    onChange={(e) => setNewUpdateTitle(e.target.value)}
-                    placeholder="e.g. Battle of the Bands 3.0"
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none focus:border-[#E50914]"
+                    value={newPhotoTitle}
+                    onChange={(e) => setNewPhotoTitle(e.target.value)}
+                    placeholder="e.g. Battle of the Bands 2.0 — Live Performance"
+                    className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
                   />
                 </div>
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+
+                <button
+                  type="submit"
+                  disabled={isAddingPhoto}
+                  className="px-5 py-2 bg-[#E6192B] hover:bg-black text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center gap-2"
+                  style={{ borderRadius: '0px' }}
+                >
+                  <HiPlus className="w-4 h-4" />
+                  <span>{isAddingPhoto ? 'Adding...' : 'Add Photograph'}</span>
+                </button>
+              </form>
+            )}
+
+            {/* Filter and Search Bar */}
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border ${
+                isLight
+                  ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                  : 'bg-[#111111] border-neutral-800'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {(['ALL', 'BOTB 2.0', 'PROJECT SHE 1.0'] as const).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setGalleryCategoryFilter(cat);
+                      setGalleryPage(1);
+                    }}
+                    className={`font-mono text-xs uppercase px-3 py-1.5 border transition-all ${
+                      galleryCategoryFilter === cat
+                        ? 'border-[#E6192B] bg-[#E6192B] text-white font-bold'
+                        : isLight
+                        ? 'border-[#C5BFB2] bg-[#FAF8F5] text-neutral-700 hover:text-black hover:border-black'
+                        : 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="relative w-full sm:w-64">
+                <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 w-3.5 h-3.5" />
+                <input
+                  type="text"
+                  value={gallerySearchQuery}
+                  onChange={(e) => {
+                    setGallerySearchQuery(e.target.value);
+                    setGalleryPage(1);
+                  }}
+                  placeholder="Search photographs..."
+                  className={`w-full pl-8 pr-3 py-1.5 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                    isLight
+                      ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                      : 'bg-[#090909] border-neutral-700 text-white'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                />
+              </div>
+            </div>
+
+            {/* Gallery Images Grid */}
+            {filteredGalleryPhotos.length === 0 ? (
+              <div
+                className={`p-12 text-center border space-y-2 ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <p className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+                  No Photographs Found
+                </p>
+                <p
+                  className={`font-sans text-sm ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  No photographs match the current filter or search criteria.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {paginatedPhotos.map((item) => (
+                    <div
+                      key={item.id}
+                      className={`group relative aspect-square border overflow-hidden ${
+                        isLight ? 'bg-neutral-100 border-[#D4CFC4]' : 'bg-neutral-900 border-neutral-800'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    >
+                      <Image
+                        src={item.src}
+                        alt={item.title || 'Gallery photograph'}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        loading="lazy"
+                      />
+
+                      {/* Gradient Overlay & Delete Action */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+                        <span className="font-mono text-[9px] text-white/90 bg-black/80 px-1.5 py-0.5 self-start">
+                          {item.category || 'BOTB 2.0'}
+                        </span>
+
+                        <button
+                          onClick={() => handleDeletePhotograph(item.id)}
+                          className="self-end p-2 bg-[#E6192B] hover:bg-black text-white transition-colors"
+                          title="Delete photo permanently across all devices"
+                          style={{ borderRadius: '0px' }}
+                        >
+                          <HiTrash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                <div
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border font-mono text-xs ${
+                    isLight
+                      ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                      : 'bg-[#111111] border-neutral-800'
+                  }`}
+                >
+                  <span className={isLight ? 'text-neutral-600' : 'text-neutral-400'}>
+                    Showing {(galleryPage - 1) * photosPerPage + 1}–
+                    {Math.min(galleryPage * photosPerPage, filteredGalleryPhotos.length)} of{' '}
+                    {filteredGalleryPhotos.length} photographs
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setGalleryPage((p) => Math.max(1, p - 1))}
+                      disabled={galleryPage === 1}
+                      className={`px-3 py-1.5 border disabled:opacity-40 flex items-center gap-1 ${
+                        isLight
+                          ? 'border-[#C5BFB2] bg-[#FAF8F5] text-neutral-800 hover:bg-[#EAE5DB]'
+                          : 'border-neutral-700 bg-neutral-900 text-neutral-300 hover:text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    >
+                      <HiChevronLeft className="w-4 h-4" />
+                      <span>Prev</span>
+                    </button>
+
+                    <span
+                      className={`px-3 py-1.5 border font-bold ${
+                        isLight
+                          ? 'border-[#C5BFB2] text-[#111111] bg-white'
+                          : 'border-neutral-800 text-white bg-[#090909]'
+                      }`}
+                    >
+                      Page {galleryPage} of {totalGalleryPages}
+                    </span>
+
+                    <button
+                      onClick={() => setGalleryPage((p) => Math.min(totalGalleryPages, p + 1))}
+                      disabled={galleryPage === totalGalleryPages}
+                      className={`px-3 py-1.5 border disabled:opacity-40 flex items-center gap-1 ${
+                        isLight
+                          ? 'border-[#C5BFB2] bg-[#FAF8F5] text-neutral-800 hover:bg-[#EAE5DB]'
+                          : 'border-neutral-700 bg-neutral-900 text-neutral-300 hover:text-white'
+                      }`}
+                      style={{ borderRadius: '0px' }}
+                    >
+                      <span>Next</span>
+                      <HiChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* SECTION 3: VISITOR INSIGHTS & WASTE DATA CLEANUP */}
+        {/* ============================================================== */}
+        {activeTab === 'insights' && (
+          <div className="space-y-8">
+            {/* Header and Clear Waste Info Action Bar */}
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <div>
+                <h2
+                  className={`font-heading font-black text-2xl uppercase tracking-tight ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  Visitor Insights &amp; Access Logs
+                </h2>
+                <p
+                  className={`font-sans text-xs mt-1 ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Active community presence, security access log, and waste records cleanup.
+                </p>
+              </div>
+
+              {/* Clear Waste Info Group */}
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleClearWasteData('visitors')}
+                  disabled={clearingWaste}
+                  className={`px-3 py-1.5 border font-mono text-[11px] uppercase transition-colors ${
+                    isLight
+                      ? 'border-[#C5BFB2] bg-[#FAF8F5] hover:bg-neutral-200 text-neutral-800'
+                      : 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-300'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                >
+                  Clear Visitor Logs
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleClearWasteData('access')}
+                  disabled={clearingWaste}
+                  className={`px-3 py-1.5 border font-mono text-[11px] uppercase transition-colors ${
+                    isLight
+                      ? 'border-[#C5BFB2] bg-[#FAF8F5] hover:bg-neutral-200 text-neutral-800'
+                      : 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-300'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                >
+                  Clear Security Logs
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleClearWasteData('all')}
+                  disabled={clearingWaste}
+                  className="px-3.5 py-1.5 bg-[#E6192B] hover:bg-black text-white font-mono text-[11px] font-bold uppercase transition-colors"
+                  style={{ borderRadius: '0px' }}
+                >
+                  Clear All Waste Info
+                </button>
+              </div>
+            </div>
+
+            {/* Four Summary Metric Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div
+                className={`p-4 border ${
+                  isLight ? 'bg-[#FFFFFF] border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div
+                  className={`font-mono text-[11px] uppercase ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Active Online Now
+                </div>
+                <div className="font-heading font-black text-3xl text-emerald-500 mt-1">
+                  {Math.max(1, activeOnlineCount)}
+                </div>
+                <div className="font-sans text-[10px] text-neutral-500 mt-0.5">
+                  Visitors seen in last 15 mins
+                </div>
+              </div>
+
+              <div
+                className={`p-4 border ${
+                  isLight ? 'bg-[#FFFFFF] border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div
+                  className={`font-mono text-[11px] uppercase ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Registered Users
+                </div>
+                <div
+                  className={`font-heading font-black text-3xl mt-1 ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  {registeredUsersCount || (user ? 1 : 0)}
+                </div>
+                <div className="font-sans text-[10px] text-neutral-500 mt-0.5">
+                  Verified member accounts
+                </div>
+              </div>
+
+              <div
+                className={`p-4 border ${
+                  isLight ? 'bg-[#FFFFFF] border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div
+                  className={`font-mono text-[11px] uppercase ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Visits Recorded
+                </div>
+                <div
+                  className={`font-heading font-black text-3xl mt-1 ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  {visitorLogs.length}
+                </div>
+                <div className="font-sans text-[10px] text-neutral-500 mt-0.5">
+                  Recent browsing sessions
+                </div>
+              </div>
+
+              <div
+                className={`p-4 border ${
+                  isLight ? 'bg-[#FFFFFF] border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <div
+                  className={`font-mono text-[11px] uppercase ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Security Attempts
+                </div>
+                <div className="font-heading font-black text-3xl text-[#E6192B] mt-1">
+                  {teamAccessLogs.length}
+                </div>
+                <div className="font-sans text-[10px] text-neutral-500 mt-0.5">
+                  Team access authentications
+                </div>
+              </div>
+            </div>
+
+            {/* Table 1: Recent Community Activity */}
+            <div className="space-y-3">
+              <h3
+                className={`font-heading font-bold text-lg uppercase tracking-tight ${
+                  isLight ? 'text-[#111111]' : 'text-white'
+                }`}
+              >
+                Recent Community Activity
+              </h3>
+
+              <div
+                className={`overflow-x-auto border ${
+                  isLight ? 'bg-[#FFFFFF] border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <table className="w-full text-left font-mono text-xs">
+                  <thead
+                    className={`border-b uppercase text-[11px] ${
+                      isLight
+                        ? 'bg-[#F4EFE5] border-[#D4CFC4] text-neutral-700'
+                        : 'bg-[#161616] border-neutral-800 text-neutral-400'
+                    }`}
+                  >
+                    <tr>
+                      <th className="px-4 py-3">Visitor / Region</th>
+                      <th className="px-4 py-3">Last Active</th>
+                      <th className="px-4 py-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    className={`divide-y font-sans ${
+                      isLight
+                        ? 'divide-[#EAE5DB] text-neutral-800'
+                        : 'divide-neutral-800 text-neutral-300'
+                    }`}
+                  >
+                    {visitorLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={3} className="px-4 py-8 text-center text-neutral-500 font-mono text-xs">
+                          No recent visitor activity recorded.
+                        </td>
+                      </tr>
+                    ) : (
+                      visitorLogs.map((log) => (
+                        <tr
+                          key={log.id}
+                          className={`transition-colors ${
+                            isLight ? 'hover:bg-neutral-50' : 'hover:bg-neutral-900/60'
+                          }`}
+                        >
+                          <td className="px-4 py-3 font-mono text-xs">
+                            <div className={isLight ? 'text-black font-bold' : 'text-white'}>
+                              {log.visitor_id}
+                            </div>
+                            <div className="text-[11px] text-neutral-500 font-sans">{log.location}</div>
+                          </td>
+                          <td
+                            className={`px-4 py-3 font-mono text-xs ${
+                              isLight ? 'text-neutral-600' : 'text-neutral-400'
+                            }`}
+                          >
+                            {new Date(log.last_online).toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs text-[#E6192B] font-bold">
+                            {log.action}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Table 2: Team Access Security Log */}
+            <div
+              className={`space-y-3 pt-4 border-t ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <h3
+                className={`font-heading font-bold text-lg uppercase tracking-tight flex items-center gap-2 ${
+                  isLight ? 'text-[#111111]' : 'text-white'
+                }`}
+              >
+                <HiShieldExclamation className="w-5 h-5 text-[#E6192B]" />
+                <span>Team Access Security Log</span>
+              </h3>
+
+              <div
+                className={`overflow-x-auto border ${
+                  isLight ? 'bg-[#FFFFFF] border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <table className="w-full text-left font-mono text-xs">
+                  <thead
+                    className={`border-b uppercase text-[11px] ${
+                      isLight
+                        ? 'bg-[#F4EFE5] border-[#D4CFC4] text-neutral-700'
+                        : 'bg-[#161616] border-neutral-800 text-neutral-400'
+                    }`}
+                  >
+                    <tr>
+                      <th className="px-4 py-3">Timestamp</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">Attempted From</th>
+                      <th className="px-4 py-3">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    className={`divide-y font-sans ${
+                      isLight
+                        ? 'divide-[#EAE5DB] text-neutral-800'
+                        : 'divide-neutral-800 text-neutral-300'
+                    }`}
+                  >
+                    {teamAccessLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-neutral-500 font-mono text-xs">
+                          No access events logged.
+                        </td>
+                      </tr>
+                    ) : (
+                      teamAccessLogs.map((log) => (
+                        <tr
+                          key={log.id}
+                          className={`transition-colors ${
+                            isLight ? 'hover:bg-neutral-50' : 'hover:bg-neutral-900/60'
+                          }`}
+                        >
+                          <td
+                            className={`px-4 py-3 font-mono text-xs ${
+                              isLight ? 'text-neutral-600' : 'text-neutral-400'
+                            }`}
+                          >
+                            {new Date(log.timestamp).toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs">
+                            <span
+                              className={`px-2 py-0.5 uppercase tracking-wider font-bold text-[10px] ${
+                                log.status === 'successful'
+                                  ? isLight
+                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                    : 'bg-emerald-950/70 border border-emerald-600 text-emerald-400'
+                                  : isLight
+                                  ? 'bg-red-100 text-red-800 border border-red-300'
+                                  : 'bg-red-950/70 border border-red-700 text-red-300'
+                              }`}
+                              style={{ borderRadius: '0px' }}
+                            >
+                              {log.status === 'successful'
+                                ? 'Successful'
+                                : 'Passkey Mismatch'}
+                            </span>
+                          </td>
+                          <td
+                            className={`px-4 py-3 font-mono text-xs ${
+                              isLight ? 'text-neutral-700' : 'text-neutral-300'
+                            }`}
+                          >
+                            {log.attempted_from || 'Local Client'}
+                          </td>
+                          <td
+                            className={`px-4 py-3 font-sans text-xs ${
+                              isLight ? 'text-neutral-600' : 'text-neutral-400'
+                            }`}
+                          >
+                            {log.reason || (log.status === 'successful' ? 'Verified passkey' : 'Passkey mismatch')}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* SECTION 4: COMMUNITY REVIEWS */}
+        {/* ============================================================== */}
+        {activeTab === 'reviews' && (
+          <div className="space-y-6">
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <div>
+                <h2
+                  className={`font-heading font-black text-2xl uppercase tracking-tight ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  Community Reviews
+                </h2>
+                <p
+                  className={`font-sans text-xs mt-1 ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Decide which community reviews and experiences are displayed on the public website.
+                </p>
+              </div>
+
+              {/* Status Filter */}
+              <div className="flex items-center gap-1.5">
+                {(['all', 'pending', 'approved'] as const).map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setReviewFilter(st)}
+                    className={`font-mono text-xs uppercase px-3 py-1.5 border transition-all ${
+                      reviewFilter === st
+                        ? 'border-[#E6192B] bg-[#E6192B] text-white font-bold'
+                        : isLight
+                        ? 'border-[#C5BFB2] bg-[#FAF8F5] text-neutral-700 hover:text-black hover:border-black'
+                        : 'border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    {st}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filteredReviews.length === 0 ? (
+              <div
+                className={`p-12 text-center border space-y-2 ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <p className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+                  No Reviews Found
+                </p>
+                <p
+                  className={`font-sans text-sm ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  No community reviews match the selected filter.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredReviews.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className={`p-6 border space-y-4 shadow-sm ${
+                      isLight
+                        ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                        : 'bg-[#111111] border-neutral-800'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3 border-neutral-800/30">
+                      <div>
+                        <span
+                          className={`font-heading font-bold text-base ${
+                            isLight ? 'text-[#111111]' : 'text-white'
+                          }`}
+                        >
+                          {rev.display_name}
+                        </span>
+                        <div
+                          className={`font-mono text-[11px] ${
+                            isLight ? 'text-neutral-500' : 'text-neutral-400'
+                          }`}
+                        >
+                          {rev.role_or_relation || 'Community Member'} •{' '}
+                          {new Date(rev.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`font-mono text-[10px] px-2 py-0.5 uppercase font-bold ${
+                            rev.status === 'approved'
+                              ? 'bg-emerald-600 text-white'
+                              : rev.status === 'pending'
+                              ? 'bg-amber-600 text-white'
+                              : 'bg-red-700 text-white'
+                          }`}
+                          style={{ borderRadius: '0px' }}
+                        >
+                          {rev.status}
+                        </span>
+
+                        <div className="flex text-amber-400 text-xs">
+                          {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                            <span key={i}>★</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <p
+                      className={`font-sans text-sm leading-relaxed ${
+                        isLight ? 'text-neutral-800' : 'text-neutral-200'
+                      }`}
+                    >
+                      &ldquo;{rev.review_text}&rdquo;
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center gap-2">
+                        {rev.status !== 'approved' && (
+                          <button
+                            onClick={() => handleUpdateReviewStatus(rev.id, 'approved')}
+                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-mono text-xs uppercase font-bold flex items-center gap-1.5"
+                            style={{ borderRadius: '0px' }}
+                          >
+                            <HiCheck className="w-4 h-4" />
+                            <span>Approve</span>
+                          </button>
+                        )}
+
+                        {rev.status !== 'rejected' && (
+                          <button
+                            onClick={() => handleUpdateReviewStatus(rev.id, 'rejected')}
+                            className={`px-3.5 py-1.5 border font-mono text-xs uppercase flex items-center gap-1.5 ${
+                              isLight
+                                ? 'border-[#C5BFB2] bg-[#FAF8F5] hover:bg-neutral-200 text-neutral-800'
+                                : 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800 text-neutral-300'
+                            }`}
+                            style={{ borderRadius: '0px' }}
+                          >
+                            <HiEyeSlash className="w-4 h-4" />
+                            <span>Hide</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => handleDeleteReview(rev.id)}
+                        className={`p-1.5 border hover:border-red-600 hover:bg-red-50 text-neutral-500 hover:text-red-600 ${
+                          isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+                        }`}
+                        title="Delete permanently"
+                        style={{ borderRadius: '0px' }}
+                      >
+                        <HiTrash className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* SECTION 5: NOTICE BOARD / ANNOUNCEMENTS */}
+        {/* ============================================================== */}
+        {activeTab === 'notices' && (
+          <div className="space-y-6">
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <div>
+                <h2
+                  className={`font-heading font-black text-2xl uppercase tracking-tight ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  Notice Board &amp; Announcements
+                </h2>
+                <p
+                  className={`font-sans text-xs mt-1 ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Publish live announcements, volunteer notices, and event banners.
+                </p>
+              </div>
+            </div>
+
+            {/* Create Announcement Form */}
+            <form
+              onSubmit={handleCreateNotice}
+              className={`p-6 border space-y-4 shadow-sm ${
+                isLight
+                  ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                  : 'bg-[#111111] border-neutral-800'
+              }`}
+              style={{ borderRadius: '0px' }}
+            >
+              <h3
+                className={`font-heading font-bold text-sm uppercase tracking-wider ${
+                  isLight ? 'text-[#111111]' : 'text-white'
+                }`}
+              >
+                Publish New Announcement
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="sm:col-span-2 space-y-1">
+                  <label
+                    className={`block font-mono text-xs uppercase ${
+                      isLight ? 'text-neutral-700 font-bold' : 'text-neutral-300'
+                    }`}
+                  >
+                    Headline
+                  </label>
+                  <input
+                    type="text"
+                    value={newNoticeTitle}
+                    onChange={(e) => setNewNoticeTitle(e.target.value)}
+                    placeholder="e.g. BOTB 2.0 Audition Results Announced"
+                    className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label
+                    className={`block font-mono text-xs uppercase ${
+                      isLight ? 'text-neutral-700 font-bold' : 'text-neutral-300'
+                    }`}
+                  >
                     Category
                   </label>
                   <select
-                    value={newUpdateCategory}
-                    onChange={(e) => setNewUpdateCategory(e.target.value)}
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none focus:border-[#E50914]"
+                    value={newNoticeCategory}
+                    onChange={(e) => setNewNoticeCategory(e.target.value)}
+                    className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
                   >
                     <option value="Announcement">Announcement</option>
-                    <option value="Workshop">Workshop</option>
-                    <option value="Event / Gig">Event / Gig</option>
-                    <option value="Safehouse Aid">Safehouse Aid</option>
-                    <option value="Volunteer Call">Volunteer Call</option>
-                    <option value="Creative & Art">Creative &amp; Art</option>
-                    <option value="Urgent Alert">Urgent Alert</option>
+                    <option value="Event">Event</option>
+                    <option value="Volunteering">Volunteering</option>
+                    <option value="Fundraiser">Fundraiser</option>
                   </select>
                 </div>
               </div>
 
-              {/* Card Style Selector */}
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1.5 text-[11px]">
-                  Card Visual Style
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {[
-                    { id: 'zine' as BulletinCardStyle, label: 'Zine Note', desc: 'Taped dark paper' },
-                    { id: 'polaroid' as BulletinCardStyle, label: 'Polaroid', desc: 'Photo + caption' },
-                    { id: 'stamp' as BulletinCardStyle, label: 'Crimson Stamp', desc: 'Brutalist official' },
-                    { id: 'doodle' as BulletinCardStyle, label: 'Punk Doodle', desc: 'Sketch & marker' },
-                  ].map((style) => (
-                    <button
-                      key={style.id}
-                      type="button"
-                      onClick={() => setNewUpdateCardStyle(style.id)}
-                      className={`p-2.5 text-left border transition-all ${
-                        newUpdateCardStyle === style.id
-                          ? 'border-[#E50914] bg-red-950/30 text-white'
-                          : 'border-neutral-800 bg-[#141414] text-neutral-400 hover:border-neutral-600'
-                      }`}
-                    >
-                      <div className="font-bold text-[11px] uppercase">{style.label}</div>
-                      <div className="text-[9px] text-neutral-500 font-mono mt-0.5">{style.desc}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Message Content */}
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
-                  Bulletin Message Content
+              <div className="space-y-1">
+                <label
+                  className={`block font-mono text-xs uppercase ${
+                    isLight ? 'text-neutral-700 font-bold' : 'text-neutral-300'
+                  }`}
+                >
+                  Announcement Message
                 </label>
                 <textarea
-                  required
                   rows={3}
-                  value={newUpdateContent}
-                  onChange={(e) => setNewUpdateContent(e.target.value)}
-                  placeholder="Details of the announcement, venue, dates, or safehouse updates..."
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none resize-none focus:border-[#E50914]"
+                  value={newNoticeContent}
+                  onChange={(e) => setNewNoticeContent(e.target.value)}
+                  placeholder="Details about the event, location, timings, or instructions..."
+                  className={`w-full px-3 py-2 font-sans text-xs focus:outline-none focus:border-[#E6192B] border ${
+                    isLight
+                      ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                      : 'bg-[#090909] border-neutral-700 text-white'
+                  }`}
+                  style={{ borderRadius: '0px' }}
+                  required
                 />
               </div>
 
-              {/* Sticker / Picture Picker */}
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
-                  Attach Sticker or Picture
-                </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {[
-                    { label: 'None', val: '', glyph: null },
-                    { label: 'HEADPHONES', val: '/assets/headphones-sticker.png', glyph: 'headphones' as const },
-                    { label: 'DISCO BALL', val: '/assets/discoball-sticker.png', glyph: 'disc' as const },
-                    { label: 'SPIRAL STAR', val: '/assets/punk-red-spiral-star-clean.png', glyph: 'sparkle' as const },
-                  ].map((stk) => (
-                    <button
-                      key={stk.val}
-                      type="button"
-                      onClick={() => setNewUpdateImageUrl(stk.val)}
-                      className={`px-2.5 py-1 text-[11px] font-mono border transition-colors flex items-center gap-1.5 ${
-                        newUpdateImageUrl === stk.val
-                          ? 'border-[#E50914] bg-[#E50914] text-white font-bold'
-                          : 'border-neutral-800 bg-[#161616] text-neutral-400 hover:border-neutral-600'
-                      }`}
-                    >
-                      {stk.glyph && <GrungeGlyph name={stk.glyph} className="w-3 h-3 text-[#E50914]" />}
-                      <span>{stk.label}</span>
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={newUpdateImageUrl}
-                  onChange={(e) => setNewUpdateImageUrl(e.target.value)}
-                  placeholder="Or paste custom image URL / photo link"
-                  className="w-full p-2 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px] focus:border-[#E50914]"
-                />
-              </div>
-
-              {/* Optional Call to Action Button */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
-                    Action Link URL (Optional)
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label
+                    className={`block font-mono text-[11px] uppercase ${
+                      isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                    }`}
+                  >
+                    Optional Button Link
                   </label>
                   <input
                     type="url"
-                    value={newUpdateLinkUrl}
-                    onChange={(e) => setNewUpdateLinkUrl(e.target.value)}
-                    placeholder="https://example.com/rsvp"
-                    className="w-full p-2 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px] focus:border-[#E50914]"
+                    value={newNoticeLinkUrl}
+                    onChange={(e) => setNewNoticeLinkUrl(e.target.value)}
+                    placeholder="https://..."
+                    className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
                   />
                 </div>
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1 text-[11px]">
+
+                <div className="space-y-1">
+                  <label
+                    className={`block font-mono text-[11px] uppercase ${
+                      isLight ? 'text-neutral-700 font-bold' : 'text-neutral-400'
+                    }`}
+                  >
                     Button Label
                   </label>
                   <input
                     type="text"
-                    value={newUpdateLinkText}
-                    onChange={(e) => setNewUpdateLinkText(e.target.value)}
-                    placeholder="e.g. REGISTER NOW"
-                    className="w-full p-2 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px] focus:border-[#E50914]"
+                    value={newNoticeLinkText}
+                    onChange={(e) => setNewNoticeLinkText(e.target.value)}
+                    placeholder="Read Details"
+                    className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
+                      isLight
+                        ? 'bg-[#FAF8F5] border-[#C5BFB2] text-[#111111]'
+                        : 'bg-[#090909] border-neutral-700 text-white'
+                    }`}
+                    style={{ borderRadius: '0px' }}
                   />
                 </div>
               </div>
-
-              {/* Top Banner Checkbox */}
-              <label className="flex items-center gap-2 pt-1 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={newUpdateIsBanner}
-                  onChange={(e) => setNewUpdateIsBanner(e.target.checked)}
-                  className="accent-[#E50914] w-4 h-4 cursor-pointer"
-                />
-                <span className="font-mono text-xs text-neutral-300 font-bold">
-                  Show as top website banner above Hero
-                </span>
-              </label>
 
               <button
                 type="submit"
-                disabled={actionLoading}
-                className="w-full py-3 bg-[#E50914] text-white font-heading font-black text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isSubmittingNotice}
+                className="px-6 py-2.5 bg-[#E6192B] hover:bg-black text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                style={{ borderRadius: '0px' }}
               >
-                {actionLoading ? (
-                  <span>POSTING BULLETIN...</span>
-                ) : (
-                  <>
-                    <GrungeGlyph name="megaphone" className="w-4 h-4" />
-                    <span>POST BULLETIN TO BOARD &amp; BANNER</span>
-                  </>
-                )}
+                {isSubmittingNotice ? 'Publishing...' : 'Publish Announcement'}
               </button>
             </form>
 
-            {/* Live Visual Preview */}
-            <div className="lg:col-span-5 p-5 bg-[#0A0A0A] border-2 border-neutral-800 space-y-3">
-              <span className="font-mono text-[10px] text-neutral-500 uppercase tracking-wider block">
-                LIVE STAR-GRID BOARD PREVIEW
-              </span>
+            {/* List of Published Notices */}
+            <div className="space-y-3">
+              <h3
+                className={`font-heading font-bold text-sm uppercase tracking-wider ${
+                  isLight ? 'text-[#111111]' : 'text-white'
+                }`}
+              >
+                Published Notices ({updates.length})
+              </h3>
 
-              {/* Mini Star Grid Sandbox */}
-              <div className="p-4 bg-[#080808] border border-neutral-800 bg-star-gridlines rounded-sm min-h-[220px] flex items-center justify-center relative overflow-hidden">
-                <div className="w-full max-w-sm">
-                  {/* Polaroid Preview */}
-                  {newUpdateCardStyle === 'polaroid' && (
-                    <div className="bg-[#EDEDED] text-black p-3 shadow-[4px_4px_0px_#000000] rotate-[-1deg]">
-                      <div className="relative w-full h-32 bg-[#181818] mb-2 flex items-center justify-center overflow-hidden">
-                        {newUpdateImageUrl ? (
-                          <Image
-                            src={newUpdateImageUrl}
-                            alt="Preview"
-                            fill
-                            sizes="96px"
-                            className="object-contain p-2"
-                          />
-                        ) : (
-                          <span className="text-[10px] text-neutral-500 font-mono">PHOTO SPACE</span>
-                        )}
-                        <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
-                          {newUpdateCategory}
-                        </span>
-                      </div>
-                      <div className="font-heading font-black text-xs text-black uppercase truncate">
-                        {newUpdateTitle || 'BULLETIN TITLE'}
-                      </div>
-                      <div className="font-mono text-[10px] text-neutral-700 line-clamp-2 mt-1">
-                        {newUpdateContent || 'Message content preview will appear here on the polaroid card...'}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Stamp Preview */}
-                  {newUpdateCardStyle === 'stamp' && (
-                    <div className="bg-[#120606] border-2 border-[#E50914] p-4 text-white space-y-2 shadow-[4px_4px_0px_#E50914]">
-                      <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
-                          {newUpdateCategory}
-                        </span>
-                        <span className="font-mono text-[8px] text-[#E50914] font-bold flex items-center gap-1">
-                          <GrungeGlyph name="bolt" className="w-2.5 h-2.5" />
-                          <span>STAMPED</span>
-                        </span>
-                      </div>
-                      {newUpdateImageUrl && (
-                        <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
-                          <Image src={newUpdateImageUrl} alt="Preview" fill sizes="96px" className="object-contain p-2" />
-                        </div>
-                      )}
-                      <div className="font-heading font-black text-xs uppercase text-white truncate">
-                        {newUpdateTitle || 'BULLETIN TITLE'}
-                      </div>
-                      <div className="font-sans text-[10px] text-neutral-300 line-clamp-2">
-                        {newUpdateContent || 'Message content preview will appear here in brutalist format...'}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Doodle Preview */}
-                  {newUpdateCardStyle === 'doodle' && (
-                    <div className="bg-[#0C0C0C] border-2 border-dashed border-neutral-600 p-4 text-white space-y-2 rotate-[1deg]">
-                      <div className="flex items-center justify-between">
-                        <span className="px-1.5 py-0.5 bg-neutral-800 text-white font-mono text-[8px] uppercase">
-                          {newUpdateCategory}
-                        </span>
-                        <GrungeGlyph name="edit" className="w-3 h-3 text-[#E50914]" />
-                      </div>
-                      {newUpdateImageUrl && (
-                        <div className="relative w-full h-24 bg-black border border-dashed border-neutral-700 overflow-hidden my-1">
-                          <Image src={newUpdateImageUrl} alt="Preview" fill sizes="96px" className="object-contain p-2" />
-                        </div>
-                      )}
-                      <div className="font-heading font-black text-xs uppercase tracking-tight text-white truncate">
-                        {newUpdateTitle || 'BULLETIN TITLE'}
-                      </div>
-                      <div className="font-mono text-[10px] text-neutral-300 line-clamp-2">
-                        {newUpdateContent || 'Message content preview will appear here in punk doodle format...'}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Zine Note Preview */}
-                  {newUpdateCardStyle === 'zine' && (
-                    <div className="bg-[#121212] border-2 border-neutral-800 p-4 text-white space-y-2 relative">
-                      <div className="zine-tape absolute -top-2 left-4 w-12 h-3" />
-                      <div className="flex items-center justify-between pt-1">
-                        <span className="px-2 py-0.5 bg-[#E50914] text-white font-mono text-[8px] font-bold uppercase">
-                          {newUpdateCategory}
-                        </span>
-                      </div>
-                      {newUpdateImageUrl && (
-                        <div className="relative w-full h-24 bg-black border border-neutral-800 overflow-hidden my-1">
-                          <Image src={newUpdateImageUrl} alt="Preview" fill sizes="96px" className="object-contain p-2" />
-                        </div>
-                      )}
-                      <div className="font-heading font-black text-xs uppercase text-white truncate">
-                        {newUpdateTitle || 'BULLETIN TITLE'}
-                      </div>
-                      <div className="font-sans text-[10px] text-neutral-300 line-clamp-2">
-                        {newUpdateContent || 'Message content preview will appear here on zine paper...'}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* List of Posted Bulletins */}
-          <div className="space-y-3 pt-4 border-t border-neutral-800">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] text-neutral-400 uppercase font-bold block">
-                POSTED BULLETINS &amp; TOPICS ({updates.length})
-              </span>
-              <span className="text-[10px] text-neutral-500 font-mono">
-                Click controls to pin, toggle banner, or lock replies
-              </span>
-            </div>
-
-            {updates.length === 0 ? (
-              <div className="p-4 bg-[#101010] border border-neutral-800 text-neutral-500 font-mono text-xs">
-                No bulletins posted yet. Create your first bulletin above.
-              </div>
-            ) : (
-              updates.map((u) => {
-                const parsed = parseBulletinPayload(u);
-                return (
-                  <div
-                    key={u.id}
-                    className="p-4 bg-[#0E0E0E] border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs"
-                  >
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      {parsed.image_url && (
-                        <div className="relative w-12 h-12 shrink-0 bg-neutral-900 border border-neutral-800">
-                          <Image
-                            src={parsed.image_url}
-                            alt={u.title}
-                            fill
-                            sizes="48px"
-                            className="object-contain p-1"
-                          />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2 py-0.5 bg-[#E50914] text-white text-[9px] font-bold uppercase shrink-0">
-                            {u.category}
-                          </span>
-                          <span className="font-bold text-white text-sm truncate">{u.title}</span>
-                          <span className="text-neutral-500 text-[10px] font-mono shrink-0">
-                            [{parsed.card_style}]
-                          </span>
-                          {parsed.pinned && (
-                            <span className="text-amber-400 text-[9px] font-mono uppercase shrink-0 font-bold flex items-center gap-1">
-                              • <GrungeGlyph name="pin" className="w-2.5 h-2.5" /> PINNED
-                            </span>
-                          )}
-                          {parsed.locked && (
-                            <span className="text-neutral-400 text-[9px] font-mono uppercase shrink-0 flex items-center gap-1">
-                              • <GrungeGlyph name="lock" className="w-2.5 h-2.5" /> LOCKED
-                            </span>
-                          )}
-                          {parsed.is_banner && (
-                            <span className="text-emerald-400 text-[9px] font-mono uppercase shrink-0 font-bold flex items-center gap-1">
-                              • <GrungeGlyph name="megaphone" className="w-2.5 h-2.5" /> TOP BANNER
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-neutral-400 text-[11px] mt-1 line-clamp-2">{parsed.body}</p>
-                        <div className="mt-2 flex items-center gap-3 text-[10px] font-mono text-neutral-500">
-                          <span>By {parsed.author_name || 'Admin'}</span>
-                          <span>•</span>
-                          <span>{new Date(u.created_at).toLocaleDateString()}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <GrungeGlyph name="chat" className="w-3 h-3" />
-                            <span>{parsed.comments?.length || 0} comments</span>
-                          </span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <GrungeGlyph name="star" className="w-3 h-3 text-amber-400" />
-                            <span>{parsed.likes || 0} stars</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quick Moderation Buttons */}
-                    <div className="flex items-center gap-1.5 flex-wrap shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleModerateBulletin(u.id, 'pin')}
-                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors flex items-center gap-1 ${
-                          parsed.pinned ? 'bg-amber-950 border-amber-600 text-amber-300' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                        }`}
-                        title="Toggle Pin"
-                      >
-                        <GrungeGlyph name="pin" className="w-2.5 h-2.5" />
-                        <span>{parsed.pinned ? 'UNPIN' : 'PIN'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleModerateBulletin(u.id, 'toggle_banner')}
-                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors flex items-center gap-1 ${
-                          parsed.is_banner ? 'bg-emerald-950 border-emerald-600 text-emerald-300' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                        }`}
-                        title="Toggle Top Banner"
-                      >
-                        <GrungeGlyph name="megaphone" className="w-2.5 h-2.5" />
-                        <span>{parsed.is_banner ? 'BANNER ON' : 'SET BANNER'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleModerateBulletin(u.id, 'lock')}
-                        className={`px-2.5 py-1 border font-mono text-[10px] font-bold transition-colors flex items-center gap-1 ${
-                          parsed.locked ? 'bg-neutral-800 border-neutral-600 text-white' : 'bg-neutral-900 border-neutral-700 text-neutral-400 hover:text-white'
-                        }`}
-                        title="Toggle Discussion Lock"
-                      >
-                        <GrungeGlyph name="lock" className="w-2.5 h-2.5" />
-                        <span>{parsed.locked ? 'UNLOCK' : 'LOCK'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleModerateBulletin(u.id, 'delete')}
-                        className="p-2 text-neutral-500 hover:text-red-500 hover:bg-neutral-900 transition-colors"
-                        title="Delete Bulletin"
-                      >
-                        <GrungeGlyph name="trash" className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 7: EMAIL NEWSLETTER */}
-      {activeTab === 'email' && (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                EMAIL NEWSLETTER
-              </h2>
-              <p className="text-xs text-neutral-400 font-sans">
-                Compose and send updates to subscribers with customizable buttons, headline, and live preview.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 bg-[#141414] border border-neutral-800 text-[11px] font-mono text-neutral-300">
-                Active Subscribers: <strong className="text-[#E50914]">{stats?.emailSubscribers || 0}</strong>
-              </span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left: Compose Form (7 cols) */}
-            <form
-              onSubmit={handleSendNewsletter}
-              className="lg:col-span-7 p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut"
-            >
-              <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-                <span className="font-heading font-black text-sm uppercase text-[#E50914]">
-                  COMPOSE NEWSLETTER
-                </span>
-                <span className="text-[10px] text-neutral-400 font-mono">
-                  Standard HTML Template
-                </span>
-              </div>
-
-              <div>
-                <label className="block text-neutral-400 uppercase font-bold mb-1.5">
-                  Send To
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${emailTarget === 'subscribed_only'
-                    ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
-                    : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
-                    }`}>
-                    <input
-                      type="radio"
-                      name="targetAudience"
-                      value="subscribed_only"
-                      checked={emailTarget === 'subscribed_only'}
-                      onChange={() => setEmailTarget('subscribed_only')}
-                      className="sr-only"
-                    />
-                    <span className="text-xs">Subscribed Only</span>
-                    <span className="text-[10px] text-neutral-500 font-mono">({stats?.emailSubscribers || 0})</span>
-                  </label>
-
-                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${emailTarget === 'all'
-                    ? 'border-[#E50914] bg-[#1A0002] text-white font-bold'
-                    : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
-                    }`}>
-                    <input
-                      type="radio"
-                      name="targetAudience"
-                      value="all"
-                      checked={emailTarget === 'all'}
-                      onChange={() => setEmailTarget('all')}
-                      className="sr-only"
-                    />
-                    <span className="text-xs">All Members</span>
-                    <span className="text-[10px] text-neutral-500 font-mono">({stats?.totalUsers || 0})</span>
-                  </label>
-
-                  <label className={`p-2.5 border cursor-pointer text-center flex flex-col items-center justify-center gap-1 transition-all ${emailTarget === 'test_admin'
-                    ? 'border-emerald-500 bg-emerald-950/40 text-emerald-300 font-bold'
-                    : 'border-neutral-800 bg-[#121212] text-neutral-400 hover:border-neutral-600'
-                    }`}>
-                    <input
-                      type="radio"
-                      name="targetAudience"
-                      value="test_admin"
-                      checked={emailTarget === 'test_admin'}
-                      onChange={() => setEmailTarget('test_admin')}
-                      className="sr-only"
-                    />
-                    <span className="text-xs">Test (Admin Only)</span>
-                    <span className="text-[10px] text-emerald-500 font-mono">Safe Preview</span>
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-neutral-400 uppercase font-bold mb-1">
-                  Email Subject Line *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="e.g. Project S.H.E. Monthly Newsletter: Upcoming Workshops & News"
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-neutral-400 uppercase font-bold mb-1">
-                    Main Headline (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={emailHeadline}
-                    onChange={(e) => setEmailHeadline(e.target.value)}
-                    placeholder="Defaults to subject if empty"
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-neutral-400 uppercase font-bold mb-1">
-                    Subtitle / Tagline (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={emailSubtitle}
-                    onChange={(e) => setEmailSubtitle(e.target.value)}
-                    placeholder="e.g. Field Update &amp; Legal Literacy"
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-neutral-400 uppercase font-bold mb-1">
-                  Email Message *
-                </label>
-                <textarea
-                  required
-                  rows={6}
-                  value={emailContent}
-                  onChange={(e) => setEmailContent(e.target.value)}
-                  placeholder="Write your newsletter text here. Line breaks are preserved in the email..."
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-sans"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-neutral-800">
-                <div>
-                  <label className="block text-neutral-400 uppercase font-bold mb-1">
-                    Call-to-Action Button Text
-                  </label>
-                  <input
-                    type="text"
-                    value={emailCtaText}
-                    onChange={(e) => setEmailCtaText(e.target.value)}
-                    placeholder="e.g. READ FULL STORY"
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none uppercase font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-neutral-400 uppercase font-bold mb-1">
-                    Button Destination URL
-                  </label>
-                  <input
-                    type="url"
-                    value={emailCtaUrl}
-                    onChange={(e) => setEmailCtaUrl(e.target.value)}
-                    placeholder="https://projectshe.org/#donate"
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px]"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2 flex flex-col sm:flex-row gap-3">
-                <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="flex-1 py-3 bg-[#E50914] text-white hover:bg-white hover:text-black font-heading font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 stencil-cut shadow-[3px_3px_0px_#000000]"
+              {updates.length === 0 ? (
+                <div
+                  className={`p-8 text-center border ${
+                    isLight ? 'bg-white border-[#D4CFC4]' : 'bg-[#111111] border-neutral-800'
+                  }`}
+                  style={{ borderRadius: '0px' }}
                 >
-                  <GrungeGlyph name="send" className="w-4 h-4" />
-                  <span>
-                    {actionLoading
-                      ? 'SENDING NEWSLETTER...'
-                      : emailTarget === 'test_admin'
-                        ? 'SEND TEST EMAIL TO ADMIN'
-                        : 'SEND NEWSLETTER TO MEMBERS'}
-                  </span>
-                </button>
-              </div>
-            </form>
-
-            {/* Right: Live Interactive Mockup (5 cols) */}
-            <div className="lg:col-span-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs uppercase font-bold text-neutral-400 font-mono">
-                  LIVE EMAIL PREVIEW
-                </span>
-                <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/60 px-2 py-0.5 border border-emerald-800">
-                  REAL-TIME PREVIEW
-                </span>
-              </div>
-
-              {/* Realistic Email Box */}
-              <div className="bg-[#0C0C0C] border-2 border-[#E50914] shadow-[6px_6px_0px_#E50914] overflow-hidden text-xs">
-                {/* Top Crimson Accent */}
-                <div className="h-1 bg-[#E50914]" />
-
-                <div className="p-5 space-y-4">
-                  {/* Brand Header */}
-                  <div className="border-b border-neutral-800 pb-3 flex items-center justify-between">
-                    <div>
-                      <span className="text-[9px] font-mono text-[#E50914] font-black uppercase tracking-widest block">
-                        // PROJECT S.H.E. NEWSLETTER
-                      </span>
-                      <h4 className="font-heading font-black text-lg text-white uppercase tracking-tight">
-                        PROJECT S.H.E.
-                      </h4>
-                    </div>
-                    <span className="text-[9px] font-mono text-neutral-500">
-                      SUPPORT • HELP • EMPOWER
-                    </span>
-                  </div>
-
-                  {/* Headline & Subtitle */}
-                  <div>
-                    <h3 className="font-heading font-extrabold text-base text-white uppercase leading-snug">
-                      {emailHeadline || emailSubject || 'Newsletter Headline'}
-                    </h3>
-                    {emailSubtitle && (
-                      <p className="text-[11px] font-mono text-[#E50914] uppercase tracking-wider font-bold mt-1">
-                        {emailSubtitle}
+                  <p className="font-mono text-xs text-neutral-400">
+                    No announcements published yet.
+                  </p>
+                </div>
+              ) : (
+                updates.map((up) => (
+                  <div
+                    key={up.id}
+                    className={`p-5 border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
+                      isLight
+                        ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                        : 'bg-[#111111] border-neutral-800'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] bg-[#E6192B] text-white px-2 py-0.5 uppercase font-bold">
+                          {up.category}
+                        </span>
+                        <span
+                          className={`font-heading font-bold text-base ${
+                            isLight ? 'text-[#111111]' : 'text-white'
+                          }`}
+                        >
+                          {up.title}
+                        </span>
+                      </div>
+                      <p
+                        className={`font-sans text-xs ${
+                          isLight ? 'text-neutral-700' : 'text-neutral-300'
+                        }`}
+                      >
+                        {up.content}
                       </p>
-                    )}
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="text-neutral-300 leading-relaxed font-sans whitespace-pre-line text-xs min-h-[80px]">
-                    {emailContent || 'Your email message will appear here with clean paragraph breaks and high-contrast typography.'}
-                  </div>
-
-                  {/* Action Button */}
-                  {emailCtaText && (
-                    <div className="pt-2">
-                      <span className="inline-block px-5 py-2.5 bg-[#E50914] text-white font-mono font-black text-[11px] uppercase tracking-wider shadow-[3px_3px_0px_#000000]">
-                        {emailCtaText} &rarr;
+                      <span className="font-mono text-[10px] text-neutral-400 block pt-1">
+                        Published {new Date(up.created_at).toLocaleDateString()}
                       </span>
                     </div>
-                  )}
 
-                  {/* Helpline box */}
-                  <div className="p-3 bg-[#141414] border border-neutral-800 text-[10px] text-neutral-400 font-mono space-y-1">
-                    <span className="text-[#E50914] font-bold block uppercase">24/7 CRISIS RESPONSE</span>
-                    <span>National Women Helpline: 1091 / 181</span>
-                  </div>
-
-                  {/* Unsubscribe Footer */}
-                  <div className="pt-3 border-t border-neutral-800 text-center text-[10px] font-mono text-neutral-500 space-y-1">
-                    <p>Sent to member@example.com • Project S.H.E. NGO</p>
-                    <p className="text-[#E50914] underline font-bold cursor-pointer">
-                      Unsubscribe from this newsletter
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 8: WEBSITE SETTINGS */}
-      {activeTab === 'config' && config && (
-        <div className="space-y-6">
-          <div>
-            <h2 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-              WEBSITE SETTINGS &amp; FORM LINKS
-            </h2>
-            <p className="text-xs text-neutral-400">
-              Update Google Form links, contact information, and donation details.
-            </p>
-          </div>
-
-          <form
-            onSubmit={handleSaveConfig}
-            className="p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs"
-          >
-            <div className="space-y-4">
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  Team Application Form Link
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={config.google_form_team_app}
-                  onChange={(e) => setConfig({ ...config, google_form_team_app: e.target.value })}
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  Artwork &amp; Poetry Form Link
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={config.google_form_artwork_poetry}
-                  onChange={(e) => setConfig({ ...config, google_form_artwork_poetry: e.target.value })}
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  Anonymous Confessions Form Link
-                </label>
-                <input
-                  type="url"
-                  required
-                  value={config.google_form_anonymous_confessions}
-                  onChange={(e) => setConfig({ ...config, google_form_anonymous_confessions: e.target.value })}
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1">
-                    Donation UPI Address
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={config.donation_upi_id}
-                    onChange={(e) => setConfig({ ...config, donation_upi_id: e.target.value })}
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1">
-                    Donation QR Image Path
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={config.donation_qr_url}
-                    onChange={(e) => setConfig({ ...config, donation_qr_url: e.target.value })}
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  Emergency Helpline Notice
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={config.emergency_helpline}
-                  onChange={(e) => setConfig({ ...config, emergency_helpline: e.target.value })}
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  Official Contact Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={config.contact_email}
-                  onChange={(e) => setConfig({ ...config, contact_email: e.target.value })}
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block uppercase font-bold text-neutral-400 mb-1">
-                  Instagram Profile Link
-                </label>
-                <input
-                  type="url"
-                  value={config.instagram_url || ''}
-                  onChange={(e) => setConfig({ ...config, instagram_url: e.target.value })}
-                  placeholder="https://instagram.com/projectshe.ngo"
-                  className="w-full p-2.5 bg-[#141414] border border-neutral-700 text-white outline-none font-mono text-[11px]"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={actionLoading}
-              className="w-full py-3 bg-[#E50914] text-white font-heading font-black text-sm uppercase tracking-wider hover:bg-white hover:text-black transition-colors"
-            >
-              {actionLoading ? 'SAVING SETTINGS...' : 'SAVE WEBSITE SETTINGS'}
-            </button>
-          </form>
-
-          {/* ADMIN PASSWORD UPDATE CARD */}
-          <div className="p-6 bg-[#0E0E0E] border-2 border-[#E50914] shadow-[6px_6px_0px_0px_#E50914] space-y-4 text-xs stencil-cut">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800 pb-3">
-              <div>
-                <h3 className="font-heading font-black text-lg uppercase tracking-tight text-white flex items-center gap-2">
-                  <GrungeGlyph name="key" className="w-5 h-5 text-[#E50914]" />
-                  <span>CHANGE ADMIN PASSWORD</span>
-                </h3>
-                <p className="text-[11px] text-neutral-400">
-                  Update the password used to sign in to the admin panel.
-                </p>
-              </div>
-              <div className="text-[11px] font-mono text-neutral-400 bg-[#141414] px-3 py-1.5 border border-neutral-700">
-                STATUS: <span className="text-[#00FF66] font-bold">ACTIVE &amp; SECURE</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleChangeMasterPassword} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1">
-                    New Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPasswordText ? 'text' : 'password'}
-                      required
-                      autoComplete="new-password"
-                      spellCheck={false}
-                      placeholder="Enter at least 6 characters..."
-                      value={newMasterPassword}
-                      onChange={(e) => setNewMasterPassword(e.target.value)}
-                      className="w-full p-2.5 bg-[#141414] border border-neutral-700 focus:border-[#E50914] text-white outline-none font-mono"
-                    />
                     <button
-                      type="button"
-                      onClick={() => setShowPasswordText(!showPasswordText)}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-neutral-400 hover:text-white uppercase font-bold"
+                      onClick={() => handleDeleteNotice(up.id)}
+                      className={`p-2 border hover:border-red-600 hover:bg-red-50 text-neutral-500 hover:text-red-600 shrink-0 ${
+                        isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+                      }`}
+                      title="Delete announcement"
+                      style={{ borderRadius: '0px' }}
                     >
-                      {showPasswordText ? 'HIDE' : 'SHOW'}
+                      <HiTrash className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block uppercase font-bold text-neutral-400 mb-1">
-                    Confirm New Password
-                  </label>
-                  <input
-                    type={showPasswordText ? 'text' : 'password'}
-                    required
-                    autoComplete="new-password"
-                    spellCheck={false}
-                    placeholder="Re-enter new password..."
-                    value={confirmMasterPassword}
-                    onChange={(e) => setConfirmMasterPassword(e.target.value)}
-                    className="w-full p-2.5 bg-[#141414] border border-neutral-700 focus:border-[#E50914] text-white outline-none font-mono"
-                  />
-                </div>
-              </div>
-
-              {passwordChangeStatus.type === 'error' && (
-                <div className="p-3 bg-red-950/80 border border-red-800 text-red-300 text-xs">
-                  {passwordChangeStatus.message}
-                </div>
+                ))
               )}
-
-              {passwordChangeStatus.type === 'success' && (
-                <div className="p-3 bg-emerald-950/80 border border-emerald-600 text-emerald-300 text-xs font-bold">
-                  ✓ {passwordChangeStatus.message}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={passwordChangeStatus.type === 'loading' || !newMasterPassword}
-                className="py-2.5 px-6 bg-[#E50914] text-white font-heading font-black text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-colors disabled:opacity-50 flex items-center gap-2"
-              >
-                <GrungeGlyph name="lock" className="w-4 h-4" />
-                <span>{passwordChangeStatus.type === 'loading' ? 'SAVING PASSWORD...' : 'UPDATE PASSWORD'}</span>
-              </button>
-            </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
+        {/* ============================================================== */}
+        {/* SECTION 6: COMMUNITY MESSAGES */}
+        {/* ============================================================== */}
+        {activeTab === 'messages' && (
+          <div className="space-y-6">
+            <div
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
+                isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+              }`}
+            >
+              <div>
+                <h2
+                  className={`font-heading font-black text-2xl uppercase tracking-tight ${
+                    isLight ? 'text-[#111111]' : 'text-white'
+                  }`}
+                >
+                  Community Messages
+                </h2>
+                <p
+                  className={`font-sans text-xs mt-1 ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  Direct confessions, inquiries, and suggestions sent through the website forms.
+                </p>
+              </div>
+            </div>
+
+            {feedback.length === 0 ? (
+              <div
+                className={`p-12 text-center border space-y-2 ${
+                  isLight
+                    ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                    : 'bg-[#111111] border-neutral-800'
+                }`}
+                style={{ borderRadius: '0px' }}
+              >
+                <p className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
+                  No Messages Found
+                </p>
+                <p
+                  className={`font-sans text-sm ${
+                    isLight ? 'text-neutral-600' : 'text-neutral-400'
+                  }`}
+                >
+                  No community inquiries or feedback have been submitted yet.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {feedback.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`p-6 border space-y-3 shadow-sm ${
+                      isLight
+                        ? 'bg-[#FFFFFF] border-[#D4CFC4]'
+                        : 'bg-[#111111] border-neutral-800'
+                    }`}
+                    style={{ borderRadius: '0px' }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3 border-neutral-800/30">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`font-mono text-[10px] px-2 py-0.5 uppercase font-bold ${
+                            msg.status === 'new'
+                              ? 'bg-[#E6192B] text-white'
+                              : 'bg-neutral-600 text-white'
+                          }`}
+                          style={{ borderRadius: '0px' }}
+                        >
+                          {msg.status === 'new' ? 'Unread' : 'Reviewed'}
+                        </span>
+                        <span
+                          className={`font-heading font-bold text-sm ${
+                            isLight ? 'text-[#111111]' : 'text-white'
+                          }`}
+                        >
+                          {msg.subject || (msg.type === 'feedback' ? 'Community Feedback' : 'Suggestion')}
+                        </span>
+                      </div>
+
+                      <span className="font-mono text-[11px] text-neutral-400">
+                        {new Date(msg.created_at).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <p
+                      className={`font-sans text-sm leading-relaxed whitespace-pre-wrap ${
+                        isLight ? 'text-neutral-800' : 'text-neutral-200'
+                      }`}
+                    >
+                      {msg.message}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2">
+                      {msg.email ? (
+                        <a
+                          href={`mailto:${msg.email}`}
+                          className="font-mono text-xs text-[#E6192B] hover:underline"
+                        >
+                          Reply to: {msg.email}
+                        </a>
+                      ) : (
+                        <span className="font-mono text-xs text-neutral-400">
+                          Anonymous submission
+                        </span>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        {msg.status === 'new' && (
+                          <button
+                            onClick={() => handleMarkMessageRead(msg.id)}
+                            className="px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-white font-mono text-xs uppercase"
+                            style={{ borderRadius: '0px' }}
+                          >
+                            Mark Read
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteMessage(msg.id)}
+                          className={`p-1.5 border hover:border-red-600 hover:bg-red-50 text-neutral-500 hover:text-red-600 ${
+                            isLight ? 'border-[#D4CFC4]' : 'border-neutral-800'
+                          }`}
+                          title="Delete message"
+                          style={{ borderRadius: '0px' }}
+                        >
+                          <HiTrash className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 }

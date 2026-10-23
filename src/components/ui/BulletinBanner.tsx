@@ -101,6 +101,7 @@ export default function BulletinBanner({ updates: initialUpdates }: BulletinBann
     }
   };
 
+  if (pathname?.startsWith('/admin')) return null;
   if (!isBannerActive || !bannerUpdate) return null;
 
   const parsed = parseBulletinPayload(bannerUpdate);

@@ -91,6 +91,10 @@ export default function FloatingNavbar() {
     { label: 'STORIES', href: '/blog' },
   ];
 
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   // Compute initials fallback from displayName or email
   const getInitials = () => {
     if (!user) return 'U';

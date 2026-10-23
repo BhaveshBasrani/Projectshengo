@@ -9,20 +9,28 @@ import GoogleFormsHub from '@/components/sections/GoogleFormsHub';
 import DonationSection from '@/components/sections/DonationSection';
 import BlogGlimpse from '@/components/sections/BlogGlimpse';
 import CommunityReviews from '@/components/sections/CommunityReviews';
-import { SiteConfig } from '@/lib/types';
+import { SiteConfig, SiteSettings } from '@/lib/types';
 
 interface LandingPageProps {
   config: SiteConfig;
+  settings?: SiteSettings;
 }
 
-export default function LandingPage({ config }: LandingPageProps) {
+export default function LandingPage({ config, settings }: LandingPageProps) {
   return (
     <div className="page-fluid-enter">
       <FlowArt aria-label="Project S.H.E. Story">
 
         {/* Chapter 1: WHO WE ARE — Hero + Identity */}
         <FlowSection aria-label="Hero" className="bg-[#090909]">
-          <HeroSection teamFormUrl={config.google_form_team_app} />
+          <HeroSection
+            teamFormUrl={settings?.google_form_team_app || config.google_form_team_app}
+            marqueeText={settings?.marquee_text}
+            headlineText={settings?.hero_headline}
+            heroBadge={settings?.hero_badge}
+            heroSubbadge={settings?.hero_subbadge}
+            heroDescription={settings?.hero_description}
+          />
         </FlowSection>
 
         {/* Chapter 2: WHAT WE DO — Founder's Story + Three Pillars */}
@@ -31,7 +39,7 @@ export default function LandingPage({ config }: LandingPageProps) {
 
           {/* Industrial Section Accent Marker */}
           <div className="relative z-10">
-            <MissionPillars />
+            <MissionPillars settings={settings} />
           </div>
         </FlowSection>
 
@@ -46,7 +54,7 @@ export default function LandingPage({ config }: LandingPageProps) {
 
           <div className="relative z-10">
             <GoogleFormsHub config={config} />
-            <DonationSection config={config} />
+            <DonationSection config={config} settings={settings} />
             <BlogGlimpse />
             <CommunityReviews />
           </div>

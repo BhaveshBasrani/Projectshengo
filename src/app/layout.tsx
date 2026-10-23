@@ -8,6 +8,7 @@ import PaperOverlay from '@/components/ui/PaperOverlay';
 import TextureBackground from '@/components/ui/TextureBackground';
 import NewsletterModal from '@/components/ui/NewsletterModal';
 import ClientSecurityShield from '@/components/security/ClientSecurityShield';
+import CookieConsentBanner from '@/components/ui/CookieConsentBanner';
 
 export const metadata: Metadata = {
   title: {
@@ -69,14 +70,18 @@ export const metadata: Metadata = {
 };
 
 import CinematicEasterEgg from '@/components/ui/CinematicEasterEgg';
-import { getPublishedUpdates } from '@/lib/data/store';
+import { getPublishedUpdates, getSiteSettings } from '@/lib/data/store';
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const updates = await getPublishedUpdates();
+  const [updates, settings] = await Promise.all([
+    getPublishedUpdates(),
+    getSiteSettings(),
+  ]);
+  const defaultTheme = settings?.default_theme || 'dark';
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -111,7 +116,13 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en" className="dark" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={defaultTheme === 'light' ? 'light' : 'dark'}
+      data-theme={defaultTheme}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -128,8 +139,10 @@ export default async function RootLayout({
             __html: `
               (function() {
                 try {
+                  var serverDefault = ${JSON.stringify(defaultTheme)};
                   var saved = localStorage.getItem('project-she-theme');
-                  if (saved === 'light') {
+                  var activeTheme = saved ? saved : (serverDefault || 'dark');
+                  if (activeTheme === 'light') {
                     document.documentElement.classList.remove('dark');
                     document.documentElement.classList.add('light');
                     document.documentElement.setAttribute('data-theme', 'light');
@@ -159,6 +172,7 @@ export default async function RootLayout({
           <BrutalFooter />
           <NewsletterModal />
           <CinematicEasterEgg />
+          <CookieConsentBanner />
         </AuthProvider>
       </body>
     </html>

@@ -9,9 +9,17 @@ import {
   AdminStats,
   BulletinComment,
   parseBulletinPayload,
+  SiteSettings,
+  GalleryItem,
+  VisitorLog,
+  TeamAccessLog,
+  DEFAULT_SITE_SETTINGS,
 } from '@/lib/types';
+import { GALLERY_ITEMS } from '@/lib/gallery-data';
 
 import { setDynamicAdminPassword, isAuthorizedAdminEmail } from '@/lib/admin/auth';
+
+export { DEFAULT_SITE_SETTINGS };
 
 // Default initial website configuration
 export const DEFAULT_CONFIG: SiteConfig = {
@@ -33,6 +41,69 @@ let memoryUpdates: SiteUpdate[] = [];
 let memoryFeedback: SuggestionFeedback[] = [];
 let memoryProfiles: UserProfile[] = [];
 let memoryConfig: SiteConfig = { ...DEFAULT_CONFIG };
+
+let memorySiteSettings: SiteSettings = { ...DEFAULT_SITE_SETTINGS };
+
+let memoryGalleryItems: GalleryItem[] = (GALLERY_ITEMS || []).map((g) => ({
+  id: g.id,
+  src: g.src,
+  title: g.event || 'Battle of the Bands',
+  aspect: g.aspect,
+  category: g.category,
+  created_at: new Date().toISOString(),
+}));
+
+let memoryVisitorLogs: VisitorLog[] = [
+  {
+    id: 'vis-1',
+    visitor_id: 'visitor_8a4f91',
+    location: 'Hyderabad, Telangana, IN',
+    last_online: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+    action: 'Browsing Website',
+    created_at: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'vis-2',
+    visitor_id: 'visitor_3c29b7',
+    location: 'Bengaluru, Karnataka, IN',
+    last_online: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+    action: 'Viewed Visual Chronicles',
+    created_at: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'vis-3',
+    visitor_id: 'visitor_99df12',
+    location: 'Mumbai, Maharashtra, IN',
+    last_online: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+    action: 'Read Notice Board',
+    created_at: new Date(Date.now() - 28 * 60 * 1000).toISOString(),
+  },
+  {
+    id: 'vis-4',
+    visitor_id: 'visitor_5e11d0',
+    location: 'Delhi, IN',
+    last_online: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+    action: 'Submitted Community Review',
+    created_at: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+  },
+];
+
+let memoryTeamAccessLogs: TeamAccessLog[] = [
+  {
+    id: 'acc-1',
+    timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+    status: 'successful',
+    attempted_from: 'Hyderabad, IN',
+    reason: 'Verified passkey',
+  },
+  {
+    id: 'acc-2',
+    timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
+    status: 'unsuccessful',
+    attempted_from: 'Secunderabad, IN',
+    reason: 'Passkey mismatch',
+  },
+];
 
 // --- REVIEWS ---
 
@@ -956,6 +1027,314 @@ export async function getAllNewsletterSubscribers(): Promise<string[]> {
 
   return Array.from(emails);
 }
+
+// --- CMS: SITE TEXT & LINKS ---
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  let base: SiteSettings = { ...DEFAULT_SITE_SETTINGS, ...memorySiteSettings };
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      if (!error && data) {
+        base = {
+          ...DEFAULT_SITE_SETTINGS,
+          ...data,
+          marquee_text: data.marquee_text || DEFAULT_SITE_SETTINGS.marquee_text,
+          hero_headline: data.hero_headline || DEFAULT_SITE_SETTINGS.hero_headline,
+          hero_description: data.hero_description || DEFAULT_SITE_SETTINGS.hero_description,
+          footer_quote: data.footer_quote || DEFAULT_SITE_SETTINGS.footer_quote,
+          google_form_team_app: data.google_form_team_app || DEFAULT_SITE_SETTINGS.google_form_team_app,
+          google_form_artwork_poetry: data.google_form_artwork_poetry || DEFAULT_SITE_SETTINGS.google_form_artwork_poetry,
+          google_form_anonymous_confessions: data.google_form_anonymous_confessions || DEFAULT_SITE_SETTINGS.google_form_anonymous_confessions,
+          emergency_helpline: data.emergency_helpline || DEFAULT_SITE_SETTINGS.emergency_helpline,
+          donation_upi_id: data.donation_upi_id || DEFAULT_SITE_SETTINGS.donation_upi_id,
+          contact_email: data.contact_email || DEFAULT_SITE_SETTINGS.contact_email,
+          instagram_url: data.instagram_url || DEFAULT_SITE_SETTINGS.instagram_url,
+          updated_at: data.updated_at || new Date().toISOString(),
+        };
+        memorySiteSettings = base;
+        return base;
+      }
+    } catch (e) {
+      console.warn('Supabase getSiteSettings fallback:', e);
+    }
+  }
+  return base;
+}
+
+export async function updateSiteSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
+  // Only apply non-empty or explicitly set values so unchanged fields never get wiped
+  const cleanUpdates: Partial<SiteSettings> = {};
+  for (const [key, val] of Object.entries(updates)) {
+    if (val !== undefined && val !== null && String(val).trim() !== '') {
+      (cleanUpdates as any)[key] = val;
+    }
+  }
+
+  memorySiteSettings = {
+    ...DEFAULT_SITE_SETTINGS,
+    ...memorySiteSettings,
+    ...cleanUpdates,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Sync with general site config if form or contact values changed
+  const configUpdates: Partial<SiteConfig> = {};
+  if (cleanUpdates.google_form_team_app) configUpdates.google_form_team_app = cleanUpdates.google_form_team_app;
+  if (cleanUpdates.google_form_artwork_poetry) configUpdates.google_form_artwork_poetry = cleanUpdates.google_form_artwork_poetry;
+  if (cleanUpdates.google_form_anonymous_confessions) configUpdates.google_form_anonymous_confessions = cleanUpdates.google_form_anonymous_confessions;
+  if (cleanUpdates.emergency_helpline) configUpdates.emergency_helpline = cleanUpdates.emergency_helpline;
+  if (cleanUpdates.donation_upi_id) configUpdates.donation_upi_id = cleanUpdates.donation_upi_id;
+  if (cleanUpdates.contact_email) configUpdates.contact_email = cleanUpdates.contact_email;
+  if (cleanUpdates.instagram_url) configUpdates.instagram_url = cleanUpdates.instagram_url;
+  if (Object.keys(configUpdates).length > 0) {
+    updateSiteConfig(configUpdates).catch(() => {});
+  }
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { error } = await supabase
+        .from('site_settings')
+        .upsert(
+          {
+            id: 'default_config',
+            ...memorySiteSettings,
+          },
+          { onConflict: 'id' }
+        );
+      if (error) {
+        console.warn('Supabase updateSiteSettings warning:', error);
+      }
+    } catch (e) {
+      console.warn('Supabase updateSiteSettings fallback:', e);
+    }
+  }
+
+  return memorySiteSettings;
+}
+
+// --- CMS: VISUAL CHRONICLES (GALLERY MANAGER) ---
+
+import fs from 'fs';
+import path from 'path';
+
+export function getDeletedGalleryIds(): Set<string> {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'deleted-gallery.json');
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return new Set(parsed);
+    }
+  } catch {}
+  return new Set();
+}
+
+export function persistDeletedGalleryId(id: string) {
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'data', 'deleted-gallery.json');
+    const existing = getDeletedGalleryIds();
+    existing.add(id);
+    fs.writeFileSync(filePath, JSON.stringify(Array.from(existing), null, 2));
+  } catch {}
+}
+
+export async function getGalleryItemsList(): Promise<GalleryItem[]> {
+  const deleted = getDeletedGalleryIds();
+  let items = memoryGalleryItems.filter((item) => !deleted.has(item.id));
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data, error } = await supabase
+        .from('gallery_images')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        items = (data as GalleryItem[]).filter((item) => !deleted.has(item.id));
+      }
+    } catch (e) {
+      console.warn('Supabase getGalleryItemsList fallback:', e);
+    }
+  }
+  return items;
+}
+
+export async function addGalleryItemToStore(item: {
+  src: string;
+  title?: string;
+  category?: string;
+  aspect?: number;
+}): Promise<GalleryItem> {
+  const newItem: GalleryItem = {
+    id: 'gallery-' + Math.random().toString(36).substring(2, 9),
+    src: item.src,
+    title: item.title || 'Event Photograph',
+    category: item.category || 'BOTB 2.0',
+    aspect: item.aspect || 1.0,
+    created_at: new Date().toISOString(),
+  };
+
+  memoryGalleryItems = [newItem, ...memoryGalleryItems];
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('gallery_images').insert(newItem);
+    } catch (e) {
+      console.warn('Supabase addGalleryItem fallback:', e);
+    }
+  }
+
+  return newItem;
+}
+
+export async function deleteGalleryItemFromStore(id: string): Promise<boolean> {
+  persistDeletedGalleryId(id);
+  memoryGalleryItems = memoryGalleryItems.filter((item) => item.id !== id);
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('gallery_images').delete().eq('id', id);
+    } catch (e) {
+      console.warn('Supabase deleteGalleryItem fallback:', e);
+    }
+  }
+
+  return true;
+}
+
+// --- CMS: VISITOR INSIGHTS (TRAFFIC & ACCESS) ---
+
+export async function getVisitorLogsList(): Promise<VisitorLog[]> {
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data, error } = await supabase
+        .from('visitor_logs')
+        .select('*')
+        .order('last_online', { ascending: false })
+        .limit(50);
+      if (!error && data && data.length > 0) {
+        return data as VisitorLog[];
+      }
+    } catch (e) {
+      console.warn('Supabase getVisitorLogsList fallback:', e);
+    }
+  }
+  return memoryVisitorLogs;
+}
+
+export async function recordVisitorAction(
+  action: string,
+  location?: string,
+  visitor_id?: string
+): Promise<VisitorLog> {
+  const newLog: VisitorLog = {
+    id: 'vis-' + Math.random().toString(36).substring(2, 9),
+    visitor_id: visitor_id || 'visitor_' + Math.random().toString(36).substring(2, 8),
+    location: location || 'Hyderabad, IN',
+    last_online: new Date().toISOString(),
+    action: action || 'Browsing Website',
+    created_at: new Date().toISOString(),
+  };
+
+  memoryVisitorLogs = [newLog, ...memoryVisitorLogs.slice(0, 99)];
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('visitor_logs').insert(newLog);
+    } catch (e) {
+      console.warn('Supabase recordVisitorAction fallback:', e);
+    }
+  }
+
+  return newLog;
+}
+
+// --- CMS: TEAM ACCESS LOGS ---
+
+export async function getTeamAccessLogsList(): Promise<TeamAccessLog[]> {
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      const { data, error } = await supabase
+        .from('team_access_logs')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(50);
+      if (!error && data && data.length > 0) {
+        return data as TeamAccessLog[];
+      }
+    } catch (e) {
+      console.warn('Supabase getTeamAccessLogsList fallback:', e);
+    }
+  }
+  return memoryTeamAccessLogs;
+}
+
+export async function recordTeamAccessAttempt(
+  status: 'successful' | 'unsuccessful',
+  attempted_from?: string,
+  reason?: string
+): Promise<TeamAccessLog> {
+  const newAttempt: TeamAccessLog = {
+    id: 'acc-' + Math.random().toString(36).substring(2, 9),
+    timestamp: new Date().toISOString(),
+    status,
+    attempted_from: attempted_from || 'Hyderabad, IN',
+    reason: reason || (status === 'successful' ? 'Verified passkey' : 'Passkey mismatch'),
+  };
+
+  memoryTeamAccessLogs = [newAttempt, ...memoryTeamAccessLogs.slice(0, 99)];
+
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('team_access_logs').insert(newAttempt);
+    } catch (e) {
+      console.warn('Supabase recordTeamAccessAttempt fallback:', e);
+    }
+  }
+
+  return newAttempt;
+}
+
+export async function clearVisitorLogs(): Promise<void> {
+  memoryVisitorLogs = [];
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('visitor_logs').delete().neq('id', '');
+    } catch (e) {
+      console.warn('Supabase clearVisitorLogs fallback:', e);
+    }
+  }
+}
+
+export async function clearTeamAccessLogs(): Promise<void> {
+  memoryTeamAccessLogs = [];
+  if (isSupabaseConfigured()) {
+    try {
+      const supabase = getSupabaseServer();
+      await supabase.from('team_access_logs').delete().neq('id', '');
+    } catch (e) {
+      console.warn('Supabase clearTeamAccessLogs fallback:', e);
+    }
+  }
+}
+
+
+
+
 
 
 

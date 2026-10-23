@@ -3,12 +3,21 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import GrungeGlyph from '@/components/ui/GrungeGlyph';
 import { HiMoon, HiSun, HiArrowRight } from 'react-icons/hi2';
 
 export default function BrutalFooter() {
+  const pathname = usePathname();
   const [theme, setTheme] = React.useState<'dark' | 'light'>('dark');
+  const [footerQuote, setFooterQuote] = React.useState(
+    'Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.'
+  );
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   React.useEffect(() => {
     const syncTheme = () => {
@@ -22,6 +31,17 @@ export default function BrutalFooter() {
 
     syncTheme();
     window.addEventListener('theme-changed', syncTheme);
+
+    // Fetch dynamic live footer quote
+    fetch('/api/admin/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.settings?.footer_quote) {
+          setFooterQuote(data.settings.footer_quote);
+        }
+      })
+      .catch(() => {});
+
     return () => window.removeEventListener('theme-changed', syncTheme);
   }, []);
 
@@ -239,7 +259,7 @@ export default function BrutalFooter() {
         {/* Centered Editorial Sign-Off Quote */}
         <div className="pt-10 mt-12 border-t border-[#222222] footer-divider text-center">
           <p className="footer-quote text-[#E5E5E5] font-sans text-xs sm:text-sm md:text-[15px] font-normal italic tracking-wide max-w-3xl mx-auto leading-relaxed">
-            &ldquo;Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.&rdquo;
+            &ldquo;{footerQuote}&rdquo;
           </p>
         </div>
 

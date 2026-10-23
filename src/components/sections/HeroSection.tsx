@@ -10,31 +10,61 @@ import { MorphingText } from '@/components/ui/MorphingText';
 
 interface HeroSectionProps {
   teamFormUrl: string;
+  marqueeText?: string;
+  headlineText?: string;
+  heroBadge?: string;
+  heroSubbadge?: string;
+  heroDescription?: string;
 }
 
-export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
+export default function HeroSection({
+  teamFormUrl,
+  marqueeText,
+  headlineText,
+  heroBadge,
+  heroSubbadge,
+  heroDescription,
+}: HeroSectionProps) {
+  const customSegments = marqueeText
+    ? marqueeText
+        .split('✦')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : null;
+
   const tickerItems = (
-    <div suppressHydrationWarning className="flex items-center px-4 font-sans font-black text-xs sm:text-sm uppercase tracking-wider text-white whitespace-nowrap">
-      <span>DISMANTLING GENDER-BASED VIOLENCE</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+    <div suppressHydrationWarning className="flex items-center px-4 font-mono font-medium text-[11px] sm:text-xs uppercase tracking-widest text-[#FDFCF7] whitespace-nowrap">
+      {customSegments && customSegments.length > 0 ? (
+        customSegments.map((seg, i) => (
+          <React.Fragment key={i}>
+            <span>{seg}</span>
+            <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
+          </React.Fragment>
+        ))
+      ) : (
+        <>
+          <span>CHALLENGING THE VIOLENCE WOMEN FACE, RESHAPING THE MINDS THAT PERMIT IT</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-      <span>EXTENDING SUPPORT TO SURVIVOR SAFE HOUSES</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+          <span>TURNING SOLIDARITY INTO DIGNITY AND TANGIBLE CHANGE</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-      <span>SAHODAYA HELP HOME PARTNER</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+          <span>₹2,00,000+ RAISED &amp; DELIVERED TOWARDS SURVIVOR CARE</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-      <span>₹2,00,000+ RAISED &amp; DELIVERED</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+          <span>SARVA NIRBHAYA FOUNDATION • SECTION 8 NGO</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-      <span>BATTLE OF THE BANDS (BOTB 1.0 &amp; 2.0)</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+          <span>BATTLE OF THE BANDS (BOTB 1.0 &amp; 2.0)</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-      <span>SARVA NIRBHAYA FOUNDATION</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+          <span>SAHODAYA WOMEN&apos;S HELP HOME PARTNERSHIP</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-      <span>HYDERABAD, INDIA</span>
-      <span className="text-white/80 px-6 sm:px-8 select-none text-xs sm:text-sm font-normal">✦</span>
+          <span>DISMANTLING GENDER-BASED VIOLENCE • HYDERABAD, INDIA</span>
+          <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
+        </>
+      )}
     </div>
   );
 
@@ -82,10 +112,10 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
         {/* Top Status Badges */}
         <div className="flex items-center gap-2 sm:gap-3 mb-4 flex-wrap">
           <span className="text-[10px] sm:text-xs bg-[#E6192B] text-white px-2.5 py-1 tracking-widest font-mono font-bold uppercase rounded-sm border border-red-500/30">
-            HYDERABAD&apos;S LEADING STUDENT NGO
+            {heroBadge || "HYDERABAD'S LEADING STUDENT NGO"}
           </span>
           <span className="text-[10px] sm:text-xs text-[#D1D5DB] font-mono tracking-wider">
-            SARVA NIRBHAYA FOUNDATION • HYDERABAD, INDIA
+            {heroSubbadge || "SARVA NIRBHAYA FOUNDATION • HYDERABAD, INDIA"}
           </span>
         </div>
 
@@ -95,7 +125,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
           {/* Main Typography & CTAs */}
           <div className="lg:col-span-7 space-y-5 sm:space-y-6">
             <h1 className="sr-only">
-              Raise your voice where theirs was silenced. Stand with those who survived.
+              {headlineText || "Raise your voice where theirs was silenced. Stand with those who survived."}
             </h1>
 
             {/* Morphing Headline with Natural Dynamic Spacer */}
@@ -105,16 +135,20 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
                 className="invisible pointer-events-none select-none font-heading font-bold text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight leading-[1.1] uppercase pb-1 sm:pb-2"
                 aria-hidden="true"
               >
-                Raise your voice where theirs was silenced.
+                {headlineText || "Raise your voice where theirs was silenced."}
               </div>
 
               {/* Absolute active morphing container fitting exactly into spacer */}
               <div className="absolute inset-0 top-0 left-0 w-full h-full">
                 <MorphingText
-                  texts={[
-                    "Raise your voice where theirs was silenced.",
-                    "Stand with those who survived.",
-                  ]}
+                  texts={
+                    headlineText
+                      ? [headlineText]
+                      : [
+                          "Raise your voice where theirs was silenced.",
+                          "Stand with those who survived.",
+                        ]
+                  }
                   className="font-heading font-bold text-3xl sm:text-5xl lg:text-[3.5rem] tracking-tight text-white leading-[1.1] uppercase"
                   cooldown={2.8}
                   morph={1.2}
@@ -123,7 +157,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
             </div>
 
             <p className="font-sans text-sm sm:text-base md:text-lg text-[#D1D5DB] max-w-xl leading-relaxed animate-fade-in-up delay-200 pt-2 sm:pt-4">
-              Violence injects itself into the lives of survivors even after the incident itself has long passed, impacting their very ability to rebuild their lives. Project S.H.E., Hyderabad&apos;s leading student NGO, works to dismantle this systemic gender-based violence as well as extend support to survivor safe houses.
+              {heroDescription || "Violence injects itself into the lives of survivors even after the incident itself has long passed, impacting their very ability to rebuild their lives. Project S.H.E., Hyderabad's leading student NGO, works to dismantle this systemic gender-based violence as well as extend support to survivor safe houses."}
             </p>
 
             {/* Rearranged CTA Buttons: Primary Donate (with sleek minimal icon), Secondary Team, Tertiary Pillars */}
@@ -155,11 +189,11 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
             </div>
           </div>
 
-          {/* S.H.E. Emblem Seal with Clean Rectangular Container & Retained Clean Electric Guitar */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end py-4">
+          {/* S.H.E. Emblem Seal - Completely removed on mobile, displayed cleanly on desktop */}
+          <div className="hidden lg:flex lg:col-span-5 justify-center lg:justify-end py-4">
             <div className="relative group w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[22rem] lg:h-[22rem]">
 
-              {/* Outer Clean Box - Softly Rounded Rectangle with Thin Border (No Crosshairs, No Double Shadow) */}
+              {/* Outer Clean Box - Softly Rounded Rectangle with Thin Border */}
               <div className="w-full h-full border border-neutral-800 hover:border-[#E6192B]/60 bg-[#0E0E0E] p-4 sm:p-5 relative transition-all duration-300 group-hover:scale-[1.01] flex items-center justify-center rounded-sm">
 
                 {/* Internal Ambient Radial Red Glow */}
@@ -182,7 +216,7 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
                 SECTION 8 NGO
               </div>
 
-              {/* RETAINED HERO ELEMENT: Red Warlock Electric Guitar (Crisp & Centered, without messy starburst) */}
+              {/* RETAINED HERO ELEMENT: Red Warlock Electric Guitar */}
               <div className="hidden sm:block absolute -left-12 -bottom-16 w-32 h-64 sm:w-36 sm:h-72 -rotate-12 pointer-events-none select-none z-20 drop-shadow-[0_10px_25px_rgba(230,25,43,0.45)]">
                 <Image
                   src="/assets/punk-warlock-guitar.png"
@@ -200,10 +234,10 @@ export default function HeroSection({ teamFormUrl }: HeroSectionProps) {
 
       </div>
 
-      {/* Crimson Marquee Ticker matching user reference styling */}
-      <div suppressHydrationWarning className="w-full mt-8 sm:mt-12 bg-[#C81E3A] border-y border-[#A6142B] text-white select-none overflow-hidden shrink-0 z-10 group/marquee shadow-sm">
+      {/* Pure Soft Red Marquee Ticker (Refined, minimal, zero pink) */}
+      <div suppressHydrationWarning className="w-full mt-6 sm:mt-10 bg-[#800C16] border-y border-[#9C111F] text-[#FDFCF7] select-none overflow-hidden shrink-0 z-10 group/marquee">
         {/* Marquee Content Rail with Hover Pause */}
-        <div suppressHydrationWarning className="py-2.5 sm:py-3.5 flex overflow-hidden group-hover/marquee:[&_.animate-marquee]:[animation-play-state:paused]">
+        <div suppressHydrationWarning className="py-2.5 sm:py-3 flex overflow-hidden group-hover/marquee:[&_.animate-marquee]:[animation-play-state:paused]">
           <div className="flex shrink-0 min-w-full items-center justify-around animate-marquee">
             {tickerItems}
           </div>

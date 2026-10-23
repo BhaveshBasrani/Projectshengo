@@ -115,3 +115,71 @@ CREATE TABLE IF NOT EXISTS public.email_logs (
 -- 8. SUPABASE STORAGE BUCKET CONFIGURATION
 -- Run in Storage setup:
 -- Create a public bucket named 'project-she-assets'
+
+-- 9. LIVE SITE SETTINGS TABLE (CMS Live Editor)
+CREATE TABLE IF NOT EXISTS public.site_settings (
+  id TEXT PRIMARY KEY DEFAULT 'default_config',
+  marquee_text TEXT NOT NULL,
+  hero_headline TEXT NOT NULL,
+  footer_quote TEXT NOT NULL,
+  google_form_team_app TEXT NOT NULL,
+  google_form_artwork_poetry TEXT NOT NULL,
+  google_form_anonymous_confessions TEXT NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Seed Initial Default Settings
+INSERT INTO public.site_settings (
+  id,
+  marquee_text,
+  hero_headline,
+  footer_quote,
+  google_form_team_app,
+  google_form_artwork_poetry,
+  google_form_anonymous_confessions
+) VALUES (
+  'default_config',
+  '₹2,00,000+ RAISED & DELIVERED ✦ BATTLE OF THE BANDS (BOTB 1.0 & 2.0) ✦ SARVA NIRBHAYA FOUNDATION ✦ HYDERABAD, INDIA ✦ DISMANTLING GENDER-BASED VIOLENCE ✦ SUPPORT. HELP. EMPOWER. ✦ REGISTERED SECTION 8 NON-PROFIT ✦ SAHODAYA WOMEN''S HELP HOME',
+  'RAISE YOUR VOICE WHERE THEIRS WAS SILENCED. STAND WITH THOSE WHO SURVIVED.',
+  'Challenging the violence women face, reshaping the minds that permit it, and turning solidarity into dignity and tangible change.',
+  'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheTeamApplication/viewform',
+  'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheArtworkPoetry/viewform',
+  'https://docs.google.com/forms/d/e/1FAIpQLScProjectSheAnonymousConfessions/viewform'
+) ON CONFLICT (id) DO NOTHING;
+
+-- 10. VISUAL CHRONICLES (GALLERY IMAGES)
+CREATE TABLE IF NOT EXISTS public.gallery_images (
+  id TEXT PRIMARY KEY,
+  src TEXT NOT NULL,
+  title TEXT NOT NULL DEFAULT 'Community Event Photograph',
+  category TEXT DEFAULT 'BOTB 2.0',
+  aspect NUMERIC DEFAULT 1.0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_gallery_created_at ON public.gallery_images(created_at DESC);
+
+-- 11. VISITOR INSIGHTS (COMMUNITY PRESENCE & TRAFFIC)
+CREATE TABLE IF NOT EXISTS public.visitor_logs (
+  id TEXT PRIMARY KEY,
+  visitor_id TEXT NOT NULL,
+  location TEXT DEFAULT 'Hyderabad, IN',
+  last_online TIMESTAMPTZ DEFAULT NOW(),
+  action TEXT DEFAULT 'Browsing Website',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_visitor_logs_last_online ON public.visitor_logs(last_online DESC);
+
+-- 12. TEAM ACCESS LOG (SECURITY & ACCESS MONITORING)
+CREATE TABLE IF NOT EXISTS public.team_access_logs (
+  id TEXT PRIMARY KEY,
+  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  status TEXT CHECK (status IN ('successful', 'unsuccessful')) NOT NULL,
+  attempted_from TEXT DEFAULT 'Hyderabad, IN',
+  reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_team_access_timestamp ON public.team_access_logs(timestamp DESC);
+

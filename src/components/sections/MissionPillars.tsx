@@ -3,8 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { HiArrowRight, HiArrowLeft } from 'react-icons/hi2';
+import { SiteSettings } from '@/lib/types';
 
-export default function MissionPillars() {
+export default function MissionPillars({ settings }: { settings?: SiteSettings } = {}) {
   const [activeSlide, setActiveSlide] = useState(0);
   const [viewAll, setViewAll] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -19,7 +20,11 @@ export default function MissionPillars() {
       render: () => (
         <div className="space-y-5 text-[#D1D5DB] font-sans text-sm sm:text-base md:text-lg leading-[1.75]">
           <p className="text-white text-base sm:text-xl font-bold">
-            Hi, I’m <span className="text-[#E6192B]">Sanskriti Mohan</span>, founder of Project S.H.E. We are a youth-led organisation based in Hyderabad, India, and this is how our movement began.
+            {settings?.about_statement || (
+              <>
+                Hi, I’m <span className="text-[#E6192B]">Sanskriti Mohan</span>, founder of Project S.H.E. We are a youth-led organisation based in Hyderabad, India, and this is how our movement began.
+              </>
+            )}
           </p>
           <p>
             In August 2024, an atrocity shook our conscience. <strong className="text-white font-bold">The RG Kar case</strong> involved the brutal <span className="text-[#E6192B] font-bold">rape</span> and murder of a young postgraduate resident doctor on campus during her 36-hour shift. This sparked nationwide outrage, causing thousands to take to the streets and demand systemic accountability.
@@ -400,11 +405,11 @@ export default function MissionPillars() {
               </div>
 
               <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white leading-snug">
-                1. Fundraising
+                {settings?.pillar_1_title || '1. Fundraising'}
               </h3>
 
               <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
-                Whether through enigmatic events like the two editions of Battle of the Bands, or through wholesome bake sales and community fundraisers, Project S.H.E. has remained committed to mobilising community support through both monetary contributions and meaningful presence. Through these events and endeavours, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.
+                {settings?.pillar_1_desc || 'Whether through enigmatic events like the two editions of Battle of the Bands, or through wholesome bake sales and community fundraisers, Project S.H.E. has remained committed to mobilising community support through both monetary contributions and meaningful presence. Through these events and endeavours, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.'}
               </p>
             </div>
 
@@ -437,11 +442,11 @@ export default function MissionPillars() {
               </div>
 
               <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white leading-snug">
-                2. Direct support for survivors.
+                {settings?.pillar_2_title || '2. Direct support for survivors.'}
               </h3>
 
               <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
-                Our partnership with Sahodaya Women&apos;s Help Home has contributed towards the establishment of a day-care centre for the children of domestic violence survivors-a nurturing space for them while their mothers work towards rebuilding their lives. More recently, funds raised through BOTB 2.0 were contributed to Sahodaya, Ammani Foundation, Snehalaya, and NIEPID, and helped support improvements in infrastructure and essential services across communities facing marginalisation.
+                {settings?.pillar_2_desc || 'Our partnership with Sahodaya Women\'s Help Home has contributed towards the establishment of a day-care centre for the children of domestic violence survivors-a nurturing space for them while their mothers work towards rebuilding their lives. More recently, funds raised through BOTB 2.0 were contributed to Sahodaya, Ammani Foundation, Snehalaya, and NIEPID, and helped support improvements in infrastructure and essential services across communities facing marginalisation.'}
               </p>
             </div>
 
@@ -474,11 +479,11 @@ export default function MissionPillars() {
               </div>
 
               <h3 className="font-heading font-bold text-xl sm:text-2xl uppercase tracking-tight text-white leading-snug">
-                3. Advocacy and dialogue.
+                {settings?.pillar_3_title || '3. Advocacy and dialogue.'}
               </h3>
 
               <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
-                Our dedicated team of writers and designers brings forward an expansive range of topics, from articles examining issues such as misogyny in the media to case posts that shed light on the violence faced by women and children. Our goal has always been to turn community support into tangible change- channelling that collective engagement towards advocacy and awareness-building.
+                {settings?.pillar_3_desc || 'Our dedicated team of writers and designers brings forward an expansive range of topics, from articles examining issues such as misogyny in the media to case posts that shed light on the violence faced by women and children. Our goal has always been to turn community support into tangible change- channelling that collective engagement towards advocacy and awareness-building.'}
               </p>
             </div>
 

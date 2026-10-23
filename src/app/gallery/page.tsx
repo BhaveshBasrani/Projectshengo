@@ -55,12 +55,25 @@ export default function GalleryPage() {
     };
   }, []);
 
+  const [galleryList, setGalleryList] = useState<GalleryItem[]>(GALLERY_ITEMS);
+
+  useEffect(() => {
+    fetch('/api/admin/gallery')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.items) && data.items.length > 0) {
+          setGalleryList(data.items);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Strict deduplication using Set and unique IDs
   const filteredItems = useMemo(() => {
     const rawList =
       activeCategory === "ALL"
-        ? GALLERY_ITEMS
-        : GALLERY_ITEMS.filter((item) => item.category === activeCategory);
+        ? galleryList
+        : galleryList.filter((item) => item.category === activeCategory);
 
     const seen = new Set<string>();
     const uniqueList: GalleryItem[] = [];
@@ -72,7 +85,7 @@ export default function GalleryPage() {
       }
     }
     return uniqueList;
-  }, [activeCategory]);
+  }, [activeCategory, galleryList]);
 
   // Reset pagination when category changes
   useEffect(() => {
@@ -155,13 +168,13 @@ export default function GalleryPage() {
           style={{ backgroundColor: carouselBg }}
         >
           <LiquidGlassCarousel
-            items={GALLERY_ITEMS}
+            items={galleryList}
             background={carouselBg}
             panelHeight={440}
             gap={14}
             entry={false}
             onItemClick={(item) => {
-              const fullItem = GALLERY_ITEMS.find((it) => it.src === item.src);
+              const fullItem = galleryList.find((it) => it.src === item.src);
               if (fullItem) setLightboxItem(fullItem);
             }}
           />
@@ -176,8 +189,8 @@ export default function GalleryPage() {
             {(["ALL", "BOTB 2.0", "PROJECT SHE 1.0"] as const).map((cat) => {
               const count =
                 cat === "ALL"
-                  ? GALLERY_ITEMS.length
-                  : GALLERY_ITEMS.filter((i) => i.category === cat).length;
+                  ? galleryList.length
+                  : galleryList.filter((i) => i.category === cat).length;
               const isActive = activeCategory === cat;
 
               return (
