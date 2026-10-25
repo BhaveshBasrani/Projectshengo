@@ -16,21 +16,14 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
       part: 'PART 01',
       title: 'HOW IT STARTED',
       subtitle: 'August 2024 • The RG Kar Case',
-      badge: 'THE STORY',
+      badge: 'THE ORIGIN',
       render: () => (
-        <div className="space-y-5 text-[#D1D5DB] font-sans text-sm sm:text-base md:text-lg leading-[1.75]">
+        <div className="space-y-6 text-[#D1D5DB] font-sans text-sm sm:text-base md:text-lg leading-[1.8]">
           <p className="text-white text-base sm:text-xl font-bold">
-            {settings?.about_statement || (
-              <>
-                Hi, I’m <span className="text-[#E6192B]">Sanskriti Mohan</span>, founder of Project S.H.E. We are a youth-led organisation based in Hyderabad, India, and this is how our movement began.
-              </>
-            )}
+            Hi, I’m <span className="text-[#E6192B]">Sanskriti Mohan</span>, the founder of Project S.H.E. We’re an NGO based in Hyderabad, India, and I want to share the story of how this organisation came to be.
           </p>
           <p>
-            In August 2024, an atrocity shook our conscience. <strong className="text-white font-bold">The RG Kar case</strong> involved the brutal <span className="text-[#E6192B] font-bold">rape</span> and murder of a young postgraduate resident doctor on campus during her 36-hour shift. This sparked nationwide outrage, causing thousands to take to the streets and demand systemic accountability.
-          </p>
-          <p>
-            The story was horrifying, and I was completely overcome by anger, grief, and horror. What disturbed me the most, though, wasn’t just the brutality itself, but the way society responded—online and in live street interviews.
+            In August 2024, a case shook India. The RG Kar case involved the rape of a young doctor on campus during her 48-hour shift. This atrocity sparked nationwide outrage, causing thousands of people to talk about it online. What was most disturbing, though, wasn’t just the case itself, but the way people spoke about it, online as well as in interviews.
           </p>
         </div>
       ),
@@ -40,33 +33,27 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
       part: 'PART 02',
       title: 'THE STATEMENTS',
       subtitle: 'Street Interviews & Public Commentary',
-      badge: 'REACTIONS',
+      badge: 'PUBLIC REACTIONS',
       render: () => (
         <div className="space-y-5 font-sans leading-[1.75]">
-          <p className="text-[#D1D5DB] text-sm sm:text-base">
-            That horror compelled me to look deeper into recurring cases and street interviews. These are verbatim statements documented from public responses:
+          <p className="text-[#D1D5DB] text-sm sm:text-base md:text-lg">
+            That pushed me to look deeper, into similar cases and street interviews, and these are some of the statements I came across:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
             {[
-              'Why was she out so late at night?',
-              'She must have done something to deserve it.',
-              'What was she wearing?',
-              'Who allows their daughter to roam so freely?',
-              'Both parties play a role in rape',
-              'She should just lie down and enjoy it',
+              '“Why was she out so late at night?”',
+              '“She must have done something to deserve it.”',
+              '“What was she wearing?”',
+              '“Who allows their daughter to roam so freely?”',
+              '“Both parties play a role in rape”',
+              '“She should just lie down and enjoy it”',
             ].map((quote, idx) => (
               <div
                 key={idx}
                 className="p-4 bg-[#080808] border border-[#222222] hover:border-[#E6192B]/50 transition-colors"
               >
                 <p className="font-sans italic text-sm sm:text-base text-neutral-200 leading-snug">
-                  &ldquo;{quote.includes('rape') ? (
-                    <>
-                      Both parties play a role in <span className="text-[#E6192B] font-bold not-italic">rape</span>
-                    </>
-                  ) : (
-                    quote
-                  )}&rdquo;
+                  {quote}
                 </p>
               </div>
             ))}
@@ -77,51 +64,71 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
     {
       id: 2,
       part: 'PART 03',
-      title: 'THE FACTS & NUMBERS',
-      subtitle: 'Realities Women Face Every Day',
-      badge: 'THE FACTS',
+      title: 'THE STATISTICS',
+      subtitle: 'Realities Throughout India & Globally',
+      badge: 'HORRIFYING REALITIES',
       render: () => (
         <div className="space-y-5 font-sans leading-[1.75]">
-          <p className="text-[#D1D5DB] text-sm sm:text-base">
-            It appalled me to see that, despite incessant claims of modernization, <strong className="text-white">this mindset still prevails throughout India</strong>. The documented statistics are chilling:
+          <p className="text-[#D1D5DB] text-sm sm:text-base md:text-lg">
+            It absolutely appalled me to see that, despite numerous claims of development, this mindset still prevails throughout India. I was unable to ignore this, and after doing some more research, I came across some more horrifying statistics:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-1">
-              <div className="font-heading font-black text-2xl sm:text-3xl text-white">87 CASES / DAY</div>
-              <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed">
-                Daily reported <span className="text-[#E6192B] font-bold">rape</span> cases recorded across India.
-              </p>
-              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider block pt-1">
-                National Crime Records Bureau (NCRB)
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-2 flex flex-col justify-between">
+              <div>
+                <div className="font-heading font-black text-2xl sm:text-3xl text-white">87 / DAY</div>
+                <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed pt-1">
+                  87 rape cases occur daily throughout India
+                </p>
+              </div>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block pt-2 border-t border-[#1C1C1C]">
+                National Crime Records Bureau
               </span>
             </div>
 
-            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-1">
-              <div className="font-heading font-black text-2xl sm:text-3xl text-white">370+ MILLION</div>
-              <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed">
-                Girls and women globally <span className="text-[#E6192B] font-bold">raped</span> or sexually assaulted before the age of 18.
-              </p>
-              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider block pt-1">
-                UNICEF Global Data
+            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-2 flex flex-col justify-between">
+              <div>
+                <div className="font-heading font-black text-2xl sm:text-3xl text-white">370M+</div>
+                <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed pt-1">
+                  Over 370 million girls and women globally were raped or sexually assaulted before the age of 18.
+                </p>
+              </div>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block pt-2 border-t border-[#1C1C1C]">
+                UNICEF
               </span>
             </div>
 
-            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-1">
-              <div className="font-heading font-black text-2xl sm:text-3xl text-white">840 MILLION</div>
-              <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed">
-                Women have endured partner violence or non-partner <span className="text-[#E6192B] font-bold">sexual violence</span>. Nearly 1 in 3 women alive today.
-              </p>
-              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider block pt-1">
-                Down To Earth Research
+            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-2 flex flex-col justify-between">
+              <div>
+                <div className="font-heading font-black text-2xl sm:text-3xl text-white">840 MILLION</div>
+                <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed pt-1">
+                  840 million women have endured either partner violence or non-partner sexual violence in their lives; that’s nearly 1 in 3 women alive today.
+                </p>
+              </div>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block pt-2 border-t border-[#1C1C1C]">
+                Down To Earth
               </span>
             </div>
 
-            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-1">
-              <div className="font-heading font-black text-2xl sm:text-3xl text-white">94.6% KNOWN</div>
-              <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed">
-                Of reported <span className="text-[#E6192B] font-bold">rapes</span> in India are committed by someone known to the victim.
-              </p>
-              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider block pt-1">
+            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-2 flex flex-col justify-between sm:col-span-1">
+              <div>
+                <div className="font-heading font-black text-2xl sm:text-3xl text-white">94.6% KNOWN</div>
+                <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed pt-1">
+                  Approximately 94.6% of reported rapes in India are committed by someone known to the victim: family members, friends, neighbours.
+                </p>
+              </div>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block pt-2 border-t border-[#1C1C1C]">
+                National Crime Records Bureau
+              </span>
+            </div>
+
+            <div className="p-4 sm:p-5 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] space-y-2 flex flex-col justify-between sm:col-span-2 lg:col-span-2">
+              <div>
+                <div className="font-heading font-black text-2xl sm:text-3xl text-white">30,000+ ANNUALLY</div>
+                <p className="font-sans text-xs sm:text-sm text-[#D1D5DB] leading-relaxed pt-1">
+                  Rape in India has consistently stayed above 30,000 reported cases annually for over a decade, except during the pandemic drop.
+                </p>
+              </div>
+              <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block pt-2 border-t border-[#1C1C1C]">
                 National Crime Records Bureau
               </span>
             </div>
@@ -134,17 +141,60 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
       part: 'PART 04',
       title: 'STARTING PROJECT S.H.E.',
       subtitle: '29 April 2025 • How We Began',
-      badge: 'OUR START',
+      badge: 'OUR IMPACT',
       render: () => (
-        <div className="space-y-5 text-[#D1D5DB] font-sans text-sm sm:text-base md:text-lg leading-[1.75]">
+        <div className="space-y-5 text-[#D1D5DB] font-sans text-sm sm:text-base md:text-lg leading-[1.8]">
           <p>
-            I decided it was time to address an issue occurring on such an alarming scale. I could not just keep reading about these cases every morning and turn the page as if nothing was wrong.
+            I decided it was time to address an issue that was occurring on such a large scale. I couldn’t just keep reading about these cases in the paper every day and turn the page as if nothing was happening. While some grow up internalising ideas that excuse or minimise violence, others are forced to live constantly aware of their vulnerability to it. Both are products of the same system.
           </p>
-          <div className="p-5 sm:p-6 bg-[#080808] border-l-2 border-[#E6192B] border-y border-r border-[#222222] text-white font-medium text-base sm:text-lg italic leading-relaxed">
-            &ldquo;While some grow up internalising ideas that excuse or minimise <span className="text-[#E6192B] font-bold not-italic">violence</span>, others are forced to live constantly aware of their vulnerability to it. Both are products of the same broken system.&rdquo;
+          <p>
+            I started this organisation with a small team on 29 April 2025, and the impact we’ve made since then has been tremendous. We’re now a team of over 50 people, with 100 volunteers supporting us.
+          </p>
+          <p>
+            We’ve done several major events, such as bake sales, and a unique fundraiser called Battle of the Bands, where 600 people came to support us and watch. We’ve raised over 2 lakhs in funds, and our funds are donated to organisations such as Sayodhya Women’s Help Home, a home for domestic violence survivors, with the rest stored for more such fundraisers. We’re committed to making change on a large scale, clearing up misconceptions surrounding rape and combating rape worldwide.
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: 4,
+      part: 'PART 05',
+      title: 'JOIN THE CHANGE',
+      subtitle: 'How You Can Make An Impact',
+      badge: 'CALL TO ACTION',
+      render: () => (
+        <div className="space-y-6 text-[#D1D5DB] font-sans text-sm sm:text-base md:text-lg leading-[1.8]">
+          <p className="text-white font-bold text-base sm:text-xl">
+            Join us on this journey and be part of this change. All you need to do is:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+            <div className="p-4 sm:p-5 bg-[#080808] border border-[#222222] hover:border-[#E6192B]/50 transition-colors flex items-start gap-3.5">
+              <span className="font-mono text-[#E6192B] font-bold text-sm shrink-0">01.</span>
+              <p className="text-sm sm:text-base text-neutral-200">
+                Share our page within your circle.
+              </p>
+            </div>
+            <div className="p-4 sm:p-5 bg-[#080808] border border-[#222222] hover:border-[#E6192B]/50 transition-colors flex items-start gap-3.5">
+              <span className="font-mono text-[#E6192B] font-bold text-sm shrink-0">02.</span>
+              <p className="text-sm sm:text-base text-neutral-200">
+                Donate to our organisation; the funds we gather go directly to supporting survivors.
+              </p>
+            </div>
+            <div className="p-4 sm:p-5 bg-[#080808] border border-[#222222] hover:border-[#E6192B]/50 transition-colors flex items-start gap-3.5">
+              <span className="font-mono text-[#E6192B] font-bold text-sm shrink-0">03.</span>
+              <p className="text-sm sm:text-base text-neutral-200">
+                Be mindful of the mindsets you fall into or see people having around you, and correct those who have misconceptions about rape.
+              </p>
+            </div>
+            <div className="p-4 sm:p-5 bg-[#080808] border border-[#222222] hover:border-[#E6192B]/50 transition-colors flex items-start gap-3.5">
+              <span className="font-mono text-[#E6192B] font-bold text-sm shrink-0">04.</span>
+              <p className="text-sm sm:text-base text-neutral-200">
+                Support other organisations that have the same goal as ours.
+              </p>
+            </div>
           </div>
-          <p className="text-white font-semibold pt-1">
-            We founded Project S.H.E. on <strong className="text-white font-bold">29 April 2025</strong>. Today, we are an active organisation of <strong className="text-white">over 50 core members</strong> and <strong className="text-white">100+ volunteers</strong>, channeling community energy directly toward survivor care facilities, daycares, and systemic education.
+          <p className="text-white font-bold text-base sm:text-xl pt-2">
+            Together, we can make an impact. Thank you.
           </p>
         </div>
       ),
@@ -207,7 +257,7 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
               </>
             ) : (
               <>
-                <span>Read All Chapters</span>
+                <span>Read Full Essay</span>
                 <HiArrowRight className="w-3.5 h-3.5 transition-transform duration-150 group-hover:translate-x-0.5" />
               </>
             )}
@@ -217,19 +267,15 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
         {/* Founder's Story - Editorial Minimalist Container */}
         <div className="founders-note-card bg-[#090909] border border-[#222222] p-6 sm:p-10 md:p-14 space-y-8 rounded-sm">
           {/* Header Title Area */}
-          <div className="space-y-2 pb-2">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <span className="font-mono text-xs text-[#E6192B] uppercase tracking-widest font-bold">
-                SARVA NIRBHAYA FOUNDATION // ORIGIN ESSAY
-              </span>
-              <span className="font-mono text-xs text-neutral-500 dark:text-[#555555] uppercase tracking-wider">
-                {slides[activeSlide].subtitle}
-              </span>
-            </div>
-
+          <div className="flex items-center justify-between gap-4 flex-wrap pb-2">
             <h2 className="font-heading font-black text-3xl sm:text-5xl md:text-6xl text-[#0A0A0A] dark:text-white uppercase tracking-tight leading-none">
               FOUNDER&apos;S NOTE
             </h2>
+            {!viewAll && (
+              <span className="font-mono text-xs text-neutral-500 dark:text-[#555555] uppercase tracking-wider">
+                {slides[activeSlide].subtitle}
+              </span>
+            )}
           </div>
 
           {/* High-End Editorial Navigation Tabs */}
@@ -283,7 +329,7 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
           <div className="pt-6 border-t border-[#222222] flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono">
             <div className="text-white font-bold tracking-wide uppercase flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-[#E6192B] inline-block" />
-              <span>Sanskriti Mohan — Founder &amp; Lead Director</span>
+              <span>Sanskriti Mohan, the founder of Project S.H.E.</span>
             </div>
 
             {!viewAll && (
@@ -345,7 +391,7 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
               FUNDS MOBILIZED
             </span>
             <span className="font-heading font-bold text-2xl sm:text-3xl lg:text-4xl text-white block truncate">
-              ₹2,00,000+
+              ₹1,00,000+
             </span>
             <span className="text-xs text-[#D1D5DB] mt-1 block">
               Contributed towards survivor care
@@ -409,7 +455,7 @@ export default function MissionPillars({ settings }: { settings?: SiteSettings }
               </h3>
 
               <p className="font-sans text-sm sm:text-[15px] text-[#A3A3A3] leading-[1.75] font-normal">
-                {settings?.pillar_1_desc || 'Whether through enigmatic events like the two editions of Battle of the Bands, or through wholesome bake sales and community fundraisers, Project S.H.E. has remained committed to mobilising community support through both monetary contributions and meaningful presence. Through these events and endeavours, we have raised and contributed more than Rs. 2,00,000 towards survivor care and rehabilitation.'}
+                {settings?.pillar_1_desc || 'Whether through enigmatic events like the two editions of Battle of the Bands, or through wholesome bake sales and community fundraisers, Project S.H.E. has remained committed to mobilising community support through both monetary contributions and meaningful presence. Through these events and endeavours, we have raised and contributed more than Rs. 1,00,000 towards survivor care and rehabilitation.'}
               </p>
             </div>
 

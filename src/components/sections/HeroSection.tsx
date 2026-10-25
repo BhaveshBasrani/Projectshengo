@@ -84,7 +84,7 @@ export default function HeroSection({
           <span>TURNING SOLIDARITY INTO DIGNITY AND TANGIBLE CHANGE</span>
           <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
-          <span>₹2,00,000+ RAISED &amp; DELIVERED TOWARDS SURVIVOR CARE</span>
+          <span>₹1,00,000+ RAISED &amp; DELIVERED TOWARDS SURVIVOR CARE</span>
           <span className="text-[#FDFCF7]/60 px-5 sm:px-7 select-none text-xs font-normal">✦</span>
 
           <span>SARVA NIRBHAYA FOUNDATION • SECTION 8 NGO</span>
