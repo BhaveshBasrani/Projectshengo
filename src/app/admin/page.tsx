@@ -111,7 +111,7 @@ export default function TeamHubPage() {
   const [savingSettings, setSavingSettings] = useState(false);
 
   // Gallery state
-  const [galleryCategoryFilter, setGalleryCategoryFilter] = useState<'ALL' | 'BOTB 2.0' | 'PROJECT SHE 1.0'>('ALL');
+  const [galleryCategoryFilter, setGalleryCategoryFilter] = useState<'ALL' | 'BOTB 2.0'>('ALL');
   const [gallerySearchQuery, setGallerySearchQuery] = useState('');
   const [galleryPage, setGalleryPage] = useState(1);
   const photosPerPage = 36;
@@ -120,7 +120,7 @@ export default function TeamHubPage() {
   const [showAddPhoto, setShowAddPhoto] = useState(false);
   const [newPhotoSrc, setNewPhotoSrc] = useState('');
   const [newPhotoTitle, setNewPhotoTitle] = useState('');
-  const [newPhotoCategory, setNewPhotoCategory] = useState<'BOTB 2.0' | 'PROJECT SHE 1.0'>('BOTB 2.0');
+  const [newPhotoCategory, setNewPhotoCategory] = useState<'BOTB 2.0'>('BOTB 2.0');
   const [isAddingPhoto, setIsAddingPhoto] = useState(false);
 
   // General loading & notice
@@ -2221,7 +2221,7 @@ export default function TeamHubPage() {
                     <select
                       value={newPhotoCategory}
                       onChange={(e) =>
-                        setNewPhotoCategory(e.target.value as 'BOTB 2.0' | 'PROJECT SHE 1.0')
+                        setNewPhotoCategory(e.target.value as 'BOTB 2.0')
                       }
                       className={`w-full px-3 py-2 font-mono text-xs focus:outline-none focus:border-[#E6192B] border ${
                         isLight
@@ -2231,7 +2231,6 @@ export default function TeamHubPage() {
                       style={{ borderRadius: '0px' }}
                     >
                       <option value="BOTB 2.0">BOTB 2.0</option>
-                      <option value="PROJECT SHE 1.0">PROJECT SHE 1.0</option>
                     </select>
                   </div>
                 </div>
@@ -2279,7 +2278,7 @@ export default function TeamHubPage() {
               }`}
             >
               <div className="flex items-center gap-2">
-                {(['ALL', 'BOTB 2.0', 'PROJECT SHE 1.0'] as const).map((cat) => (
+                {(['ALL', 'BOTB 2.0'] as const).map((cat) => (
                   <button
                     key={cat}
                     onClick={() => {

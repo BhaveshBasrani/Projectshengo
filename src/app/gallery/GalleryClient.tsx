@@ -16,7 +16,7 @@ interface GalleryClientProps {
 export default function GalleryClient({ initialItems }: GalleryClientProps) {
   const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [activeCategory, setActiveCategory] = useState<"ALL" | "BOTB 2.0" | "PROJECT SHE 1.0">("ALL");
+  const [activeCategory, setActiveCategory] = useState<string>("BOTB 2.0");
   const [visibleCount, setVisibleCount] = useState<number>(BATCH_SIZE);
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -77,7 +77,7 @@ export default function GalleryClient({ initialItems }: GalleryClientProps) {
     const rawList =
       activeCategory === "ALL"
         ? galleryList
-        : galleryList.filter((item) => item.category === activeCategory);
+        : galleryList.filter((item) => (item.category || "BOTB 2.0") === activeCategory);
 
     const seen = new Set<string>();
     const uniqueList: GalleryItem[] = [];
@@ -185,27 +185,12 @@ export default function GalleryClient({ initialItems }: GalleryClientProps) {
         {/* Category Filter Controls */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border/40 pb-4 mb-6">
           <div className="flex items-center gap-2 mx-auto sm:mx-0">
-            {(["ALL", "BOTB 2.0", "PROJECT SHE 1.0"] as const).map((cat) => {
-              const count =
-                cat === "ALL"
-                  ? galleryList.length
-                  : galleryList.filter((i) => i.category === cat).length;
-              const isActive = activeCategory === cat;
-
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`font-mono text-xs uppercase tracking-wider px-3.5 py-1.5 border transition-all ${
-                    isActive
-                      ? "border-primary bg-primary text-white font-bold"
-                      : "border-border/60 bg-card/60 text-muted-foreground hover:text-foreground hover:border-border"
-                  }`}
-                >
-                  {cat} [{count}]
-                </button>
-              );
-            })}
+            <button
+              onClick={() => setActiveCategory("BOTB 2.0")}
+              className="font-mono text-xs uppercase tracking-wider px-3.5 py-1.5 border border-primary bg-primary text-white font-bold transition-all"
+            >
+              BOTB 2.0 [{galleryList.length}]
+            </button>
           </div>
 
           <div className="font-mono text-xs text-muted-foreground tracking-widest uppercase mx-auto sm:mx-0">

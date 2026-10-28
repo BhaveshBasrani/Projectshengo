@@ -210,7 +210,7 @@ export interface GalleryItem {
   src: string;
   title?: string;
   aspect?: number;
-  category?: 'BOTB 2.0' | 'PROJECT SHE 1.0' | string;
+  category?: 'BOTB 2.0' | string;
   event?: string;
   width?: number;
   height?: number;
